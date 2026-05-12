@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAdminAuth } from '../../shared/admin/adminAuth';
@@ -109,17 +109,20 @@ export default function AdminDashboard() {
     useEffect(() => { dispatch(fetchCategories({ branch: branchId })); }, [dispatch, branchId]);
 
     useEffect(() => {
-        if (view === 'news-list') {
-            const params = { branch: branchId };
-            if (dateFrom) params.date_from = dateFrom;
-            if (dateTo) params.date_to = dateTo;
-            if (catFilter !== 'All') {
-                const cat = categoriesList.find((c) => c.name === catFilter);
-                if (cat) params.category_id = cat.id;
-            }
-            dispatch(fetchNews(params));
+        if (view !== 'news-list') return;
+
+        const params = { branch: branchId };
+
+        if (dateFrom) params.date_from = dateFrom;
+        if (dateTo) params.date_to = dateTo;
+
+        if (catFilter !== 'All') {
+            const cat = categoriesList.find((c) => c.name === catFilter);
+            if (cat) params.category_id = cat.id;
         }
-    }, [dispatch, view, branchId, dateFrom, dateTo, catFilter, categoriesList.length]);
+
+        dispatch(fetchNews(params));
+    }, [dispatch, view, branchId, dateFrom, dateTo, catFilter]);
 
     useEffect(() => {
         if (view === 'pos-list') {
@@ -156,12 +159,20 @@ export default function AdminDashboard() {
 
     const published = newsList.filter((n) => n.published).length;
 
-    const filteredNews = newsList.filter((n) => {
-        const matchSearch = (n.title || '').toLowerCase().includes(search.toLowerCase()) ||
-            (n.description || '').toLowerCase().includes(search.toLowerCase());
-        const matchCat = catFilter === 'All' || n.category?.name === catFilter || n.category === catFilter;
-        return matchSearch && matchCat;
-    });
+    const filteredNews = useMemo(() => {
+        return newsList.filter((n) => {
+            const matchSearch =
+                (n.title || '').toLowerCase().includes(search.toLowerCase()) ||
+                (n.description || '').toLowerCase().includes(search.toLowerCase());
+
+            const matchCat =
+                catFilter === 'All' ||
+                n.category?.name === catFilter ||
+                n.category === catFilter;
+
+            return matchSearch && matchCat;
+        });
+    }, [newsList, search, catFilter]);
 
     const filteredPositions = positions.filter((p) => {
         const matchSearch = (p.title || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -249,6 +260,7 @@ export default function AdminDashboard() {
             )}
         </div>
     );
+    console.log(filteredNews, "newsss")
 
     return (
         <div className="admin-layout">
@@ -276,7 +288,7 @@ export default function AdminDashboard() {
                             onClick={() => { setView('adm-list'); setSearch(''); }}>
                         <UserPlus size={18} /> Qabullar
                     </button>
-                    <Link to="/" className="sidebar-item" target="_blank" rel="noreferrer">
+                    <Link to="/editable/" className="sidebar-item" target="_blank" rel="noopener noreferrer">
                         <Globe size={18} /> Saytni ko'rish
                     </Link>
                 </nav>
@@ -363,11 +375,21 @@ export default function AdminDashboard() {
                                                              input.click();
                                                          }}>
 
-                                                        <img src={item.image} alt={item.title}
-                                                             onError={(e) => {
-                                                                 e.target.src = "/no-image.png";
-                                                             }}
-                                                             style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />
+                                                        <img
+                                                            loading="lazy"
+                                                            src={item.image || PLACEHOLDER}
+                                                            alt={item.title}
+                                                            onError={(e) => {
+                                                                e.currentTarget.onerror = null;
+                                                                e.currentTarget.src = PLACEHOLDER;
+                                                            }}
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover',
+                                                                borderRadius: 8
+                                                            }}
+                                                        />
                                                         <div style={{
                                                             position: 'absolute', inset: 0, borderRadius: 8,
                                                             background: 'rgba(0,0,0,0.35)', display: 'flex',
