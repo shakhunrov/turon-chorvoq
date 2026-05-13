@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../shared/api';
 
-const ENDPOINT = '/public/news/';
+const ENDPOINT = '/webstite-sources/public/news/';
 
 // ── Thunks ────────────────────────────────────────────────────────
 
