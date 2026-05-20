@@ -7,26 +7,46 @@ import api from './axiosInstance';
 
 // Section'larni olish
 export const getPageSections = async (params) => {
-    const response = await api.get('/page-sections/', { params });
+    const response = await api.get('/website-sources/page-sections/', { params });
     return response.data;
 };
 
 // Section yaratish yoki yangilash
-export const savePageSection = async (data) => {
-    // Vsegda используем FormData для совместимости с backend
+export const savePageSection = async (data, isFormData = false) => {
+    // Agar data allaqachon FormData bo'lsa, to'g'ridan-to'g'ri yuboramiz
+    if (isFormData && data instanceof FormData) {
+        const response = await api.post('/website-sources/page-sections/', data, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data;
+    }
+
+    // Aks holda, oddiy object'dan FormData yaratamiz
     const formData = new FormData();
+
+    // Har bir key'ni tekshiramiz
     Object.keys(data).forEach(key => {
-        if (key === 'content' && typeof data[key] === 'string') {
-            // content уже JSON string
-            formData.append(key, data[key]);
-        } else if (key === 'content' && typeof data[key] === 'object') {
-            formData.append(key, JSON.stringify(data[key]));
-        } else {
-            formData.append(key, data[key]);
+        const value = data[key];
+
+        // Agar File obyekti bo'lsa (rasm)
+        if (value instanceof File) {
+            formData.append(key, value);
+        }
+        // Agar content_uz, content_ru, content_en bo'lsa
+        else if (key.startsWith('content_')) {
+            if (typeof value === 'string') {
+                formData.append(key, value);
+            } else if (typeof value === 'object') {
+                formData.append(key, JSON.stringify(value));
+            }
+        }
+        // Agar oddiy qiymat bo'lsa
+        else {
+            formData.append(key, value);
         }
     });
 
-    const response = await api.post('/page-sections/', formData, {
+    const response = await api.post('/website-sources/page-sections/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -34,13 +54,34 @@ export const savePageSection = async (data) => {
 
 // Section o'chirish
 export const deletePageSection = async (id) => {
-    const response = await api.delete(`/page-sections/${id}/`);
+    const response = await api.delete(`/website-sources/page-sections/${id}/`);
     return response.data;
 };
 
 // Bitta section'ni olish
 export const getPageSection = async (id) => {
-    const response = await api.get(`/page-sections/${id}/`);
+    const response = await api.get(`/website-sources/page-sections/${id}/`);
+    return response.data;
+};
+
+// Ko'p rasmlar yuklash
+export const uploadSectionImages = async (sectionId, imageFiles) => {
+    const formData = new FormData();
+
+    // Har bir rasmni qo'shamiz
+    imageFiles.forEach(file => {
+        formData.append('images', file);
+    });
+
+    const response = await api.post(`/website-sources/page-sections/${sectionId}/upload-images/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+};
+
+// Bitta rasmni o'chirish
+export const deleteSectionImage = async (imageId) => {
+    const response = await api.delete(`/website-sources/page-sections/images/${imageId}/`);
     return response.data;
 };
 
@@ -49,4 +90,7 @@ export default {
     savePageSection,
     deletePageSection,
     getPageSection,
+    uploadSectionImages,
+    deleteSectionImage,
 };
+

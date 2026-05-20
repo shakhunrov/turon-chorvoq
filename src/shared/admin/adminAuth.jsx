@@ -11,7 +11,7 @@ let branchId;
 
 if (host.includes('chorvoq')) branchId = 6;
 if (host.includes('sergeli')) branchId = 9;
-if (host.includes("chirchiq")) branchId = 8;
+if (host.includes('chirchiq')) branchId = 8;
 
 localStorage.setItem("globalBranchId", branchId);
 
