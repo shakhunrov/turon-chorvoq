@@ -7,7 +7,7 @@ const AUTH_KEY = 'tis_admin_auth';
 
 const host = window.location.hostname;
 
-let branchId;
+let branchId = 6; // Default for Chorvoq
 
 if (host.includes('chorvoq')) branchId = 6;
 if (host.includes('sergeli')) branchId = 9;

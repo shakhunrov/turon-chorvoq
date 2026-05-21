@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLang } from '../../shared/i18n';
 import { EditableSection, EditableList } from '../../shared/editable';
-import { getPageSections, savePageSection } from '../../shared/api/pageSections';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import {
   fetchPositions,
   selectPositions,
@@ -29,7 +29,7 @@ export default function EditableCareers() {
   const [applyModal, setApplyModal] = useState(null);
   const [applyForm, setApplyForm] = useState({ name: '', email: '', phone: '' });
 
-  const [sections, setSections] = useState({
+  const defaultSections = {
     hero: {
       label: 'Biz bilan ishlang',
       title: c.title,
@@ -54,7 +54,9 @@ export default function EditableCareers() {
       title: c.joinTitle,
       subtitle: c.joinSubtitle,
     },
-  });
+  };
+
+  const { sections, handleSaveSection } = useEditableSections('careers', defaultSections);
 
   useEffect(() => {
     dispatch(fetchPositions({ branch: branchId }));
@@ -70,56 +72,6 @@ export default function EditableCareers() {
       return () => clearTimeout(timer);
     }
   }, [applySuccess, dispatch]);
-
-  // Backend'dan ma'lumotlarni yuklash
-  useEffect(() => {
-    const loadSections = async () => {
-      try {
-        const data = await getPageSections({ branch: branchId, page: 'careers' });
-        if (data && data.length > 0) {
-          const loadedSections = {};
-          data.forEach(section => {
-            try {
-              const contentField = `content_${lang}`;
-              let content = section[contentField];
-
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
-
-              if (content && Object.keys(content).length > 0) {
-                loadedSections[section.section_id] = content;
-              }
-            } catch (e) {
-              console.error(`Section ${section.section_id} parse error:`, e);
-            }
-          });
-          setSections(prev => ({ ...prev, ...loadedSections }));
-        }
-      } catch (error) {
-        console.error('Section ma\'lumotlarini yuklashda xatolik:', error);
-      }
-    };
-    loadSections();
-  }, [branchId, lang]);
-
-  // Section'ni saqlash
-  const handleSaveSection = async (sectionId, data) => {
-    try {
-      const contentField = `content_${lang}`;
-      await savePageSection({
-        branch: branchId,
-        page: 'careers',
-        section_id: sectionId,
-        [contentField]: JSON.stringify(data),
-      });
-      setSections(prev => ({ ...prev, [sectionId]: data }));
-      alert('Section muvaffaqiyatli saqlandi!');
-    } catch (error) {
-      console.error('Section saqlashda xatolik:', error);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
-    }
-  };
 
   const handleApply = (e) => {
     e.preventDefault();

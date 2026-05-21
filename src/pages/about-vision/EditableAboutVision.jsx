@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
-import { getPageSections, savePageSection } from '../../shared/api/pageSections';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import './AboutVision.css';
 
 export default function EditableAboutVision() {
     const { t, lang } = useLang();
     const v = t.about.vision;
-    const branchId = localStorage.getItem('globalBranchId');
 
-    const [sections, setSections] = useState({
+    const defaultSections = {
         hero: {
             label: 'Biz haqimizda',
             title: v.title,
@@ -27,58 +25,9 @@ export default function EditableAboutVision() {
             title: v.outcomesTitle,
             outcomes: v.outcomes,
         },
-    });
-
-    useEffect(() => {
-        const loadSections = async () => {
-            try {
-                const data = await getPageSections({ branch: branchId, page: 'about-vision' });
-                if (data && data.length > 0) {
-                    const loadedSections = {};
-                    data.forEach(section => {
-                        try {
-                            // Получаем контент для текущего языка
-                            const contentField = `content_${lang}`;
-                            let content = section[contentField];
-
-                            // Если content - строка, парсим JSON
-                            if (typeof content === 'string') {
-                                content = JSON.parse(content);
-                            }
-
-                            if (content && Object.keys(content).length > 0) {
-                                loadedSections[section.section_id] = content;
-                            }
-                        } catch (e) {
-                            console.error(`Section ${section.section_id} parse error:`, e);
-                        }
-                    });
-                    setSections(prev => ({ ...prev, ...loadedSections }));
-                }
-            } catch (error) {
-                console.error('Section ma\'lumotlarini yuklashda xatolik:', error);
-            }
-        };
-        loadSections();
-    }, [branchId, lang]);
-
-    const handleSaveSection = async (sectionId, data) => {
-        try {
-            // Отправляем в поле для текущего языка
-            const contentField = `content_${lang}`;
-            await savePageSection({
-                branch: branchId,
-                page: 'about-vision',
-                section_id: sectionId,
-                [contentField]: JSON.stringify(data),
-            });
-            setSections(prev => ({ ...prev, [sectionId]: data }));
-            alert('Section muvaffaqiyatli saqlandi!');
-        } catch (error) {
-            console.error('Section saqlashda xatolik:', error);
-            alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
-        }
     };
+
+    const { sections, handleSaveSection } = useEditableSections('about-vision', defaultSections);
 
     return (
         <div className="page">
