@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../shared/api';
 
 const ENDPOINT = '/website-sources/public/news/';
+const ENDPOINTADMIN = '/website-sources/news/';
 
 // ── Thunks ────────────────────────────────────────────────────────
 
@@ -18,7 +19,7 @@ export const fetchNews = createAsyncThunk(
       if (filters.date_to) params.date_to = filters.date_to;
       if (filters.created_by) params.created_by = filters.created_by;
 
-      const { data } = await api.get(ENDPOINT, { params });
+      const { data } = await api.get(ENDPOINTADMIN, { params });
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to fetch news');
@@ -62,7 +63,7 @@ export const createNews = createAsyncThunk(
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : {};
 
-      const { data } = await api.post(ENDPOINT, body, config);
+      const { data } = await api.post(ENDPOINTADMIN, body, config);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to create news');
@@ -91,7 +92,7 @@ export const updateNews = createAsyncThunk(
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : {};
 
-      const { data } = await api.put(`${ENDPOINT}${id}/`, body, config);
+      const { data } = await api.put(`${ENDPOINTADMIN}${id}/`, body, config);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to update news');
@@ -104,7 +105,7 @@ export const deleteNews = createAsyncThunk(
   'news/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`${ENDPOINT}${id}/`);
+      await api.delete(`${ENDPOINTADMIN}${id}/`);
       return id;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to delete news');

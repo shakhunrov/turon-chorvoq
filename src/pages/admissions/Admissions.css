@@ -1,58 +1,330 @@
-/* Shared */
-.page-hero-simple {
-  padding: 80px 24px 60px;
-  background: linear-gradient(180deg, rgba(0,212,255,0.04) 0%, transparent 100%);
-  border-bottom: 1px solid var(--glass-border);
+/* ════════════════════════════════════════════════════════
+   ADMISSIONS PAGE — Cinematic redesign  (adm-* prefix)
+════════════════════════════════════════════════════════ */
+
+/* ── Cinematic Hero ── */
+.adm-page-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 72px 0 56px;
+  background: linear-gradient(135deg, #080E1C 0%, #0F172A 45%, #1e1b4b 100%);
+  border-bottom: 1px solid rgba(245,158,11,0.12);
 }
 
-/* Admissions */
+.adm-page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245,158,11,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,158,11,0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: adm-mesh 22s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes adm-mesh {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(56px); }
+}
+
+.adm-page-hero::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 440px; height: 440px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,158,11,0.16) 0%, rgba(99,102,241,0.12) 50%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+}
+
+.adm-page-hero .container { position: relative; z-index: 1; }
+.adm-page-hero .section-label {
+  background: rgba(245,158,11,0.12);
+  border-color: rgba(245,158,11,0.30);
+  color: rgba(245,158,11,0.95);
+}
+.adm-page-hero .section-title   { color: #ffffff; }
+.adm-page-hero .section-subtitle { color: rgba(255,255,255,0.65); }
+.adm-page-hero .divider {
+  background: linear-gradient(90deg, #F59E0B 0%, rgba(245,158,11,0.30) 60%, transparent 100%);
+}
+
+/* ── Hero chips ── */
+.adm-hero-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.adm-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.30);
+  border-radius: 100px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(245,158,11,0.95);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-head);
+}
+
+/* ── Admissions layout ── */
 .admissions-center {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 60px;
+  grid-template-columns: 380px 1fr;
+  gap: 64px;
   align-items: start;
 }
 
+/* ── School card ── */
 .school-card {
   overflow: hidden;
-  background: var(--grad-card);
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  box-shadow: 0 8px 48px rgba(15,23,42,0.09);
+  position: sticky;
+  top: 120px;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
 }
-.school-card-img {
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
-  background: linear-gradient(135deg, rgba(0,212,255,0.10), rgba(124,58,237,0.08));
-}
-.school-card-body { padding: 28px; }
-.school-card-name { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; }
-.school-card-infos { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-.school-card-info { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); }
-.info-icon { font-size: 18px; }
 
-/* Steps */
-.admission-steps { }
-.step-item {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px 28px;
-  margin-bottom: 12px;
+.school-card:hover {
+  border-color: rgba(245,158,11,0.25);
+  box-shadow: 0 16px 64px rgba(245,158,11,0.10);
 }
-.step-num {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: var(--grad-cyan);
+
+.school-card-img {
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(145deg, #080E1C 0%, #0F172A 50%, #1c1400 100%);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid #F59E0B;
+}
+
+.school-card-img::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245,158,11,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,158,11,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.school-card-img svg {
+  width: 80px;
+  height: 80px;
+  stroke: rgba(245,158,11,0.75);
+  position: relative;
+  z-index: 2;
+}
+
+/* Gold glow orb */
+.school-card-img::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,158,11,0.20) 0%, transparent 70%);
+  filter: blur(30px);
+}
+
+.school-card-body { padding: 36px; }
+
+.school-card-name {
   font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 16px;
-  color: #000;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #0F172A;
+  margin-bottom: 24px;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+}
+
+.school-card-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.school-card-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #475569;
+  padding: 11px 16px;
+  background: #F8FAFC;
+  border-radius: 10px;
+  border: 1px solid #F1F5F9;
+  transition: all 0.22s ease;
+}
+
+.school-card-info:hover {
+  background: rgba(245,158,11,0.06);
+  color: #0F172A;
+  border-color: rgba(245,158,11,0.20);
+}
+
+.info-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: #94A3B8;
+  transition: stroke 0.22s ease;
+}
+
+.school-card-info:hover .info-icon svg {
+  stroke: #D97706;
+}
+
+/* ── Admission steps (timeline) ── */
+.admission-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Benefits section ── */
+.adm-benefits-section { margin-top: 56px; }
+
+.adm-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.adm-benefit-card:nth-child(4n+1) { --ab-accent: #F59E0B; --ab-bg: rgba(245,158,11,0.08); }
+.adm-benefit-card:nth-child(4n+2) { --ab-accent: #2563EB; --ab-bg: rgba(37,99,235,0.08); }
+.adm-benefit-card:nth-child(4n+3) { --ab-accent: #10B981; --ab-bg: rgba(16,185,129,0.08); }
+.adm-benefit-card:nth-child(4n)   { --ab-accent: #A855F7; --ab-bg: rgba(168,85,247,0.08); }
+
+.adm-benefit-card {
+  padding: 32px 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(15,23,42,0.06);
+  transition: all 0.35s cubic-bezier(0.23,1,0.32,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.adm-benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ab-accent, #F59E0B), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.adm-benefit-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--ab-accent, rgba(245,158,11,0.30));
+  box-shadow: 0 20px 56px rgba(15,23,42,0.10);
+}
+
+.adm-benefit-card:hover::before { transform: scaleX(1); }
+
+.adm-benefit-icon {
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ab-bg, rgba(245,158,11,0.08));
+  border: 1.5px solid transparent;
+  border-radius: 16px;
+  margin-bottom: 4px;
+  transition: all 0.30s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.adm-benefit-card:hover .adm-benefit-icon {
+  transform: scale(1.10) rotate(-5deg);
+  background: var(--ab-accent, #F59E0B);
+}
+
+.adm-benefit-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke: var(--ab-accent, #F59E0B);
+  transition: stroke 0.25s ease;
+}
+
+.adm-benefit-card:hover .adm-benefit-icon svg {
+  stroke: #fff;
+}
+
+.adm-hero-chip svg {
   flex-shrink: 0;
 }
-.step-text { font-size: 15px; color: var(--text-secondary); }
 
-@media (max-width: 900px) { .admissions-center { grid-template-columns: 1fr; } }
+.adm-benefit-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.012em;
+}
+
+.adm-benefit-desc {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.60;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .adm-benefits-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 820px) {
+  .admissions-center { grid-template-columns: 1fr; gap: 40px; }
+  .school-card { position: static; max-width: 480px; margin: 0 auto; width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .adm-page-hero { padding: 52px 0 40px; }
+}
+
+@media (max-width: 600px) {
+  .school-card-body { padding: 24px 20px; }
+  .school-card-img { height: 190px; }
+  .adm-benefits-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .adm-benefit-card { padding: 22px 16px; }
+}
+
+@media (max-width: 480px) {
+  .adm-page-hero { padding: 40px 0 32px; }
+  .admissions-center { gap: 28px; }
+  .adm-hero-chips { gap: 7px; }
+  .adm-hero-chip { font-size: 11.5px; padding: 5px 12px; }
+}
+
+@media (max-width: 360px) {
+  .school-card-name { font-size: 1.22rem; }
+  .adm-benefits-grid { grid-template-columns: 1fr; }
+}

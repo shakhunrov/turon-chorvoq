@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, ImagePlus } from 'lucide-react';
 import './EditableSection.css';
 
 /**
@@ -17,6 +17,44 @@ export default function EditableSection({ sectionId, data, onSave, children, but
     const isEditableMode = location.pathname.startsWith('/editable');
     const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+
+    /* ── Background image ── */
+    const bgInputRef = useRef(null);
+    const [bgPreview, setBgPreview] = useState(
+        typeof data.backgroundImage === 'string' && data.backgroundImage ? data.backgroundImage : null
+    );
+
+    // Sync when data.backgroundImage changes (e.g. API reload)
+    useEffect(() => {
+        if (typeof data.backgroundImage === 'string' && data.backgroundImage) {
+            setBgPreview(data.backgroundImage);
+        }
+    }, [data.backgroundImage]);
+
+    const handleBgSelect = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 3 * 1024 * 1024) {
+            alert('Rasm hajmi 3MB dan oshmasligi kerak');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result;
+            setBgPreview(base64);
+            onSave({ ...data, backgroundImage: base64 });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    };
+
+    const handleRemoveBg = (e) => {
+        e.stopPropagation();
+        setBgPreview(null);
+        const newData = { ...data };
+        delete newData.backgroundImage;
+        onSave(newData);
+    };
 
     const handleEdit = (e) => {
         e.stopPropagation();
@@ -56,19 +94,66 @@ export default function EditableSection({ sectionId, data, onSave, children, but
 
     return (
         <div
-            className={`editable-section ${isFocused ? 'focused' : ''} ${!isFocused && isEditing ? 'blurred' : ''} ${className || ''}`}
+            className={`editable-section ${isFocused ? 'focused' : ''} ${!isFocused && isEditing ? 'blurred' : ''} ${className || ''} ${bgPreview ? 'has-bg-image' : ''}`}
             data-section-id={sectionId}
         >
-            {/* Edit tugmasi - faqat editable rejimda */}
+            {/* Background image layers — visible in both public and edit mode */}
+            {bgPreview && (
+                <>
+                    <div
+                        className="section-bg-layer"
+                        style={{ backgroundImage: `url(${bgPreview})` }}
+                    />
+                    <div className="section-bg-overlay" />
+                </>
+            )}
+
+            {/* Action buttons — faqat editable rejimda */}
             {isEditableMode && (
-                <button
-                    className={`edit-section-btn ${buttonClassName || ''}`}
-                    onClick={handleEdit}
-                    title="Bu section'ni tahrirlash"
-                    style={buttonStyle}
-                >
-                    <Edit2 size={16} />
-                </button>
+                <>
+                    {/* Hidden file input — hero sectionda kerak emas lekin ref uchun qoladi */}
+                    {sectionId !== 'hero' && (
+                        <input
+                            ref={bgInputRef}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleBgSelect}
+                        />
+                    )}
+
+                    {/* Remove background button — hero da ko'rsatma */}
+                    {sectionId !== 'hero' && bgPreview && (
+                        <button
+                            className="bg-remove-btn"
+                            onClick={handleRemoveBg}
+                            title="Background rasmni o'chirish"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
+
+                    {/* Background image upload button — hero da ko'rsatma */}
+                    {sectionId !== 'hero' && (
+                        <button
+                            className="bg-image-btn"
+                            onClick={(e) => { e.stopPropagation(); bgInputRef.current?.click(); }}
+                            title="Section uchun background rasm yuklash"
+                        >
+                            <ImagePlus size={16} />
+                        </button>
+                    )}
+
+                    {/* Edit content button */}
+                    <button
+                        className={`edit-section-btn ${buttonClassName || ''}`}
+                        onClick={handleEdit}
+                        title="Bu section'ni tahrirlash"
+                        style={buttonStyle}
+                    >
+                        <Edit2 size={16} />
+                    </button>
+                </>
             )}
 
             {/* Section content */}
@@ -395,6 +480,9 @@ function EditModal({ sectionId, data, onSave, onClose }) {
     };
 
     const renderField = (key, value) => {
+        // backgroundImage — dedicated bg button handles it, skip in modal
+        if (key === 'backgroundImage') return null;
+
         // Stats секция - все карточки в одном textarea
         if (key === 'students' || key === 'teachers' || key === 'programs' || key === 'universities') {
             // Пропускаем отдельные карточки, они будут обработаны ниже

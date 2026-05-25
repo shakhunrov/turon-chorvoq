@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import { getPageSections } from '../../shared/api/pageSections';
+import {
+  TextSplit,
+  GradientBlob,
+  StaggerGrid,
+  staggerItem,
+  RevealOnScroll,
+  TiltCard,
+  MarqueeRow,
+} from '../../shared/components/kinetic';
 import './Education.css';
 
 export default function Education() {
@@ -9,40 +19,18 @@ export default function Education() {
   const branchId = localStorage.getItem('globalBranchId');
 
   const [sections, setSections] = useState({
-    hero: {
-      label: 'Ta\'lim',
-      title: e.title,
+    hero:       { label: "Ta'lim", title: e.title },
+    truth:      { num: '01', title: e.truthTitle, text: e.truthText },
+    approach:   { title: e.approachTitle, text: e.approachText },
+    skills:     { title: e.skillsTitle, skills: e.skills },
+    classroom:  {
+      title:         e.classroomTitle || "Ko'nikmalar → Sinf amaliyoti",
+      skillLabel:    e.classroomSkillLabel || "Ko'nikma",
+      practiceLabel: e.classroomPracticeLabel || "Sinfda qanday ko'rinadi",
     },
-    truth: {
-      num: '01',
-      title: e.truthTitle,
-      text: e.truthText,
-    },
-    approach: {
-      title: e.approachTitle,
-      text: e.approachText,
-    },
-    skills: {
-      title: e.skillsTitle,
-      skills: e.skills,
-    },
-    classroom: {
-      title: e.classroomTitle || 'Ko\'nikmalar → Sinf amaliyoti',
-      skillLabel: e.classroomSkillLabel || 'Ko\'nikma',
-      practiceLabel: e.classroomPracticeLabel || 'Sinfda qanday ko\'rinadi',
-    },
-    assessment: {
-      title: e.assessTitle,
-      text: e.assessText,
-    },
-    curriculum: {
-      title: e.curriculumTitle,
-      curricula: e.curricula,
-    },
-    closing: {
-      title: e.closingTitle,
-      text: e.closingText,
-    },
+    assessment: { title: e.assessTitle, text: e.assessText },
+    curriculum: { title: e.curriculumTitle, curricula: e.curricula },
+    closing:    { title: e.closingTitle, text: e.closingText },
   });
 
   useEffect(() => {
@@ -55,116 +43,143 @@ export default function Education() {
             try {
               const contentField = `content_${lang}`;
               let content = section[contentField];
-
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
-
-              if (content && Object.keys(content).length > 0) {
+              if (typeof content === 'string') content = JSON.parse(content);
+              if (content && Object.keys(content).length > 0)
                 loadedSections[section.section_id] = content;
-              }
-            } catch (e) {
-              console.error(`Section ${section.section_id} parse error:`, e);
+            } catch (err) {
+              console.error(`Section ${section.section_id} parse error:`, err);
             }
           });
           setSections(prev => ({ ...prev, ...loadedSections }));
         }
       } catch (error) {
-        console.error('Section ma\'lumotlarini yuklashda xatolik:', error);
+        console.error("Section ma'lumotlarini yuklashda xatolik:", error);
       }
     };
     loadSections();
   }, [branchId, lang, e]);
 
+  const curriculumBadges = sections.curriculum.curricula.map((c, i) => (
+    <span key={i} className="curriculum-marquee-badge">{c}</span>
+  ));
+
   return (
-    <div className="page">
-      <div className="page-hero-simple">
-        <div className="container">
-          <span className="section-label">{sections.hero.label}</span>
-          <h1 className="section-title">{sections.hero.title}</h1>
-          <div className="divider" />
+    <div className="page edu-page">
+      {/* ── Hero ── */}
+      <div className="edu-hero">
+        <GradientBlob position="top-right"  color="emerald" size={360} opacity={0.16} />
+        <GradientBlob position="bottom-left" color="blue"   size={260} opacity={0.10} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <motion.span
+            className="section-label"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+          >
+            {sections.hero.label}
+          </motion.span>
+          <TextSplit text={sections.hero.title} as="h1" className="section-title" style={{ marginTop: 12 }} />
+          <motion.div
+            className="divider"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.65, delay: 0.35, ease: [0.23, 1, 0.32, 1] }}
+            style={{ transformOrigin: 'left' }}
+          />
         </div>
       </div>
 
       <section className="section">
         <div className="container">
-          {/* Truth about education */}
-          <div className="edu-truth glass-card">
-            <div className="edu-truth-num">{sections.truth.num}</div>
-            <div>
-              <h2 className="edu-truth-title">{sections.truth.title}</h2>
-              <p className="edu-truth-text">{sections.truth.text}</p>
-            </div>
-          </div>
 
-          {/* Educational Approach */}
-          <div className="edu-approach">
-            <h2 className="section-title">{sections.approach.title}</h2>
-            <div className="divider" />
-            <p className="section-subtitle">{sections.approach.text}</p>
-          </div>
-
-          {/* Future Skills */}
-          <div className="skills-section">
-            <h2 className="section-title">{sections.skills.title}</h2>
-            <div className="divider" />
-            <div className="skills-grid">
-              {sections.skills.skills.map((skill, i) => (
-                <div key={i} className="skill-card glass-card">
-                  <div className="skill-icon">{skill.icon}</div>
-                  <h3 className="skill-title">{skill.title}</h3>
-                  <p className="skill-desc">{skill.desc}</p>
-                  <div className="skill-how">
-                    <span className="skill-how-label">How:</span> {skill.how}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Skills → Classroom table */}
-          <div className="classroom-section">
-            <h2 className="section-title">{sections.classroom.title}</h2>
-            <div className="divider" />
-            <div className="classroom-table glass-card">
-              <div className="classroom-header">
-                <span>{sections.classroom.skillLabel}</span>
-                <span>{sections.classroom.practiceLabel}</span>
+          {/* ── Truth block ── */}
+          <RevealOnScroll variant="scaleUp">
+            <div className="edu-truth glass-card">
+              <div className="edu-truth-num">{sections.truth.num}</div>
+              <div>
+                <h2 className="edu-truth-title">{sections.truth.title}</h2>
+                <p className="edu-truth-text">{sections.truth.text}</p>
               </div>
-              {sections.skills.skills.map((skill) => (
-                <div key={skill.title} className="classroom-row">
-                  <span className="classroom-skill">{skill.title}</span>
-                  <span className="classroom-practice">{skill.how}</span>
-                </div>
-              ))}
             </div>
-          </div>
+          </RevealOnScroll>
 
-          {/* Assessment */}
-          <div className="assess-section glass-card">
-            <h2 className="assess-title">{sections.assessment.title}</h2>
-            <p className="assess-text">{sections.assessment.text}</p>
-          </div>
-
-          {/* Curriculum */}
-          <div className="curriculum-section">
-            <h2 className="section-title">{sections.curriculum.title}</h2>
-            <div className="divider" />
-            <div className="curriculum-grid">
-              {sections.curriculum.curricula.map((c, i) => (
-                <div key={i} className="curriculum-card glass-card">
-                  <span className="curriculum-icon">📋</span>
-                  <span className="curriculum-name">{c}</span>
-                </div>
-              ))}
+          {/* ── Educational Approach ── */}
+          <RevealOnScroll variant="fadeUp" delay={0.05}>
+            <div className="edu-approach">
+              <h2 className="section-title">{sections.approach.title}</h2>
+              <div className="divider" />
+              <p className="section-subtitle">{sections.approach.text}</p>
             </div>
+          </RevealOnScroll>
+
+          {/* ── Future Skills with TiltCard ── */}
+          <div className="skills-section">
+            <RevealOnScroll>
+              <h2 className="section-title">{sections.skills.title}</h2>
+              <div className="divider" />
+            </RevealOnScroll>
+            <StaggerGrid className="skills-grid" stagger={0.07}>
+              {sections.skills.skills.map((skill, i) => (
+                <motion.div key={i} variants={staggerItem}>
+                  <TiltCard className="skill-card glass-card" intensity={7}>
+                    <div className="skill-icon">{skill.icon}</div>
+                    <h3 className="skill-title">{skill.title}</h3>
+                    <p className="skill-desc">{skill.desc}</p>
+                    <div className="skill-how">
+                      <span className="skill-how-label">How:</span> {skill.how}
+                    </div>
+                  </TiltCard>
+                </motion.div>
+              ))}
+            </StaggerGrid>
           </div>
 
-          {/* Closing */}
-          <div className="edu-closing glass-card">
-            <h2 className="edu-closing-title">{sections.closing.title}</h2>
-            <p className="edu-closing-text">{sections.closing.text}</p>
-          </div>
+          {/* ── Skills → Classroom table ── */}
+          <RevealOnScroll variant="fadeUp">
+            <div className="classroom-section">
+              <h2 className="section-title">{sections.classroom.title}</h2>
+              <div className="divider" />
+              <div className="classroom-table glass-card">
+                <div className="classroom-header">
+                  <span>{sections.classroom.skillLabel}</span>
+                  <span>{sections.classroom.practiceLabel}</span>
+                </div>
+                {sections.skills.skills.map((skill) => (
+                  <div key={skill.title} className="classroom-row">
+                    <span className="classroom-skill">{skill.title}</span>
+                    <span className="classroom-practice">{skill.how}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </RevealOnScroll>
+
+          {/* ── Assessment ── */}
+          <RevealOnScroll variant="fadeLeft">
+            <div className="assess-section glass-card">
+              <h2 className="assess-title">{sections.assessment.title}</h2>
+              <p className="assess-text">{sections.assessment.text}</p>
+            </div>
+          </RevealOnScroll>
+
+          {/* ── Curriculum → Marquee ── */}
+          <RevealOnScroll>
+            <div className="curriculum-section">
+              <h2 className="section-title">{sections.curriculum.title}</h2>
+              <div className="divider" style={{ marginBottom: 24 }} />
+            </div>
+          </RevealOnScroll>
+          <MarqueeRow items={curriculumBadges} speed="30s" />
+          <MarqueeRow items={curriculumBadges} speed="25s" reverse className="edu-marquee-row2" />
+
+          {/* ── Closing banner ── */}
+          <RevealOnScroll variant="scaleUp" delay={0.05}>
+            <div className="edu-closing glass-card">
+              <h2 className="edu-closing-title">{sections.closing.title}</h2>
+              <p className="edu-closing-text">{sections.closing.text}</p>
+            </div>
+          </RevealOnScroll>
+
         </div>
       </section>
     </div>

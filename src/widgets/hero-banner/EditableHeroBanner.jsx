@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
+import schoolImg from '../../shared/assets/img/school.png';
 import './HeroBanner.css';
 
 export default function EditableHeroBanner() {
@@ -15,12 +17,14 @@ export default function EditableHeroBanner() {
     text: t.whoWeAre.text,
     cta: t.hero.cta,
     apply: t.hero.apply,
+    image: null,
   });
 
   const [statsData, setStatsData] = useState({
     students: { val: t.stats.studentsVal, label: t.stats.students },
     teachers: { val: t.stats.teachersVal, label: t.stats.teachers },
     universities: { val: t.stats.universitiesVal, label: t.stats.universities },
+    languages: { val: '3', label: 'Languages' },
   });
 
   // Backend'dan ma'lumotlarni yuklash
@@ -34,17 +38,11 @@ export default function EditableHeroBanner() {
             try {
               const contentField = `content_${lang}`;
               let content = heroSection[contentField];
-
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
+              if (typeof content === 'string') content = JSON.parse(content);
 
               if (content && Object.keys(content).length > 0) {
-                // Agar section'da image field alohida bo'lsa, uni qo'shamiz
-                if (heroSection.image) {
-                  content.image = heroSection.image;
-                }
-                setHeroData(prev => ({ ...prev, ...content }));
+                const bgImage = heroSection.image || null;
+                setHeroData(prev => ({ ...prev, ...content, image: bgImage }));
               }
             } catch (e) {
               console.error('Hero section parse error:', e);
@@ -56,20 +54,14 @@ export default function EditableHeroBanner() {
             try {
               const contentField = `content_${lang}`;
               let content = statsSection[contentField];
-
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
+              if (typeof content === 'string') content = JSON.parse(content);
 
               if (content && Object.keys(content).length > 0) {
-                // Agar section'da image field alohida bo'lsa, uni qo'shamiz
-                if (statsSection.image) {
-                  content.image = statsSection.image;
-                }
                 setStatsData(prev => ({
                   students: content.students || prev.students,
                   teachers: content.teachers || prev.teachers,
                   universities: content.universities || prev.universities,
+                  languages: content.languages || prev.languages,
                 }));
               }
             } catch (e) {
@@ -82,7 +74,7 @@ export default function EditableHeroBanner() {
       }
     };
     loadHeroData();
-  }, [branchId, lang]);
+  }, [branchId, lang, t]);
 
   // Hero'ni saqlash
   const handleSaveHero = async (data) => {
@@ -93,24 +85,32 @@ export default function EditableHeroBanner() {
         section_id: 'hero',
       };
 
-      // Agar data ichida File obyekti bo'lsa, uni alohida yuboramiz
       const contentData = {};
-
       Object.keys(data).forEach(key => {
         if (data[key] instanceof File) {
-          // File obyektini to'g'ridan-to'g'ri payload'ga qo'shamiz
           payload[key] = data[key];
-        } else {
+        } else if (key !== 'image') { // image field alohida payload'da ketadi
           contentData[key] = data[key];
         }
       });
 
-      // Content'ni til uchun saqlash
       const contentField = `content_${lang}`;
       payload[contentField] = JSON.stringify(contentData);
 
       await savePageSection(payload);
-      setHeroData(data);
+      
+      // Yangilangan ma'lumotlarni qayta o'qish yoki state'ni yangilash
+      if (data.image instanceof File) {
+        // Preview uchun rasm url'ini yaratish
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setHeroData({ ...data, image: reader.result });
+        };
+        reader.readAsDataURL(data.image);
+      } else {
+        setHeroData(data);
+      }
+      
       alert('Hero muvaffaqiyatli saqlandi!');
     } catch (error) {
       console.error('Hero saqlashda xatolik:', error);
@@ -128,7 +128,6 @@ export default function EditableHeroBanner() {
       };
 
       const contentData = {};
-
       Object.keys(data).forEach(key => {
         if (data[key] instanceof File) {
           payload[key] = data[key];
@@ -149,6 +148,10 @@ export default function EditableHeroBanner() {
     }
   };
 
+  const bgStyle = heroData.image 
+    ? { backgroundImage: `url(${heroData.image})` }
+    : { backgroundImage: `url(${schoolImg})` };
+
   return (
     <EditableSection
       sectionId="hero"
@@ -157,65 +160,58 @@ export default function EditableHeroBanner() {
       buttonStyle={{ top: '80px', right: '20px' }}
     >
       <section className="hero">
-        {/* Animated background orbs */}
-        <div className="hero-orb hero-orb-1" />
-        <div className="hero-orb hero-orb-2" />
-        <div className="hero-orb hero-orb-3" />
-
-        {/* Grid overlay */}
-        <div className="hero-grid" />
-
-        <div className="container hero-content">
-          <div className="hero-badge fade-up">
-            <span className="badge badge-cyan">🎓 {heroData.subtitle}</span>
-          </div>
-
-          <h1 className="hero-title fade-up-d1">
-            {heroData.vision.split(' ').slice(0, 5).join(' ')}{' '}
-            <span className="text-gradient">{heroData.vision.split(' ').slice(5, 9).join(' ')}</span>{' '}
-            {heroData.vision.split(' ').slice(9).join(' ')}
-          </h1>
-
-          <p className="hero-sub fade-up-d2">{heroData.text}</p>
-
-          <div className="hero-actions fade-up-d3">
-            <Link to="/about/vision" className="btn btn-primary">
-              {heroData.cta} →
-            </Link>
-            <Link to="/admissions" className="btn btn-outline">
-              {heroData.apply}
-            </Link>
-          </div>
-
-          {/* Stats row */}
-          <EditableSection
-            sectionId="hero-stats"
-            data={statsData}
-            onSave={handleSaveStats}
-            buttonStyle={{ bottom: '20px', right: '20px' }}
-          >
-            <div className="hero-stats fade-up-d3">
-              <div className="hero-stat">
-                <div className="hero-stat-val">{statsData.students.val}</div>
-                <div className="hero-stat-label">{statsData.students.label}</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-val">{statsData.teachers.val}</div>
-                <div className="hero-stat-label">{statsData.teachers.label}</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-val">{statsData.universities.val}</div>
-                <div className="hero-stat-label">{statsData.universities.label}</div>
-              </div>
-              <div className="hero-stat">
-                <div className="hero-stat-val">3</div>
-                <div className="hero-stat-label">Languages</div>
-              </div>
-            </div>
-          </EditableSection>
+        <div className="hero-bg-container" style={bgStyle}>
+          <div className="hero-overlay" />
         </div>
 
-        {/* Scroll indicator */}
+        <div className="container hero-container">
+          <div className="hero-content">
+            <div className="hero-badge fade-up">
+              <span className="badge badge-primary">
+                <Sparkles size={14} className="badge-icon" /> {heroData.subtitle}
+              </span>
+            </div>
+
+            <h1 className="hero-title fade-up-d1">
+              {heroData.vision.split(' ').slice(0, 5).join(' ')}{' '}
+              <span className="text-gradient-vibrant">{heroData.vision.split(' ').slice(5, 9).join(' ')}</span>{' '}
+              {heroData.vision.split(' ').slice(9).join(' ')}
+            </h1>
+
+            <p className="hero-sub fade-up-d2">{heroData.text}</p>
+
+            <div className="hero-actions fade-up-d3">
+              <div className="btn btn-primary">
+                {heroData.cta} <ArrowRight size={18} />
+              </div>
+              <div className="btn btn-outline">
+                {heroData.apply}
+              </div>
+            </div>
+
+            <EditableSection
+              sectionId="hero-stats"
+              data={statsData}
+              onSave={handleSaveStats}
+              buttonStyle={{ bottom: '20px', right: '20px' }}
+            >
+              <div className="hero-stats fade-up-d3">
+                {[
+                  statsData.students,
+                  statsData.teachers,
+                  statsData.universities,
+                  statsData.languages,
+                ].map((s, idx) => (
+                  <div key={idx} className="hero-stat">
+                    <div className="hero-stat-val">{s.val}</div>
+                    <div className="hero-stat-label">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </EditableSection>
+          </div>
+        </div>
+
         <div className="hero-scroll">
           <div className="scroll-dot" />
         </div>
@@ -223,3 +219,4 @@ export default function EditableHeroBanner() {
     </EditableSection>
   );
 }
+

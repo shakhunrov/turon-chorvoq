@@ -11,7 +11,7 @@ import {
 import { X } from 'lucide-react';
 import './AdmissionModal.css';
 
-const GRADES = ['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11'];
+const GRADES = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11'];
 
 export default function AdmissionModal({ onClose }) {
   const { t } = useLang();
@@ -48,12 +48,18 @@ export default function AdmissionModal({ onClose }) {
         </div>
         {submitSuccess ? (
           <div className="modal-success">
-            <div className="success-icon">✅</div>
-            <p>{m.success}</p>
+            <div className="success-icon-wrap">
+              <span className="success-icon">✅</span>
+            </div>
+            <div>
+              <strong>Muvaffaqiyatli!</strong>
+              <p>{m.success}</p>
+            </div>
           </div>
         ) : (
           <form className="modal-form" onSubmit={handleSubmit}>
             <div className="form-group">
+              <label className="form-label">{m.namePlaceholder}</label>
               <input
                 className="form-input"
                 placeholder={m.namePlaceholder}
@@ -63,9 +69,10 @@ export default function AdmissionModal({ onClose }) {
               />
             </div>
             <div className="form-group">
+              <label className="form-label">{m.phonePlaceholder}</label>
               <input
                 className="form-input"
-                placeholder={m.phonePlaceholder}
+                placeholder="+998 __ ___ __ __"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 required
@@ -73,6 +80,7 @@ export default function AdmissionModal({ onClose }) {
               />
             </div>
             <div className="form-group">
+              <label className="form-label">{m.gradePlaceholder}</label>
               <select
                 className="form-input"
                 value={form.grade}
@@ -84,11 +92,11 @@ export default function AdmissionModal({ onClose }) {
               </select>
             </div>
             {error && (
-              <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>
+              <div className="modal-error">
                 {typeof error === 'string' ? error : "Xatolik yuz berdi. Qaytadan urinib ko'ring."}
               </div>
             )}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8, justifyContent: 'center' }} disabled={loading}>
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Yuborilmoqda…' : m.submit}
             </button>
           </form>

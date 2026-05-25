@@ -1,22 +1,191 @@
+/* Page-specific hero accent — deep navy → slate (professional, neutral) */
 .page-hero-simple {
-  padding: 80px 24px 60px;
-  background: linear-gradient(180deg, rgba(0,212,255,0.04) 0%, transparent 100%);
-  border-bottom: 1px solid var(--glass-border);
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 55%, #475569 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.policies-content { display: flex; flex-direction: column; gap: 32px; }
+.policies-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Color-coded policy blocks */
+.policy-block:nth-child(4n+1) { --pb-accent: var(--blue); --pb-muted: var(--blue-muted); --pb-border: var(--blue-border); }
+.policy-block:nth-child(4n+2) { --pb-accent: #10B981; --pb-muted: rgba(16,185,129,0.08); --pb-border: rgba(16,185,129,0.20); }
+.policy-block:nth-child(4n+3) { --pb-accent: #A855F7; --pb-muted: rgba(168,85,247,0.08); --pb-border: rgba(168,85,247,0.20); }
+.policy-block:nth-child(4n)   { --pb-accent: var(--gold-dark); --pb-muted: var(--gold-muted); --pb-border: var(--gold-border); }
+
 .policy-block {
   display: flex;
-  gap: 28px;
-  padding: 40px;
+  gap: 22px;
+  padding: 28px 32px;
   align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--navy-border);
+  border-left: 4px solid var(--pb-accent, var(--blue));
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  transition: all 0.30s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
 }
-.policy-icon {
-  font-size: 2.5rem;
-  flex-shrink: 0;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-}
-.policy-title { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
-.policy-text { font-size: 15px; color: var(--text-secondary); line-height: 1.75; }
 
-@media (max-width: 600px) { .policy-block { flex-direction: column; gap: 16px; padding: 28px; } }
+.policy-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pb-muted, var(--blue-muted));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.policy-block:hover {
+  border-color: var(--pb-border, var(--blue-border));
+  box-shadow: 0 10px 36px rgba(37, 99, 235, 0.11);
+  transform: translateY(-3px) translateX(4px);
+}
+
+.policy-block:hover::before {
+  opacity: 1;
+}
+
+.policy-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pb-muted, var(--blue-muted));
+  border: 1px solid var(--pb-border, var(--blue-border));
+  border-radius: var(--radius-sm);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  transition: all 0.30s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.policy-block:hover .policy-icon {
+  transform: scale(1.10) rotate(-5deg);
+  background: var(--pb-accent, var(--blue));
+  border-color: transparent;
+}
+
+.policy-card {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.policy-title {
+  font-family: var(--font-head);
+  font-size: 1.28rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 14px;
+  letter-spacing: -0.022em;
+}
+
+.policy-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.80;
+}
+
+@media (max-width: 768px) {
+  .policy-block { padding: 22px 24px; gap: 18px; }
+  .policy-title { font-size: 1.1rem; }
+  .policy-text { font-size: 14px; }
+}
+
+@media (max-width: 600px) {
+  .policy-block { flex-direction: column; gap: 12px; padding: 18px 16px; }
+  .policy-icon { width: 48px; height: 48px; font-size: 1.8rem; }
+  .policies-content { gap: 14px; }
+}
+
+@media (max-width: 480px) {
+  .policy-block { padding: 16px 14px; }
+  .policy-title { font-size: 1rem; }
+  .policy-icon { width: 42px; height: 42px; font-size: 1.6rem; }
+}
+
+/* ── Hero chip ── */
+.policy-hero-chip {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.20);
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.80);
+  font-family: var(--font-head);
+  letter-spacing: 0.04em;
+}
+
+/* ── Accordion ── */
+.policy-accordion {
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.policy-accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 28px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.20s ease;
+}
+
+.policy-accordion-header:hover {
+  background: var(--blue-pale);
+}
+
+.policy-accordion.open .policy-accordion-header {
+  border-bottom: 1px solid var(--navy-border);
+}
+
+.policy-chevron {
+  margin-left: auto;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.policy-accordion.open .policy-chevron {
+  color: var(--blue);
+}
+
+.policy-accordion .policy-title {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.policy-accordion-body {
+  overflow: hidden;
+  padding: 0 28px;
+}
+
+.policy-accordion-body .policy-text {
+  padding: 20px 0 24px;
+}
+
+@media (max-width: 600px) {
+  .policy-accordion-header { padding: 18px 16px; gap: 12px; }
+  .policy-accordion-body { padding: 0 16px; }
+}
+
+@media (max-width: 360px) {
+  .policy-text { font-size: 13.5px; }
+}

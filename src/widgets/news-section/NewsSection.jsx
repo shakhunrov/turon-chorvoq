@@ -1,9 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Newspaper, Calendar, ArrowRight } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { getPageSections } from '../../shared/api/pageSections';
 import { fetchNews, selectNewsList } from '../../features/news';
+import {
+  useAnimateOnScroll,
+  fadeUp,
+  staggerContainer,
+  staggerChild,
+} from '../../shared/hooks/useScrollAnimation';
 import './NewsSection.css';
 
 export default function NewsSection() {
@@ -57,36 +65,65 @@ export default function NewsSection() {
     dispatch(fetchNews({ branch: branchId }));
   }, [dispatch, branchId]);
 
-  // Faqat eng so'nggi 3ta yangilikni olish
   const latestNews = newsList.slice(0, 3);
+
+  const header = useAnimateOnScroll(0.15);
+  const grid = useAnimateOnScroll(0.10);
+  const cta = useAnimateOnScroll(0.20);
 
   return (
     <section className="news-section section">
       <div className="container">
-        <div className="section-header">
-          <span className="section-label">{section.label}</span>
-          <h2 className="section-title">{section.title}</h2>
-          <div className="divider" />
-        </div>
+        <motion.div
+          className="section-header"
+          ref={header.ref}
+          variants={staggerContainer(0.12)}
+          initial="hidden"
+          animate={header.animate}
+        >
+          <motion.span className="section-label" variants={fadeUp}>{section.label}</motion.span>
+          <motion.h2 className="section-title" variants={fadeUp}>{section.title}</motion.h2>
+          <motion.div className="divider" variants={fadeUp} />
+        </motion.div>
 
-        <div className="news-grid">
+        <motion.div
+          className="news-grid"
+          ref={grid.ref}
+          variants={staggerContainer(0.12, 0.05)}
+          initial="hidden"
+          animate={grid.animate}
+        >
           {latestNews.map((item, i) => (
-            <article key={i} className="news-card glass-card">
-              <div className="news-img-placeholder" style={{ background: `var(--grad-${['cyan','gold','purple'][i % 3]})`, opacity: 0.15 }} />
+            <motion.article key={i} className="news-card glass-card" variants={staggerChild}>
+              <div className="news-img-placeholder" style={{ background: `var(--vibrant-grad)`, opacity: 0.9 }}>
+                  { !item?.image ? <Newspaper size={48} className="news-placeholder-icon" /> :
+                  <img src={`${item?.image}`} alt=""/>
+                }              </div>
               <div className="news-body">
-                <time className="news-date">{item.date}</time>
+                <time className="news-date">
+                  <Calendar size={12} style={{ marginRight: 6 }} /> {item.date}
+                </time>
                 <h3 className="news-title">{item.title}</h3>
                 <p className="news-desc">{item.desc}</p>
-                <Link to={`${basePrefix}/news`} className="news-read-more">{t.news.readMore} →</Link>
+                <Link to={`${basePrefix}/news`} className="news-read-more">
+                  {t.news.readMore} <ArrowRight size={14} />
+                </Link>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <Link to={`${basePrefix}/news`} className="btn btn-outline">Barcha yangiliklar</Link>
-        </div>
+        <motion.div
+          ref={cta.ref}
+          style={{ textAlign: 'center', marginTop: 40 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={cta.animate === 'visible' ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.55, ease: [0.23, 1, 0.32, 1] }}
+        >
+          <Link to={`${basePrefix}/news`} className="btn btn-outline">{t.news.allNews || 'Barcha yangiliklar'}</Link>
+        </motion.div>
       </div>
     </section>
   );
 }
+

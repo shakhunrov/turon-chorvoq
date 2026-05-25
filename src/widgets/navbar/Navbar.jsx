@@ -70,7 +70,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link to={basePrefix + "/"} className="navbar-logo">
           <div className="logo-icon">
-              <img  width={70} src={logo} alt=""/>
+            <img width={70} src={logo} alt="" />
           </div>
           <div className="logo-text">
             <span className="logo-name">TURON</span>
@@ -91,7 +91,7 @@ export default function Navbar() {
                   onClick={() => setDropdown(dropdown === link.href ? null : link.href)}
                 >
                   {link.label}
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{marginLeft:4}}><path d="M2 4l4 4 4-4"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style={{ marginLeft: 4 }}><path d="M2 4l4 4 4-4" /></svg>
                 </button>
               ) : (
                 <Link

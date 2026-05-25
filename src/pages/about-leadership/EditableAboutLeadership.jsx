@@ -7,7 +7,7 @@ import directorImg from '../../shared/assets/img/director.png';
 import './AboutLeadership.css';
 
 export default function EditableAboutLeadership() {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   const l = t.about.leadership;
   const branchId = localStorage.getItem('globalBranchId');
   const [uploading, setUploading] = useState(false);
@@ -35,145 +35,206 @@ export default function EditableAboutLeadership() {
     },
   });
 
-  // Board member saqlashda rasmni alohida yuklash
+  /* ── Board member image upload ── */
   const handleSaveBoardMembers = async (newMembers) => {
     try {
       setUploading(true);
-
-      // Har bir member'ni tekshiramiz va File bo'lsa yuklaymiz
       const processedMembers = await Promise.all(
         newMembers.map(async (member) => {
           if (member.avatar instanceof File) {
-            // Rasmni yuklash
             const formData = new FormData();
             formData.append('branch', branchId);
             formData.append('page', 'about-leadership');
             formData.append('section_id', 'board');
             formData.append('image', member.avatar);
-
             try {
               const response = await savePageSection(formData, true);
-              // Backend'dan URL olish
               const imageUrl = response.image || response.url || response.file;
               return { ...member, avatar: imageUrl };
             } catch (error) {
               console.error('Rasm yuklashda xatolik:', error);
-              return { ...member, avatar: '👤' }; // Default avatar
+              return { ...member, avatar: '👤' };
             }
           }
           return member;
         })
       );
-
-      // Barcha rasmlar yuklangandan keyin saqlash
       await handleSaveSection('board', { ...sections.board, members: processedMembers });
-      setUploading(false);
     } catch (error) {
       console.error('Board members saqlashda xatolik:', error);
+      alert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+    } finally {
       setUploading(false);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     }
   };
 
-    console.log(sections, 'seksiya')
+  const directorPhoto =
+    typeof sections.director.image === 'string' && sections.director.image
+      ? sections.director.image
+      : directorImg;
+
   return (
-    <div className="page">
+    <div className="page ls-page">
+
+      {/* ════════════════════════════════════════
+          CINEMATIC HERO  (director photo + title)
+      ════════════════════════════════════════ */}
       <EditableSection
         sectionId="hero"
         data={sections.hero}
         onSave={(data) => handleSaveSection('hero', data)}
       >
-        <div className="page-hero-simple">
+        <div className="ls-hero">
+          <div className="ls-hero-mesh" />
+          <div className="ls-orb ls-orb-1" />
+          <div className="ls-orb ls-orb-2" />
+
+          <div className="container ls-hero-inner">
+            {/* Left: director photo with gold rings */}
+            <div className="ls-hero-photo-col">
+              <div className="ls-director-frame">
+                <div className="ls-ring ls-ring-1" />
+                <div className="ls-ring ls-ring-2" />
+                <div className="ls-ring ls-ring-3" />
+                <img
+                  src={directorPhoto}
+                  alt={sections.director.name}
+                  className="ls-director-photo"
+                />
+              </div>
+              <div className="ls-hero-role-badge">
+                <span className="ls-role-dot" />
+                {sections.director.title}
+              </div>
+            </div>
+
+            {/* Right: name + subtitle */}
+            <div className="ls-hero-text-col">
+              <span className="ls-eyebrow">{sections.hero.label}</span>
+              <h1 className="ls-hero-name">{sections.director.name}</h1>
+              <div className="ls-hero-title-line" />
+              <p className="ls-hero-subtitle">{sections.hero.title}</p>
+            </div>
+          </div>
+
+          <div className="ls-scroll-hint">↓</div>
+        </div>
+      </EditableSection>
+
+      {/* ════════════════════════════════════════
+          DIRECTOR QUOTE
+      ════════════════════════════════════════ */}
+      <EditableSection
+        sectionId="director"
+        data={sections.director}
+        onSave={(data) => handleSaveSection('director', data)}
+      >
+        <div className="ls-quote-section">
           <div className="container">
-            <span className="section-label">{sections.hero.label}</span>
-            <h1 className="section-title">{sections.hero.title}</h1>
-            <div className="divider" />
+            <div className="ls-quote-card">
+              <div className="ls-giant-quote">"</div>
+              <div className="ls-quote-inner">
+                <p className="ls-quote-text">{sections.director.message}</p>
+                <div className="ls-quote-sig">
+                  <div className="ls-sig-line" />
+                  <div>
+                    <div className="ls-sig-name">{sections.director.name}</div>
+                    <div className="ls-sig-role">{sections.director.title}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="ls-quote-bottom-strip" />
+            </div>
           </div>
         </div>
       </EditableSection>
 
-      <section className="section">
-        <div className="container">
-          {/* Director */}
-          <EditableSection
-            sectionId="director"
-            data={sections.director}
-            onSave={(data) => handleSaveSection('director', data)}
-          >
-            <div className="director-section">
-              <div className="director-avatar-area">
-                <div className="director-avatar">
-                  <img
-                    src={typeof sections.director.image === 'string' ? sections.director.image : directorImg}
-                    alt={sections.director.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
-                  />
-                </div>
-                <div className="director-badge">
-                  <span className="badge badge-cyan">{sections.director.title}</span>
-                </div>
-                <h2 className="director-name">{sections.director.name}</h2>
+      {/* ════════════════════════════════════════
+          ADVISORY BOARD
+      ════════════════════════════════════════ */}
+      <EditableSection
+        sectionId="board"
+        data={sections.board}
+        onSave={(data) => handleSaveSection('board', data)}
+      >
+        {/* Board intro */}
+        <section className="ls-board-intro-section">
+          <div className="container">
+            <div className="ls-board-intro">
+              <div className="ls-board-intro-left">
+                <span className="ls-section-eyebrow">Bizning Jamoamiz</span>
+                <h2 className="ls-board-title">{sections.board.title}</h2>
               </div>
-              <div className="director-message glass-card">
-                <div className="quote-mark">"</div>
-                <p className="director-text">{sections.director.message}</p>
-                <div className="director-sig">— {sections.director.name}</div>
-              </div>
+              <p className="ls-board-desc-text">{sections.board.desc}</p>
             </div>
-          </EditableSection>
+          </div>
+        </section>
 
-          {/* Advisory Board */}
-          <EditableSection
-            sectionId="board"
-            data={sections.board}
-            onSave={(data) => handleSaveSection('board', data)}
-          >
-            <div className="board-section">
-              <h2 className="section-title">{sections.board.title}</h2>
-              <div className="divider" />
-              <div className="board-desc glass-card">
-                <p>{sections.board.desc}</p>
-              </div>
-
-              <div className="board-members">
-                <EditableList
-                  items={sections.board.members}
-                  onSave={handleSaveBoardMembers}
-                  renderItem={(member) => (
-                    <div className="board-card glass-card">
-                      <div className="board-avatar">
-                        {typeof member.avatar === 'string' && member.avatar.startsWith('http') ? (
-                            <img
-                                src={member.avatar}
-                                alt={member.name}
-                                style={{
-                                    width: '50%',
-                                    aspectRatio: '1 / 1',
-                                    objectFit: 'cover',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        ) : (
-                          <div className="board-avatar">{typeof member.avatar === 'string' ? member.avatar : '👤'}</div>
-                        )}
+        {/* Board member cards */}
+        <section className="ls-teachers-section">
+          <div className="container">
+            <div className="ls-board-members">
+              <EditableList
+                items={sections.board.members}
+                onSave={handleSaveBoardMembers}
+                renderItem={(member, i) => (
+                  <div className="ls-board-card">
+                    <div className="ls-board-photo">
+                      {typeof member.avatar === 'string' &&
+                      (member.avatar.startsWith('http') || member.avatar.startsWith('/')) ? (
+                        <>
+                          <img src={member.avatar} alt={member.name} />
+                          <div className="ls-board-photo-overlay" />
+                        </>
+                      ) : (
+                        <div className="ls-board-emoji-wrap">
+                          <div className="ls-board-emoji-icon">
+                            {typeof member.avatar === 'string' ? member.avatar : '👤'}
+                          </div>
+                        </div>
+                      )}
+                      <div className="ls-board-index-badge">
+                        {String(i + 1).padStart(2, '0')}
                       </div>
-                      <div className="board-name">{member.name}</div>
-                      <div className="board-role">{member.role}</div>
                     </div>
-                  )}
-                  defaultItem={{ name: '', role: 'Academic Advisor', avatar: '👤' }}
-                  itemName="Kengash a'zosi"
-                />
-                {uploading && (
-                  <div style={{ textAlign: 'center', padding: 20, color: 'var(--text-secondary)' }}>
-                    Rasmlar yuklanmoqda...
+                    <div className="ls-board-info">
+                      <div className="ls-board-name">{member.name}</div>
+                      <div className="ls-board-role">{member.role}</div>
+                    </div>
                   </div>
                 )}
-              </div>
+                defaultItem={{ name: '', role: 'Academic Advisor', avatar: '👤' }}
+                itemName="Kengash a'zosi"
+              />
+              {uploading && (
+                <div style={{ textAlign: 'center', padding: 20, color: 'var(--text-secondary)' }}>
+                  Rasmlar yuklanmoqda...
+                </div>
+              )}
             </div>
-          </EditableSection>
+          </div>
+        </section>
+      </EditableSection>
+
+      {/* ════════════════════════════════════════
+          BOTTOM CTA
+      ════════════════════════════════════════ */}
+      <section className="section">
+        <div className="container">
+          <div className="ls-cta-banner">
+            <div className="ls-cta-mesh" />
+            <div className="ls-cta-orb" />
+            <div className="ls-cta-inner">
+              <h2 className="ls-cta-title">Jamoamiz bilan bog'laning</h2>
+              <p className="ls-cta-sub">Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.</p>
+              <a href="/contact" className="btn btn-primary ls-cta-btn">
+                Bog'lanish →
+              </a>
+            </div>
+          </div>
         </div>
       </section>
+
     </div>
   );
 }

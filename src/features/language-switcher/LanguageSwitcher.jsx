@@ -22,6 +22,7 @@ export default function LanguageSwitcher() {
           title={name}
         >
           <img src={flag} alt={name} className="flag-img" />
+          {/*<span className="lang-code">{code.toUpperCase()}</span>*/}
         </button>
       ))}
     </div>

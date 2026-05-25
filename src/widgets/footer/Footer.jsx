@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
 import { MessageCircle, ExternalLink, Play, MapPin, Mail, Phone } from 'lucide-react';
+import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
 import './Footer.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
 
@@ -9,9 +11,10 @@ export default function Footer() {
   const { t } = useLang();
   const location = useLocation();
 
-  // Editable rejimda ekanligini aniqlash
   const isEditableMode = location.pathname.startsWith('/editable');
   const basePrefix = isEditableMode ? '/editable' : '';
+
+  const inner = useAnimateOnScroll(0.08);
 
   const quickLinks = [
     { label: t.nav.home, href: basePrefix + '/' },
@@ -27,11 +30,17 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-glow" />
-      <div className="container footer-inner">
+      <motion.div
+        className="container footer-inner"
+        ref={inner.ref}
+        variants={staggerContainer(0.14, 0.05)}
+        initial="hidden"
+        animate={inner.animate}
+      >
         {/* Brand */}
-        <div className="footer-brand">
+        <motion.div className="footer-brand" variants={fadeUp}>
           <div className="footer-logo">
-              <img width={70} src={logo} alt=""/>
+            <img width={70} src={logo} alt="" />
             <div>
               <div className="footer-logo-name">TURON</div>
               <div className="footer-logo-sub">International School · Chorvoq</div>
@@ -54,10 +63,10 @@ export default function Footer() {
             <a href="#" className="social-btn" aria-label="Telegram"><ExternalLink size={18} /></a>
             <a href="#" className="social-btn" aria-label="YouTube"><Play size={18} /></a>
           </div>
-        </div>
+        </motion.div>
 
         {/* Quick Links */}
-        <div className="footer-col">
+        <motion.div className="footer-col" variants={fadeUp}>
           <h4 className="footer-col-title">{t.footer.links}</h4>
           <ul className="footer-links-list">
             {quickLinks.map((l) => (
@@ -66,10 +75,10 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
 
         {/* Accreditations & Lang */}
-        <div className="footer-col">
+        <motion.div className="footer-col" variants={fadeUp}>
           <h4 className="footer-col-title">{t.footer.accreditation}</h4>
           <div className="accreditation-badges">
             <div className="accred-badge">
@@ -88,8 +97,8 @@ export default function Footer() {
           <div style={{ marginTop: 24 }}>
             <LanguageSwitcher />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Bottom bar */}
       <div className="footer-bottom">

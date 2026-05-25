@@ -27,6 +27,7 @@ import Contact from '../pages/contact/Contact';
 import Policies from '../pages/policies/Policies';
 import AdminLogin from '../pages/admin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import { useSmoothScroll } from '../shared/hooks/useSmoothScroll';
 import '../app/globals.css';
 import '../pages/admin/AdminDashboard.css';
 
@@ -49,6 +50,8 @@ function PublicLayout({ children }) {
 }
 
 export default function App() {
+  useSmoothScroll();
+
   return (
     <LangProvider>
       <AdminAuthProvider>
@@ -92,14 +95,14 @@ export default function App() {
               <PublicLayout>
                 <Routes>
 
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<EditableHome />} />
                   <Route path="/about" element={<Navigate to="/about/vision" replace />} />
-                  <Route path="/about/campus" element={<AboutCampus />} />
-                  <Route path="/about/vision" element={<AboutVision />} />
-                  <Route path="/about/leadership" element={<AboutLeadership />} />
+                  <Route path="/about/campus" element={<EditableAboutCampus />} />
+                  <Route path="/about/vision" element={<EditableAboutVision />} />
+                  <Route path="/about/leadership" element={<EditableAboutLeadership />} />
                   <Route path="/about/why-tis" element={<AboutWhyTis />} />
-                  <Route path="/education" element={<Education />} />
-                  <Route path="/partnerships" element={<Partnerships />} />
+                  <Route path="/education" element={<EditableEducation />} />
+                  <Route path="/partnerships" element={<EditablePartnerships />} />
                   <Route path="/careers" element={<EditableCareers />} />
                   <Route path="/news" element={<News />} />
                   <Route path="/admissions" element={<Admissions />} />

@@ -1,0 +1,108 @@
+.timeline-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tl-step {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* ── Rail (dot + connector) ── */
+.tl-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 52px;
+}
+
+.tl-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.28);
+  position: relative;
+  z-index: 1;
+}
+
+.tl-dot-num {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.tl-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 32px;
+  background: linear-gradient(to bottom, rgba(37,99,235,0.35), rgba(37,99,235,0.08));
+  border-radius: 2px;
+  margin: 4px 0;
+}
+
+/* ── Body ── */
+.tl-body {
+  padding-bottom: 32px;
+  flex: 1;
+  padding-top: 8px;
+}
+
+.tl-step:last-child .tl-body {
+  padding-bottom: 0;
+}
+
+.tl-icon {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  display: flex;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(245,158,11,0.08);
+  border: 1.5px solid rgba(245,158,11,0.20);
+  border-radius: 10px;
+  justify-content: center;
+}
+
+.tl-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #F59E0B;
+  flex-shrink: 0;
+}
+
+.tl-title {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.tl-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.72;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .tl-rail { width: 40px; }
+  .tl-dot  { width: 36px; height: 36px; }
+  .tl-dot-num { font-size: 10px; }
+  .tl-body { padding-bottom: 24px; }
+  .tl-title { font-size: 0.95rem; }
+  .tl-text  { font-size: 0.88rem; }
+}
