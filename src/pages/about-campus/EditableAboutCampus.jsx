@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { getPageSections, uploadSectionImages, deleteSectionImage } from '../../shared/api/pageSections';
+import { selectIsAuth } from '../../features/auth';
 import { Upload, Trash2 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import './AboutCampus.css';
 
 const TABS = ['education', 'houses', 'sports'];
@@ -32,8 +33,7 @@ const tabData = (t) => [
 
 export default function EditableAboutCampus() {
   const { t } = useLang();
-  const location = useLocation();
-  const isEditableMode = location.pathname.startsWith('/editable');
+  const isEditableMode = useSelector(selectIsAuth);
   const branchId = localStorage.getItem('globalBranchId');
   const [activeTab, setActiveTab] = useState('education');
   const tabs = tabData(t);

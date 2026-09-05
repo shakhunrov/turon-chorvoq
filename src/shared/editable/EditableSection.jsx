@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Edit2, Save, X, ImagePlus } from 'lucide-react';
+import { selectIsAuth } from '../../features/auth';
 import './EditableSection.css';
 
 /**
@@ -13,8 +14,7 @@ import './EditableSection.css';
  * @param {ReactNode} children - section content
  */
 export default function EditableSection({ sectionId, data, onSave, children, buttonStyle, className, buttonClassName }) {
-    const location = useLocation();
-    const isEditableMode = location.pathname.startsWith('/editable');
+    const isEditableMode = useSelector(selectIsAuth);
     const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 

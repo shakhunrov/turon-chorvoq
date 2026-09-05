@@ -1,14 +1,15 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useLang } from '../../shared/i18n';
+import { selectIsAuth } from '../../features/auth';
 import { Phone, GraduationCap, MapPin } from 'lucide-react';
 import './StickyCTA.css';
 
 export default function StickyCTA() {
   const { t } = useLang();
-  const location = useLocation();
 
-  // Editable rejimda ekanligini aniqlash
-  const isEditableMode = location.pathname.startsWith('/editable');
+  // Tahrirlash rejimi haqiqiy login holatiga bog'liq
+  const isEditableMode = useSelector(selectIsAuth);
   const basePrefix = isEditableMode ? '/editable' : '';
 
   return (

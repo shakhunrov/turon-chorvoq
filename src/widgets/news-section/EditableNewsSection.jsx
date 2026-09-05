@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { fetchNews, selectNewsList, selectNewsLoading } from '../../features/news';
+import { selectIsAuth } from '../../features/auth';
 import './NewsSection.css';
 
 export default function EditableNewsSection() {
   const { t } = useLang();
   const dispatch = useDispatch();
-  const location = useLocation();
-  const isEditableMode = location.pathname.startsWith('/editable');
+  const isEditableMode = useSelector(selectIsAuth);
   const basePrefix = isEditableMode ? '/editable' : '';
   const branchId = localStorage.getItem('globalBranchId');
 

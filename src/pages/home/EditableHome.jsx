@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
 import { EditableSection } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
+import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 import schoolImg from '../../shared/assets/img/school.png';
 import '../home/Home.css';
 
 export default function EditableHome() {
     const { t, lang } = useLang();
-    const location = useLocation();
     const branchId = localStorage.getItem('globalBranchId');
-    const isEditableMode = location.pathname.startsWith('/editable');
+    const isEditableMode = useSelector(selectIsAuth);
     const basePrefix = isEditableMode ? '/editable' : '';
 
     // Section ma'lumotlari

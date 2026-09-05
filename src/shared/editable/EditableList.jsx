@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Edit2, Trash2, Plus, Save, X } from 'lucide-react';
+import { selectIsAuth } from '../../features/auth';
 import './EditableList.css';
 
 /**
@@ -9,8 +10,7 @@ import './EditableList.css';
  * Har bir card'da alohida edit tugmasi
  */
 export default function EditableList({ items = [], onSave, renderItem, defaultItem = {}, itemName = "Item" }) {
-    const location = useLocation();
-    const isEditableMode = location.pathname.startsWith('/editable');
+    const isEditableMode = useSelector(selectIsAuth);
     const [editingIndex, setEditingIndex] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [formData, setFormData] = useState({});

@@ -70,6 +70,7 @@ export default function App() {
 
             {/* Editable routes (admin edit mode) */}
             <Route path="/editable/*" element={
+              <ProtectedAdminRoute>
               <PublicLayout>
                 <Routes>
                   <Route path="/" element={<EditableHome />} />
@@ -88,6 +89,7 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/editable/" replace />} />
                 </Routes>
               </PublicLayout>
+              </ProtectedAdminRoute>
             } />
 
             {/* Public routes */}

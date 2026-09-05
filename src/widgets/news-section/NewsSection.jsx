@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Newspaper, Calendar, ArrowRight } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { getPageSections } from '../../shared/api/pageSections';
 import { fetchNews, selectNewsList } from '../../features/news';
+import { selectIsAuth } from '../../features/auth';
 import {
   useAnimateOnScroll,
   fadeUp,
@@ -17,8 +18,7 @@ import './NewsSection.css';
 export default function NewsSection() {
   const { t, lang } = useLang();
   const dispatch = useDispatch();
-  const location = useLocation();
-  const isEditableMode = location.pathname.startsWith('/editable');
+  const isEditableMode = useSelector(selectIsAuth);
   const basePrefix = isEditableMode ? '/editable' : '';
   const branchId = localStorage.getItem('globalBranchId');
 

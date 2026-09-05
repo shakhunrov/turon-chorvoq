@@ -1,6 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
+import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
 import { MessageCircle, ExternalLink, Play, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
@@ -9,9 +11,8 @@ import logo from "../../shared/assets/logo/turonLogo.png"
 
 export default function Footer() {
   const { t } = useLang();
-  const location = useLocation();
 
-  const isEditableMode = location.pathname.startsWith('/editable');
+  const isEditableMode = useSelector(selectIsAuth);
   const basePrefix = isEditableMode ? '/editable' : '';
 
   const inner = useAnimateOnScroll(0.08);

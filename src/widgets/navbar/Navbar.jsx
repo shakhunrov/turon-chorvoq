@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Menu, X } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
+import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
 import './Navbar.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
@@ -32,8 +34,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dropdown, setDropdown] = useState(null);
 
-  // Editable rejimda ekanligini aniqlash
-  const isEditableMode = location.pathname.startsWith('/editable');
+  // Tahrirlash rejimi haqiqiy login holatiga bog'liq
+  const isEditableMode = useSelector(selectIsAuth);
   const basePrefix = isEditableMode ? '/editable' : '';
 
   useEffect(() => {
