@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
-import { fetchNews, selectNewsList, selectNewsLoading } from '../../features/news';
+import { fetchPublicNews, selectNewsList, selectNewsLoading } from '../../features/news';
 import { selectIsAuth } from '../../features/auth';
 import './NewsSection.css';
 
@@ -26,9 +26,9 @@ export default function EditableNewsSection() {
   });
 
 
-  // Backend'dan yangiliklar ma'lumotlarini yuklash
+  // Backend'dan yangiliklar ma'lumotlarini yuklash (faqat nashr etilganlar — public endpoint)
   useEffect(() => {
-    dispatch(fetchNews({ branch: branchId }));
+    dispatch(fetchPublicNews({ branch: branchId }));
   }, [dispatch, branchId]);
 
   // Faqat nashr etilgan va eng so'nggi 3ta yangilikni olish

@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../shared/api';
+import adminTisApi from '../../shared/api/adminTisApi';
 
+// Yangilik kategoriyalari admin.tisedu.uz (new-turon) ga ko'chirildi —
+// eski school.gennis.uz endi ishlatilmaydi. uploadApplicationCV (pastda)
+// alohida — Careers arizalari, hali eski backend'da.
 const ENDPOINT = '/website-sources/admin/categories/';
 
 // ── Thunks ────────────────────────────────────────────────────────
@@ -11,8 +15,8 @@ export const fetchCategories = createAsyncThunk(
     try {
       const params = {};
       if (filters.branch) params.branch = filters.branch;
-      
-      const { data } = await api.get(ENDPOINT, { params });
+
+      const { data } = await adminTisApi.get(ENDPOINT, { params });
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to fetch categories');
@@ -24,7 +28,7 @@ export const createCategory = createAsyncThunk(
   'categories/create',
   async (categoryData, { rejectWithValue }) => {
     try {
-      const { data } = await api.post(ENDPOINT, categoryData);
+      const { data } = await adminTisApi.post(ENDPOINT, categoryData);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to create category');
@@ -36,7 +40,7 @@ export const updateCategory = createAsyncThunk(
   'categories/update',
   async ({ id, ...fields }, { rejectWithValue }) => {
     try {
-      const { data } = await api.put(`${ENDPOINT}${id}/`, fields);
+      const { data } = await adminTisApi.put(`${ENDPOINT}${id}/`, fields);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to update category');
@@ -48,7 +52,7 @@ export const deleteCategory = createAsyncThunk(
   'categories/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`${ENDPOINT}${id}/`);
+      await adminTisApi.delete(`${ENDPOINT}${id}/`);
       return id;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to delete category');

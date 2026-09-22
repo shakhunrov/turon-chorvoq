@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Newspaper, Calendar, ArrowRight } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { getPageSections } from '../../shared/api/pageSections';
-import { fetchNews, selectNewsList } from '../../features/news';
+import { fetchPublicNews, selectNewsList } from '../../features/news';
 import { selectIsAuth } from '../../features/auth';
 import {
   useAnimateOnScroll,
@@ -60,9 +60,9 @@ export default function NewsSection() {
     loadSection();
   }, [branchId, lang, t]);
 
-  // Backend'dan yangiliklar ma'lumotlarini yuklash
+  // Backend'dan yangiliklar ma'lumotlarini yuklash (faqat nashr etilganlar — public endpoint)
   useEffect(() => {
-    dispatch(fetchNews({ branch: branchId }));
+    dispatch(fetchPublicNews({ branch: branchId }));
   }, [dispatch, branchId]);
 
   const latestNews = newsList.slice(0, 3);

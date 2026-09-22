@@ -1,5 +1,6 @@
 export {
   default as newsReducer,
+  fetchPublicNews,
   fetchNews,
   fetchNewsById,
   createNews,

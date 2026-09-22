@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import {
-  fetchNews,
+  fetchPublicNews,
   selectNewsList,
   selectNewsLoading,
 } from '../../features/news';
@@ -40,7 +40,7 @@ export default function News() {
   const [selectedNews, setSelectedNews] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchNews({ branch: branchId, published: true }));
+    dispatch(fetchPublicNews({ branch: branchId }));
   }, [dispatch]);
 
   const allPosts = newsList.filter((p) => p.published !== false);

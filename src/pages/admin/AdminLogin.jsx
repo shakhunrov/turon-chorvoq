@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginThunk, selectAuth, clearAuthError } from '../../features/auth';
+import { loginThunk, loginAdminTisThunk, selectAuth, clearAuthError } from '../../features/auth';
 import { Eye, EyeOff, Lock, User, Shield } from 'lucide-react';
 import './AdminLogin.css';
 
@@ -26,6 +26,9 @@ export default function AdminLogin() {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginThunk({ username: form.username, password: form.password }));
+    // Yangiliklarni admin.tisedu.uz orqali tahrirlash uchun — best-effort,
+    // muvaffaqiyatsiz bo'lsa ham asosiy login (yuqorida) davom etadi.
+    dispatch(loginAdminTisThunk({ username: form.username, password: form.password }));
   };
 
   return (

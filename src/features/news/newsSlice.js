@@ -1,25 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../shared/api';
+import adminTisApi from '../../shared/api/adminTisApi';
 
 const ENDPOINT = '/website-sources/public/news/';
 const ENDPOINTADMIN = '/website-sources/news/';
 
 // ── Thunks ────────────────────────────────────────────────────────
 
-// GET list with filters
-export const fetchNews = createAsyncThunk(
-  'news/fetchAll',
+// GET public list (auth kerak emas) — sayt tashrifchilariga ko'rinadigan
+// yagona endpoint: faqat nashr etilgan yangiliklarni qaytaradi.
+// admin.tisedu.uz (new-turon) — eski school.gennis.uz endi ishlatilmaydi.
+export const fetchPublicNews = createAsyncThunk(
+  'news/fetchPublic',
   async (filters = {}, { rejectWithValue }) => {
     try {
       const params = {};
       if (filters.branch) params.branch = filters.branch;
-      if (filters.published !== undefined) params.published = filters.published;
-      if (filters.category_id) params.category_id = filters.category_id;
-      if (filters.date_from) params.date_from = filters.date_from;
-      if (filters.date_to) params.date_to = filters.date_to;
-      if (filters.created_by) params.created_by = filters.created_by;
+      if (filters.category_id) params.category = filters.category_id;
 
-      const { data } = await api.get(ENDPOINTADMIN, { params });
+      const { data } = await adminTisApi.get(ENDPOINT, { params });
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to fetch news');
@@ -27,7 +26,26 @@ export const fetchNews = createAsyncThunk(
   },
 );
 
-// GET single news profile
+// GET list — admin panel uchun (auth kerak, qoralamalarni ham qaytaradi)
+export const fetchNews = createAsyncThunk(
+  'news/fetchAll',
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const params = {};
+      if (filters.branch) params.branch = filters.branch;
+      if (filters.category_id) params.category = filters.category_id;
+
+      const { data } = await adminTisApi.get(ENDPOINTADMIN, { params });
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || 'Failed to fetch news');
+    }
+  },
+);
+
+// GET single news profile — hozircha hech qayerda chaqirilmaydi (dead code,
+// eski `api` da qoldirilgan; admin.tisedu.uz da bitta-yangilik public
+// endpointi yo'q).
 export const fetchNewsById = createAsyncThunk(
   'news/fetchById',
   async (id, { rejectWithValue }) => {
@@ -63,7 +81,7 @@ export const createNews = createAsyncThunk(
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : {};
 
-      const { data } = await api.post(ENDPOINTADMIN, body, config);
+      const { data } = await adminTisApi.post(ENDPOINTADMIN, body, config);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to create news');
@@ -92,7 +110,7 @@ export const updateNews = createAsyncThunk(
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
         : {};
 
-      const { data } = await api.put(`${ENDPOINTADMIN}${id}/`, body, config);
+      const { data } = await adminTisApi.put(`${ENDPOINTADMIN}${id}/`, body, config);
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to update news');
@@ -105,7 +123,7 @@ export const deleteNews = createAsyncThunk(
   'news/delete',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`${ENDPOINTADMIN}${id}/`);
+      await adminTisApi.delete(`${ENDPOINTADMIN}${id}/`);
       return id;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to delete news');
@@ -120,7 +138,7 @@ export const uploadNewsImage = createAsyncThunk(
             const formData = new FormData();
             formData.append('image', imageFile);
 
-            const { data } = await api.patch(
+            const { data } = await adminTisApi.patch(
                 `/website-sources/news/${id}/upload-image/`,
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -152,8 +170,22 @@ const newsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // ── fetch all ──
+    // ── fetch public ──
+    builder
+      .addCase(fetchPublicNews.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPublicNews.fulfilled, (state, { payload }) => {
+        state.loading = false;
+        state.newsList = payload;
+      })
+      .addCase(fetchPublicNews.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.error = payload;
+      });
 
+    // ── fetch all (admin) ──
     builder
       .addCase(fetchNews.pending, (state) => {
         state.loading = true;
