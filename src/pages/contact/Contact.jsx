@@ -10,6 +10,7 @@ import {
   selectSubmitSuccess,
 } from '../../features/contact';
 import { RevealOnScroll, StaggerGrid, staggerItem } from '../../shared/components/kinetic';
+import { getBranchInfo } from '../../shared/config/branchInfo';
 import './Contact.css';
 
 /* ── SVG Icon components ── */
@@ -71,6 +72,12 @@ export default function Contact() {
   const error         = useSelector(selectContactError);
   const submitSuccess = useSelector(selectSubmitSuccess);
   const branchId      = localStorage.getItem('globalBranchId');
+  // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar ishlatiladi
+  const bi = getBranchInfo();
+  const address = bi?.address || c.address;
+  const email = bi?.email || c.email;
+  const phone = bi?.phone || c.phone;
+  const mapUrl = bi?.mapUrl || 'https://maps.app.goo.gl/PgHEEa95VYGmd5ow7';
 
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [focused, setFocused] = useState({});
@@ -85,9 +92,9 @@ export default function Contact() {
   };
 
   const infoItems = [
-    { Icon: IconLocation, label: c.address,  color: '#F59E0B' },
-    { Icon: IconMail,     label: c.email,    color: '#2563EB' },
-    { Icon: IconPhone,    label: c.phone,    color: '#10B981' },
+    { Icon: IconLocation, label: address, color: '#F59E0B' },
+    { Icon: IconMail,     label: email,   color: '#2563EB' },
+    { Icon: IconPhone,    label: phone,   color: '#10B981' },
   ];
 
   return (
@@ -183,7 +190,7 @@ export default function Contact() {
                     <div className="con-map-sub">Uzbekistan</div>
                   </div>
                   <a
-                    href="https://maps.app.goo.gl/PgHEEa95VYGmd5ow7"
+                    href={mapUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="con-map-btn"

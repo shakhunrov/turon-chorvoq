@@ -1,0 +1,62 @@
+// Filial bo'yicha haqiqiy aloqa ma'lumotlari (manzil, telefon, ijtimoiy tarmoqlar).
+// Domen filialni avtomatik aniqlaydi (src/shared/admin/adminAuth.jsx bilan bir xil
+// mantiq: chorvoq=6, sergeli=9, chirchiq=8), shuning uchun bu yerda ham branchId
+// bo'yicha ajratilgan — Contact/Footer shu yerdan o'qiydi, i18n fayllaridagi
+// (uz/ru/en.js) contact.address/phone/email endi FAQAT "ma'lumot topilmasa"gi
+// zaxira (fallback) sifatida ishlatiladi.
+//
+// Manba: "turon sayt malumot.xlsx" (Chirchiq) va "turon_sayt_chek-list_uz_sodda.xlsx"
+// (Sergeli) — 2026-09-22 da foydalanuvchi tomonidan yuborilgan.
+// Chorvoq uchun hali real ma'lumot yo'q — pastdagi qiymatlar eski placeholder,
+// TODO: Chorvoq filialidan xuddi shu anketani to'ldirib olish kerak.
+
+const DEFAULT_EMAIL = 'info@tisedu.uz';
+
+export const BRANCH_INFO = {
+  // Chirchiq
+  8: {
+    name: 'Chirchiq',
+    address: "Toshkent viloyati, Chirchiq shahar, Temiryo'lovchilar ko'chasi 128A",
+    phone: '+998 99 792 03 33',
+    email: DEFAULT_EMAIL,
+    mapUrl: 'https://maps.apple/p/oVUgH2MQUJSm9E',
+    social: {
+      instagram: 'https://www.instagram.com/turonschool_chirchiq',
+      telegram: 'https://t.me/tis_chirchiq_info',
+      facebook: 'https://www.facebook.com/share/1Bunwgo3zb/?mibextid=wwXIfr',
+      youtube: '',
+    },
+  },
+  // Sergeli
+  9: {
+    name: 'Sergeli',
+    address: 'Toshkent shahar, Yangi Sergeli, 9/13',
+    phone: '', // hali berilmagan — fallback ishlatiladi
+    email: DEFAULT_EMAIL,
+    mapUrl: 'https://yandex.ru/navi?text=41.229213,69.218142',
+    social: {
+      instagram: 'https://www.instagram.com/turon_international_school',
+      telegram: 'https://t.me/turon_international_school',
+      facebook: 'https://www.facebook.com/share/1DDi5L5Ak5/',
+      youtube: '',
+    },
+  },
+  // Chorvoq — TODO: haqiqiy ma'lumot hali kelmagan, joriy (placeholder) qiymatlar qoldirilgan
+  6: {
+    name: 'Chorvoq',
+    address: '',
+    phone: '',
+    email: DEFAULT_EMAIL,
+    mapUrl: '',
+    social: { instagram: '', telegram: '', facebook: '', youtube: '' },
+  },
+};
+
+// Joriy filial ma'lumotini oladi (branchId — localStorage'dagi 'globalBranchId').
+// Chirchiq/Sergeli uchun bo'sh maydon bo'lsa yoki filial umuman topilmasa (Chorvoq
+// yoki noma'lum), fallback qiymatlarga (i18n contact obyekti) tayanish uchun `null`
+// qaytaradi — chaqiruvchi joyida `branchInfo?.field || fallback` shaklida ishlatiladi.
+export function getBranchInfo() {
+  const branchId = Number(localStorage.getItem('globalBranchId'));
+  return BRANCH_INFO[branchId] || null;
+}

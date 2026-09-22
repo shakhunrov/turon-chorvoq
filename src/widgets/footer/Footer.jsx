@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
-import { MessageCircle, ExternalLink, Play, MapPin, Mail, Phone } from 'lucide-react';
+import { MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
+import { getBranchInfo } from '../../shared/config/branchInfo';
 import './Footer.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
 
@@ -16,6 +17,21 @@ export default function Footer() {
   const basePrefix = isEditableMode ? '/editable' : '';
 
   const inner = useAnimateOnScroll(0.08);
+
+  // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar
+  const bi = getBranchInfo();
+  const branchName = bi?.name || 'Chorvoq';
+  const address = bi?.address || t.contact.address;
+  const email = bi?.email || t.contact.email;
+  const phone = bi?.phone || t.contact.phone;
+  const mapUrl = bi?.mapUrl || 'https://maps.google.com';
+  // Eski lucide-react (1.8.0) da brend ikonkalari yo'q — mavjud generic ikonkalar bilan
+  const socials = [
+    { key: 'instagram', label: 'Instagram', Icon: MessageCircle, href: bi?.social?.instagram },
+    { key: 'telegram', label: 'Telegram', Icon: ExternalLink, href: bi?.social?.telegram },
+    { key: 'facebook', label: 'Facebook', Icon: ThumbsUp, href: bi?.social?.facebook },
+    { key: 'youtube', label: 'YouTube', Icon: Play, href: bi?.social?.youtube },
+  ].filter((s) => s.href);
 
   const quickLinks = [
     { label: t.nav.home, href: basePrefix + '/' },
@@ -44,26 +60,32 @@ export default function Footer() {
             <img width={70} src={logo} alt="" />
             <div>
               <div className="footer-logo-name">TURON</div>
-              <div className="footer-logo-sub">International School · Chorvoq</div>
+              <div className="footer-logo-sub">International School · {branchName}</div>
             </div>
           </div>
           <p className="footer-tagline">{t.footer.tagline}</p>
           <div className="footer-contact-items">
-            <a href="https://maps.google.com" className="footer-contact-item" target="_blank" rel="noreferrer">
-              <MapPin size={14} /> {t.contact.address}
+            <a href={mapUrl} className="footer-contact-item" target="_blank" rel="noreferrer">
+              <MapPin size={14} /> {address}
             </a>
-            <a href={`mailto:${t.contact.email}`} className="footer-contact-item">
-              <Mail size={14} /> {t.contact.email}
+            <a href={`mailto:${email}`} className="footer-contact-item">
+              <Mail size={14} /> {email}
             </a>
-            <a href={`tel:${t.contact.phone}`} className="footer-contact-item">
-              <Phone size={14} /> {t.contact.phone}
-            </a>
+            {phone && (
+              <a href={`tel:${phone}`} className="footer-contact-item">
+                <Phone size={14} /> {phone}
+              </a>
+            )}
           </div>
-          <div className="footer-social">
-            <a href="#" className="social-btn" aria-label="Instagram"><MessageCircle size={18} /></a>
-            <a href="#" className="social-btn" aria-label="Telegram"><ExternalLink size={18} /></a>
-            <a href="#" className="social-btn" aria-label="YouTube"><Play size={18} /></a>
-          </div>
+          {socials.length > 0 && (
+            <div className="footer-social">
+              {socials.map(({ key, label, Icon, href }) => (
+                <a key={key} href={href} className="social-btn" aria-label={label} target="_blank" rel="noreferrer">
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* Quick Links */}

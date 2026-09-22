@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import AdmissionModal from '../../features/admission-modal/AdmissionModal';
+import { getBranchInfo } from '../../shared/config/branchInfo';
 import {
   TextSplit,
   GradientBlob,
@@ -99,6 +100,7 @@ export default function Admissions() {
   const { t } = useLang();
   const a = t.admissions;
   const [showModal, setShowModal] = useState(false);
+  const branchName = getBranchInfo()?.name || 'Chorvoq';
 
   const heroChips = [
     { icon: <IconClipboard />, text: '5-step process' },
@@ -111,7 +113,7 @@ export default function Admissions() {
   const benefits = [
     { icon: <IconGraduationCap />, title: 'IB Curriculum',  desc: 'Internationally recognised qualification' },
     { icon: <IconGlobe />,         title: 'Native Teachers', desc: 'World-class educators from 12+ countries' },
-    { icon: <IconBuilding />,      title: 'Modern Campus',   desc: 'State-of-the-art facilities in Chorvoq' },
+    { icon: <IconBuilding />,      title: 'Modern Campus',   desc: `State-of-the-art facilities in ${branchName}` },
     { icon: <IconAward />,         title: 'Scholarships',    desc: 'Merit-based financial support available' },
   ];
 
