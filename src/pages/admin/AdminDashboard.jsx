@@ -49,8 +49,9 @@ import {
     Newspaper, Briefcase, UserPlus, Plus, Edit2, Trash2,
     LogOut, Search, CheckCircle, Clock,
     X, Save, Shield, TrendingUp, Globe,
-    Upload, Tag, List as ListIcon, FileText,
+    Upload, Tag, List as ListIcon, FileText, LayoutTemplate,
 } from 'lucide-react';
+import PageSectionsManager from './PageSectionsManager';
 import './AdminDashboard.css';
 
 const TYPE_CHOICES = ['Academic', 'Non-Academic'];
@@ -104,7 +105,8 @@ export default function AdminDashboard() {
         : view.startsWith('adm') ? 'admissions'
             : view.startsWith('cat') ? 'categories'
                 : view.startsWith('app') ? 'applications'
-                    : 'news';
+                    : view.startsWith('sections') ? 'sections'
+                        : 'news';
 
     useEffect(() => { dispatch(fetchCategories({ branch: branchId })); }, [dispatch, branchId]);
 
@@ -287,6 +289,10 @@ export default function AdminDashboard() {
                     <button className={`sidebar-item ${section === 'admissions' ? 'active' : ''}`}
                             onClick={() => { setView('adm-list'); setSearch(''); }}>
                         <UserPlus size={18} /> Qabullar
+                    </button>
+                    <button className={`sidebar-item ${section === 'sections' ? 'active' : ''}`}
+                            onClick={() => { setView('sections-list'); setSearch(''); }}>
+                        <LayoutTemplate size={18} /> Sahifa bo'limlari
                     </button>
                     <Link to="/editable/" className="sidebar-item" target="_blank" rel="noopener noreferrer">
                         <Globe size={18} /> Saytni ko'rish
@@ -635,6 +641,9 @@ export default function AdminDashboard() {
                         onCancel={() => setView('pos-list')}
                     />
                 )}
+
+                {/* ═══════════════════ PAGE SECTIONS (sayt matnlari, CMS) ═══════════════════ */}
+                {view === 'sections-list' && <PageSectionsManager branchId={branchId} />}
 
                 {/* ═══════════════════ ADMISSIONS LIST ═══════════════════ */}
                 {view === 'adm-list' && (
