@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Image as ImageIcon, Plus, Save, Sparkles, Trash2, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+    ChevronDown, ChevronUp, Image as ImageIcon, Minus, Plus, RotateCcw, Save, Sparkles, Trash2, X,
+} from 'lucide-react';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 
 // Saytdagi har bir "pencil" bilan tahrirlanadigan joy shu ro'yxatdagi (page, section_id)
@@ -64,11 +66,29 @@ const emptyLike = (sample) => {
 // ── Bitta maydon: qiymat turiga qarab input/textarea, ro'yxat yoki ichki guruh ──
 function Field({ label, value, onChange }) {
     if (Array.isArray(value)) {
+        const move = (i, dir) => {
+            const j = i + dir;
+            if (j < 0 || j >= value.length) return;
+            const copy = [...value];
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+            onChange(copy);
+        };
         return (
             <div className="pgsec-group">
                 <div className="pgsec-group-title">{label}</div>
                 {value.map((item, i) => (
                     <div key={i} className="pgsec-array-item">
+                        <div className="pgsec-array-order">
+                            <button type="button" className="action-btn" title="Tepaga surish"
+                                    disabled={i === 0} onClick={() => move(i, -1)}>
+                                <ChevronUp size={14} />
+                            </button>
+                            <span className="pgsec-array-index">{i + 1}</span>
+                            <button type="button" className="action-btn" title="Pastga surish"
+                                    disabled={i === value.length - 1} onClick={() => move(i, 1)}>
+                                <ChevronDown size={14} />
+                            </button>
+                        </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                             {item && typeof item === 'object' ? (
                                 <ObjectFields

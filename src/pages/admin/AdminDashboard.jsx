@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAdminAuth } from '../../shared/admin/adminAuth';
 import { logout as reduxLogout } from '../../features/auth';
@@ -52,6 +52,7 @@ import {
     Upload, Tag, List as ListIcon, FileText, LayoutTemplate,
 } from 'lucide-react';
 import PageSectionsManager from './PageSectionsManager';
+import SitePreview from './SitePreview';
 import './AdminDashboard.css';
 
 const TYPE_CHOICES = ['Academic', 'Non-Academic'];
@@ -106,7 +107,8 @@ export default function AdminDashboard() {
             : view.startsWith('cat') ? 'categories'
                 : view.startsWith('app') ? 'applications'
                     : view.startsWith('sections') ? 'sections'
-                        : 'news';
+                        : view.startsWith('site-preview') ? 'preview'
+                            : 'news';
 
     useEffect(() => { dispatch(fetchCategories({ branch: branchId })); }, [dispatch, branchId]);
 
@@ -294,9 +296,10 @@ export default function AdminDashboard() {
                             onClick={() => { setView('sections-list'); setSearch(''); }}>
                         <LayoutTemplate size={18} /> Sahifa bo'limlari
                     </button>
-                    <Link to="/editable/" className="sidebar-item" target="_blank" rel="noopener noreferrer">
+                    <button className={`sidebar-item ${section === 'preview' ? 'active' : ''}`}
+                            onClick={() => { setView('site-preview'); setSearch(''); }}>
                         <Globe size={18} /> Saytni ko'rish
-                    </Link>
+                    </button>
                 </nav>
                 <button className="sidebar-logout" onClick={handleLogout}><LogOut size={16} /> Chiqish</button>
             </aside>
@@ -644,6 +647,9 @@ export default function AdminDashboard() {
 
                 {/* ═══════════════════ PAGE SECTIONS (sayt matnlari, CMS) ═══════════════════ */}
                 {view === 'sections-list' && <PageSectionsManager branchId={branchId} />}
+
+                {/* ═══════════════════ SAYTNI KO'RISH (admin panel ichida, kattalashtiriladigan) ═══════════════════ */}
+                {view === 'site-preview' && <SitePreview />}
 
                 {/* ═══════════════════ ADMISSIONS LIST ═══════════════════ */}
                 {view === 'adm-list' && (
