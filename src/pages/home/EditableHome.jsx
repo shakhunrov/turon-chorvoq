@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { GripVertical } from 'lucide-react';
 import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
 import { EditableSection } from '../../shared/editable';
+import { useDragReorder } from '../../shared/editable/useDragReorder';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -128,6 +130,14 @@ export default function EditableHome() {
         }
     };
 
+    // Statistika kartalari nomlangan maydonlarda saqlanadi (students/teachers/...), tartibi esa
+    // alohida `order` massivida — shunday qilib mavjud ma'lumotni buzmasdan sudrab tartiblash mumkin.
+    const STAT_KEYS_DEFAULT = ['students', 'teachers', 'programs', 'universities'];
+    const statOrder = Array.isArray(sections.stats.order) && sections.stats.order.length === STAT_KEYS_DEFAULT.length
+        ? sections.stats.order
+        : STAT_KEYS_DEFAULT;
+    const statsDrag = useDragReorder(statOrder, (next) => handleSaveSection('stats', { ...sections.stats, order: next }));
+
     return (
         <div className="page">
             <EditableHeroBanner />
@@ -174,19 +184,24 @@ export default function EditableHome() {
                             <div className="divider center" />
                         </div>
                         <div className="stats-grid">
-                            {[
-                                sections.stats.students,
-                                sections.stats.teachers,
-                                sections.stats.programs,
-                                sections.stats.universities,
-                            ].map((s, idx) => (
-                                <div key={idx} className="stat-card glass-card">
-                                    <div className="stat-icon">{s.icon}</div>
-                                    <div className="stat-val">{s.val}</div>
-                                    <div className="stat-label">{s.label}</div>
-                                    {s.note && <div className="stat-note">{s.note}</div>}
-                                </div>
-                            ))}
+                            {statOrder.map((key, idx) => {
+                                const s = sections.stats[key];
+                                if (!s) return null;
+                                const { dragClassName, ...dropProps } = statsDrag.itemProps(idx);
+                                return (
+                                    <div key={key} className={`stat-card glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
+                                        {isEditableMode && (
+                                            <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...statsDrag.gripProps(idx)}>
+                                                <GripVertical size={14} />
+                                            </button>
+                                        )}
+                                        <div className="stat-icon">{s.icon}</div>
+                                        <div className="stat-val">{s.val}</div>
+                                        <div className="stat-label">{s.label}</div>
+                                        {s.note && <div className="stat-note">{s.note}</div>}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>

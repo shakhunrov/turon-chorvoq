@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { Sparkles, ArrowRight, GraduationCap, GripVertical } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
+import { useDragReorder } from '../../shared/editable/useDragReorder';
+import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
 import schoolImg from '../../shared/assets/img/school.png';
@@ -146,9 +149,18 @@ export default function EditableHeroBanner() {
     }
   };
 
-  const bgStyle = heroData.image 
+  const bgStyle = heroData.image
     ? { backgroundImage: `url(${heroData.image})` }
     : { backgroundImage: `url(${schoolImg})` };
+
+  const isEditableMode = useSelector(selectIsAuth);
+  // Statistika kartalari nomlangan maydonlarda (students/teachers/...), tartibi esa alohida
+  // `order` massivida — mavjud ma'lumotni buzmasdan sudrab tartiblash mumkin.
+  const HERO_STAT_KEYS_DEFAULT = ['students', 'teachers', 'universities', 'languages'];
+  const heroStatOrder = Array.isArray(statsData.order) && statsData.order.length === HERO_STAT_KEYS_DEFAULT.length
+    ? statsData.order
+    : HERO_STAT_KEYS_DEFAULT;
+  const heroStatsDrag = useDragReorder(heroStatOrder, (next) => handleSaveStats({ ...statsData, order: next }));
 
   return (
     <EditableSection
@@ -194,17 +206,22 @@ export default function EditableHeroBanner() {
               buttonStyle={{ bottom: '20px', right: '20px' }}
             >
               <div className="hero-stats fade-up-d3">
-                {[
-                  statsData.students,
-                  statsData.teachers,
-                  statsData.universities,
-                  statsData.languages,
-                ].map((s, idx) => (
-                  <div key={idx} className="hero-stat">
-                    <div className="hero-stat-val">{s.val}</div>
-                    <div className="hero-stat-label">{s.label}</div>
-                  </div>
-                ))}
+                {heroStatOrder.map((key, idx) => {
+                  const s = statsData[key];
+                  if (!s) return null;
+                  const { dragClassName, ...dropProps } = heroStatsDrag.itemProps(idx);
+                  return (
+                    <div key={key} className={`hero-stat drag-reorder-host ${dragClassName}`} {...dropProps}>
+                      {isEditableMode && (
+                        <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...heroStatsDrag.gripProps(idx)}>
+                          <GripVertical size={14} />
+                        </button>
+                      )}
+                      <div className="hero-stat-val">{s.val}</div>
+                      <div className="hero-stat-label">{s.label}</div>
+                    </div>
+                  );
+                })}
               </div>
             </EditableSection>
           </div>
