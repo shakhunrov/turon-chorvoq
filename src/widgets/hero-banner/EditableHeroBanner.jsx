@@ -196,27 +196,20 @@ export default function EditableHeroBanner() {
               </div>
             </div>
 
-            <EditableSection
-              sectionId="hero-stats"
-              data={statsData}
-              onSave={handleSaveStats}
-              buttonStyle={{ bottom: '20px', right: '20px' }}
-            >
-              <div className="hero-stats fade-up-d3">
-                <EditableList
-                  items={heroStatsItems}
-                  onSave={(newItems) => handleSaveStats({ ...statsData, items: newItems })}
-                  defaultItem={{ val: '', label: '' }}
-                  itemName="Statistika"
-                  renderItem={(s) => (
-                    <div className="hero-stat">
-                      <div className="hero-stat-val">{s.val}</div>
-                      <div className="hero-stat-label">{s.label}</div>
-                    </div>
-                  )}
-                />
-              </div>
-            </EditableSection>
+            <div className="hero-stats fade-up-d3">
+              <EditableList
+                items={heroStatsItems}
+                onSave={(newItems) => handleSaveStats({ ...statsData, items: newItems })}
+                defaultItem={{ val: '', label: '' }}
+                itemName="Statistika"
+                renderItem={(s) => (
+                  <div className="hero-stat">
+                    <div className="hero-stat-val">{s.val}</div>
+                    <div className="hero-stat-label">{s.label}</div>
+                  </div>
+                )}
+              />
+            </div>
           </div>
         </div>
 

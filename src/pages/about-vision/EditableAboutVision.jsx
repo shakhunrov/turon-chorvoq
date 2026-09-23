@@ -1,5 +1,5 @@
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableSection, EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './AboutVision.css';
 
@@ -61,56 +61,56 @@ export default function EditableAboutVision() {
                     </EditableSection>
 
                     {/* Values */}
-                    <EditableSection
-                        sectionId="values"
-                        data={sections.values}
-                        onSave={(data) => handleSaveSection('values', data)}
-                    >
-                        <div className="vision-values-section">
-                            <h2 className="section-title">{sections.values.title}</h2>
-                            <div className="divider" />
-                            <div className="values-grid">
-                                <EditableList
-                                    items={sections.values.values || []}
-                                    onSave={(newValues) => handleSaveSection('values', { ...sections.values, values: newValues })}
-                                    defaultItem=""
-                                    itemName="Qadriyat"
-                                    renderItem={(val) => (
-                                        <div className="value-tag glass-card">
-                                            <span className="value-dot" />
-                                            {val}
-                                        </div>
-                                    )}
-                                />
-                            </div>
+                    <div className="vision-values-section">
+                        <h2 className="section-title">
+                            <EditableText
+                                value={sections.values.title}
+                                onSave={(newTitle) => handleSaveSection('values', { ...sections.values, title: newTitle })}
+                                label="Sarlavha"
+                            />
+                        </h2>
+                        <div className="divider" />
+                        <div className="values-grid">
+                            <EditableList
+                                items={sections.values.values || []}
+                                onSave={(newValues) => handleSaveSection('values', { ...sections.values, values: newValues })}
+                                defaultItem=""
+                                itemName="Qadriyat"
+                                renderItem={(val) => (
+                                    <div className="value-tag glass-card">
+                                        <span className="value-dot" />
+                                        {val}
+                                    </div>
+                                )}
+                            />
                         </div>
-                    </EditableSection>
+                    </div>
 
                     {/* Student Outcomes */}
-                    <EditableSection
-                        sectionId="outcomes"
-                        data={sections.outcomes}
-                        onSave={(data) => handleSaveSection('outcomes', data)}
-                    >
-                        <div className="outcomes-section">
-                            <h2 className="section-title">{sections.outcomes.title}</h2>
-                            <div className="divider" />
-                            <div className="outcomes-list">
-                                <EditableList
-                                    items={sections.outcomes.outcomes || []}
-                                    onSave={(newOutcomes) => handleSaveSection('outcomes', { ...sections.outcomes, outcomes: newOutcomes })}
-                                    defaultItem=""
-                                    itemName="Natija"
-                                    renderItem={(o, i) => (
-                                        <div className="outcome-item glass-card">
-                                            <span className="outcome-num">{String(i + 1).padStart(2, '0')}</span>
-                                            <p>{o}</p>
-                                        </div>
-                                    )}
-                                />
-                            </div>
+                    <div className="outcomes-section">
+                        <h2 className="section-title">
+                            <EditableText
+                                value={sections.outcomes.title}
+                                onSave={(newTitle) => handleSaveSection('outcomes', { ...sections.outcomes, title: newTitle })}
+                                label="Sarlavha"
+                            />
+                        </h2>
+                        <div className="divider" />
+                        <div className="outcomes-list">
+                            <EditableList
+                                items={sections.outcomes.outcomes || []}
+                                onSave={(newOutcomes) => handleSaveSection('outcomes', { ...sections.outcomes, outcomes: newOutcomes })}
+                                defaultItem=""
+                                itemName="Natija"
+                                renderItem={(o, i) => (
+                                    <div className="outcome-item glass-card">
+                                        <span className="outcome-num">{String(i + 1).padStart(2, '0')}</span>
+                                        <p>{o}</p>
+                                    </div>
+                                )}
+                            />
                         </div>
-                    </EditableSection>
+                    </div>
                 </div>
             </section>
         </div>

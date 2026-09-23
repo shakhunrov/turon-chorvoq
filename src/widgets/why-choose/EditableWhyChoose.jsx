@@ -1,6 +1,5 @@
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
-import { EditableList } from '../../shared/editable';
+import { EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './WhyChoose.css';
 
@@ -18,35 +17,41 @@ export default function EditableWhyChoose() {
   });
 
   return (
-    <EditableSection
-      sectionId="main"
-      data={sections.main}
-      onSave={(data) => handleSaveSection('main', data)}
-    >
-      <section className="why-choose section">
-        <div className="container">
-          <div className="section-header center">
-            <span className="section-label">{sections.main.label}</span>
-            <h2 className="why-choose-title">{sections.main.title}</h2>
-            <div className="divider center" />
-          </div>
-
-          <div className="why-grid">
-            <EditableList
-              items={sections.main.items || []}
-              onSave={(newItems) => handleSaveSection('main', { ...sections.main, items: newItems })}
-              defaultItem={{ text: '', icon: '🌍' }}
-              itemName="Card"
-              renderItem={(item) => (
-                <div className="why-card glass-card">
-                  <div className="why-icon">{item.icon}</div>
-                  <p className="why-text">{item.text}</p>
-                </div>
-              )}
+    <section className="why-choose section">
+      <div className="container">
+        <div className="section-header center">
+          <span className="section-label">
+            <EditableText
+              value={sections.main.label}
+              onSave={(newLabel) => handleSaveSection('main', { ...sections.main, label: newLabel })}
+              label="Yorliq"
             />
-          </div>
+          </span>
+          <h2 className="why-choose-title">
+            <EditableText
+              value={sections.main.title}
+              onSave={(newTitle) => handleSaveSection('main', { ...sections.main, title: newTitle })}
+              label="Sarlavha"
+            />
+          </h2>
+          <div className="divider center" />
         </div>
-      </section>
-    </EditableSection>
+
+        <div className="why-grid">
+          <EditableList
+            items={sections.main.items || []}
+            onSave={(newItems) => handleSaveSection('main', { ...sections.main, items: newItems })}
+            defaultItem={{ text: '', icon: '🌍' }}
+            itemName="Card"
+            renderItem={(item) => (
+              <div className="why-card glass-card">
+                <div className="why-icon">{item.icon}</div>
+                <p className="why-text">{item.text}</p>
+              </div>
+            )}
+          />
+        </div>
+      </div>
+    </section>
   );
 }
