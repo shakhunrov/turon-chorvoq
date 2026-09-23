@@ -174,6 +174,14 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
+    // Modal ochiq turganda orqa fon (body) aylanmasin — aks holda ba'zi brauzerlarda
+    // sichqoncha g'ildiragi modal ichini emas, orqa fonni aylantirishga urinadi.
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = prev; };
+    }, []);
+
     const save = async () => {
         if (!sectionId.trim()) {
             setError("Bo'lim nomi (Section ID) kiritilmagan — masalan: main");
@@ -204,8 +212,9 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
 
     return (
         <div className="modal-overlay" onClick={onCancel}>
-            <div className="modal-box" style={{ maxWidth: 860, width: '92vw', maxHeight: '88vh', overflowY: 'auto' }}
-                 onClick={(e) => e.stopPropagation()}>
+            <div className="modal-box" style={{ maxWidth: 860, width: '92vw', maxHeight: '88vh', overflowY: 'auto', overscrollBehavior: 'contain' }}
+                 onClick={(e) => e.stopPropagation()}
+                 onWheel={(e) => e.stopPropagation()}>
                 <button className="modal-close" onClick={onCancel}><X size={18} /></button>
 
                 <h2 style={{ marginTop: 0, marginBottom: 4 }}>
