@@ -9,6 +9,7 @@ import { EditableSection } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
+import { showToast } from '../../shared/toast/toast';
 import schoolImg from '../../shared/assets/img/school.png';
 import '../home/Home.css';
 
@@ -121,11 +122,9 @@ export default function EditableHome() {
                 ...prev,
                 [sectionId]: data,
             }));
-
-            alert('Section muvaffaqiyatli saqlandi!');
         } catch (error) {
             console.error('Section saqlashda xatolik:', error);
-            alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+            showToast('Saqlashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
         }
     };
 

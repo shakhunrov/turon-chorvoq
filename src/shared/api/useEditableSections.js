@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getPageSections, savePageSection } from './pageSections';
 import { useLang } from '../i18n';
+import { showToast } from '../toast/toast';
 
 /**
  * useEditableSections - Editable sections uchun custom hook
@@ -96,10 +97,9 @@ export function useEditableSections(pageName, defaultSections) {
 
             await savePageSection(payload);
             setSections(prev => ({ ...prev, [sectionId]: data }));
-            alert('Section muvaffaqiyatli saqlandi!');
         } catch (error) {
             console.error('Section saqlashda xatolik:', error);
-            alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+            showToast('Saqlashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
         }
     };
 

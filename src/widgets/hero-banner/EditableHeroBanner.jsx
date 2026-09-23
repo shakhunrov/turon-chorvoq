@@ -4,6 +4,7 @@ import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { EditableSection } from '../../shared/editable';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
+import { showToast } from '../../shared/toast/toast';
 import schoolImg from '../../shared/assets/img/school.png';
 import './HeroBanner.css';
 
@@ -110,11 +111,9 @@ export default function EditableHeroBanner() {
       } else {
         setHeroData(data);
       }
-      
-      alert('Hero muvaffaqiyatli saqlandi!');
     } catch (error) {
       console.error('Hero saqlashda xatolik:', error);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      showToast('Saqlashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     }
   };
 
@@ -141,10 +140,9 @@ export default function EditableHeroBanner() {
 
       await savePageSection(payload);
       setStatsData(data);
-      alert('Stats muvaffaqiyatli saqlandi!');
     } catch (error) {
       console.error('Stats saqlashda xatolik:', error);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      showToast('Saqlashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     }
   };
 

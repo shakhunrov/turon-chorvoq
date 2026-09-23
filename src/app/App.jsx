@@ -28,6 +28,7 @@ import Policies from '../pages/policies/Policies';
 import AdminLogin from '../pages/admin/AdminLogin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import { useSmoothScroll } from '../shared/hooks/useSmoothScroll';
+import ToastHost from '../shared/toast/ToastHost';
 import '../app/globals.css';
 import '../pages/admin/AdminDashboard.css';
 
@@ -55,6 +56,7 @@ export default function App() {
   return (
     <LangProvider>
       <AdminAuthProvider>
+        <ToastHost />
         <BrowserRouter>
           <Routes>
             {/* Admin routes (no public navbar/footer) */}

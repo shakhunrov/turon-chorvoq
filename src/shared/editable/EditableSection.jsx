@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
 import { Edit2, Save, X, ImagePlus } from 'lucide-react';
 import { selectIsAuth } from '../../features/auth';
+import { showToast } from '../toast/toast';
 import './EditableSection.css';
 
 /**
@@ -35,7 +36,7 @@ export default function EditableSection({ sectionId, data, onSave, children, but
         const file = e.target.files?.[0];
         if (!file) return;
         if (file.size > 3 * 1024 * 1024) {
-            alert('Rasm hajmi 3MB dan oshmasligi kerak');
+            showToast('Rasm hajmi 3MB dan oshmasligi kerak');
             return;
         }
         const reader = new FileReader();
@@ -468,7 +469,7 @@ function EditModal({ sectionId, data, onSave, onClose }) {
 
     const handleNewsImageUpload = (index, file) => {
         if (file && file.size > 2 * 1024 * 1024) {
-            alert('Rasm hajmi 2MB dan oshmasligi kerak');
+            showToast('Rasm hajmi 2MB dan oshmasligi kerak');
             return;
         }
 

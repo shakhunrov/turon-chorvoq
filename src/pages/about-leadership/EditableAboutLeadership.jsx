@@ -3,6 +3,7 @@ import { useLang } from '../../shared/i18n';
 import { EditableSection, EditableList } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { savePageSection } from '../../shared/api/pageSections';
+import { showToast } from '../../shared/toast/toast';
 import directorImg from '../../shared/assets/img/director.png';
 import './AboutLeadership.css';
 
@@ -62,7 +63,7 @@ export default function EditableAboutLeadership() {
       await handleSaveSection('board', { ...sections.board, members: processedMembers });
     } catch (error) {
       console.error('Board members saqlashda xatolik:', error);
-      alert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+      showToast("Saqlashda xatolik yuz berdi. Qaytadan urinib ko'ring.");
     } finally {
       setUploading(false);
     }

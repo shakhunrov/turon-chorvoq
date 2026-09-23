@@ -5,6 +5,7 @@ import { EditableSection } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { getPageSections, uploadSectionImages, deleteSectionImage } from '../../shared/api/pageSections';
 import { selectIsAuth } from '../../features/auth';
+import { showToast } from '../../shared/toast/toast';
 import { Upload, Trash2 } from 'lucide-react';
 import './AboutCampus.css';
 
@@ -107,7 +108,7 @@ export default function EditableAboutCampus() {
 
     const sectionId = sectionIds[activeTab];
     if (!sectionId) {
-      alert('Avval section ma\'lumotlarini saqlang!');
+      showToast('Avval section ma\'lumotlarini saqlang!');
       return;
     }
 
@@ -120,10 +121,9 @@ export default function EditableAboutCampus() {
           [activeTab]: response.images.sort((a, b) => a.order - b.order),
         }));
       }
-      alert('Rasmlar muvaffaqiyatli yuklandi!');
     } catch (error) {
       console.error('Rasmlarni yuklashda xatolik:', error);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      showToast('Rasm yuklashda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -142,10 +142,9 @@ export default function EditableAboutCampus() {
         ...prev,
         [activeTab]: prev[activeTab].filter(img => img.id !== imageId),
       }));
-      alert('Rasm o\'chirildi!');
     } catch (error) {
       console.error('Rasmni o\'chirishda xatolik:', error);
-      alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+      showToast('O\'chirishda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
     }
   };
 
