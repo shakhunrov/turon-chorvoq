@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { Sparkles, ArrowRight, GraduationCap, GripVertical } from 'lucide-react';
+import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
-import { useDragReorder } from '../../shared/editable/useDragReorder';
-import { selectIsAuth } from '../../features/auth';
+import { EditableSection, EditableList } from '../../shared/editable';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
 import schoolImg from '../../shared/assets/img/school.png';
@@ -153,14 +150,14 @@ export default function EditableHeroBanner() {
     ? { backgroundImage: `url(${heroData.image})` }
     : { backgroundImage: `url(${schoolImg})` };
 
-  const isEditableMode = useSelector(selectIsAuth);
-  // Statistika kartalari nomlangan maydonlarda (students/teachers/...), tartibi esa alohida
-  // `order` massivida — mavjud ma'lumotni buzmasdan sudrab tartiblash mumkin.
+  // Statistika kartalari avval nomlangan maydonlarda saqlangan (students/teachers/...).
+  // Endi umumiy ro'yxat (items) sifatida saqlaymiz — shu bilan har bir kartani alohida
+  // tahrirlash/o'chirish/qo'shish/sudrash (EditableList) mumkin bo'ladi. Eski ma'lumot uchun
+  // quyidagi fallback bilan o'qiymiz — hech narsa yo'qolmaydi.
   const HERO_STAT_KEYS_DEFAULT = ['students', 'teachers', 'universities', 'languages'];
-  const heroStatOrder = Array.isArray(statsData.order) && statsData.order.length === HERO_STAT_KEYS_DEFAULT.length
-    ? statsData.order
-    : HERO_STAT_KEYS_DEFAULT;
-  const heroStatsDrag = useDragReorder(heroStatOrder, (next) => handleSaveStats({ ...statsData, order: next }));
+  const heroStatsItems = Array.isArray(statsData.items)
+    ? statsData.items
+    : HERO_STAT_KEYS_DEFAULT.map((k) => statsData[k]).filter(Boolean);
 
   return (
     <EditableSection
@@ -206,22 +203,18 @@ export default function EditableHeroBanner() {
               buttonStyle={{ bottom: '20px', right: '20px' }}
             >
               <div className="hero-stats fade-up-d3">
-                {heroStatOrder.map((key, idx) => {
-                  const s = statsData[key];
-                  if (!s) return null;
-                  const { dragClassName, ...dropProps } = heroStatsDrag.itemProps(idx);
-                  return (
-                    <div key={key} className={`hero-stat drag-reorder-host ${dragClassName}`} {...dropProps}>
-                      {isEditableMode && (
-                        <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...heroStatsDrag.gripProps(idx)}>
-                          <GripVertical size={14} />
-                        </button>
-                      )}
+                <EditableList
+                  items={heroStatsItems}
+                  onSave={(newItems) => handleSaveStats({ ...statsData, items: newItems })}
+                  defaultItem={{ val: '', label: '' }}
+                  itemName="Statistika"
+                  renderItem={(s) => (
+                    <div className="hero-stat">
                       <div className="hero-stat-val">{s.val}</div>
                       <div className="hero-stat-label">{s.label}</div>
                     </div>
-                  );
-                })}
+                  )}
+                />
               </div>
             </EditableSection>
           </div>

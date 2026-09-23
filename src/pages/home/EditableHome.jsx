@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { GripVertical } from 'lucide-react';
 import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
-import { EditableSection } from '../../shared/editable';
-import { useDragReorder } from '../../shared/editable/useDragReorder';
+import { EditableSection, EditableList } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -130,13 +128,14 @@ export default function EditableHome() {
         }
     };
 
-    // Statistika kartalari nomlangan maydonlarda saqlanadi (students/teachers/...), tartibi esa
-    // alohida `order` massivida — shunday qilib mavjud ma'lumotni buzmasdan sudrab tartiblash mumkin.
+    // Statistika kartalari avval nomlangan maydonlarda saqlangan (students/teachers/...).
+    // Endi umumiy ro'yxat (items) sifatida saqlaymiz — shu bilan har bir kartani alohida
+    // tahrirlash/o'chirish/qo'shish/sudrash (EditableList) mumkin bo'ladi. Eski (hali `items`ga
+    // o'tmagan) ma'lumot uchun quyidagi fallback bilan o'qiymiz — hech narsa yo'qolmaydi.
     const STAT_KEYS_DEFAULT = ['students', 'teachers', 'programs', 'universities'];
-    const statOrder = Array.isArray(sections.stats.order) && sections.stats.order.length === STAT_KEYS_DEFAULT.length
-        ? sections.stats.order
-        : STAT_KEYS_DEFAULT;
-    const statsDrag = useDragReorder(statOrder, (next) => handleSaveSection('stats', { ...sections.stats, order: next }));
+    const statsItems = Array.isArray(sections.stats.items)
+        ? sections.stats.items
+        : STAT_KEYS_DEFAULT.map((k) => sections.stats[k]).filter(Boolean);
 
     return (
         <div className="page">
@@ -184,24 +183,20 @@ export default function EditableHome() {
                             <div className="divider center" />
                         </div>
                         <div className="stats-grid">
-                            {statOrder.map((key, idx) => {
-                                const s = sections.stats[key];
-                                if (!s) return null;
-                                const { dragClassName, ...dropProps } = statsDrag.itemProps(idx);
-                                return (
-                                    <div key={key} className={`stat-card glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                                        {isEditableMode && (
-                                            <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...statsDrag.gripProps(idx)}>
-                                                <GripVertical size={14} />
-                                            </button>
-                                        )}
+                            <EditableList
+                                items={statsItems}
+                                onSave={(newItems) => handleSaveSection('stats', { ...sections.stats, items: newItems })}
+                                defaultItem={{ icon: '⭐', val: '', label: '', note: '' }}
+                                itemName="Statistika"
+                                renderItem={(s) => (
+                                    <div className="stat-card glass-card">
                                         <div className="stat-icon">{s.icon}</div>
                                         <div className="stat-val">{s.val}</div>
                                         <div className="stat-label">{s.label}</div>
                                         {s.note && <div className="stat-note">{s.note}</div>}
                                     </div>
-                                );
-                            })}
+                                )}
+                            />
                         </div>
                     </div>
                 </section>

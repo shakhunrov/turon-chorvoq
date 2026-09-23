@@ -1,11 +1,9 @@
-import { useSelector } from 'react-redux';
-import { GripVertical } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
+import { EditableSection, EditableList } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
-import { useDragReorder } from '../../shared/editable/useDragReorder';
-import { selectIsAuth } from '../../features/auth';
 import './Partnerships.css';
+
+const CATEGORY_ICONS = ['🎓', '🏭', '🌐', '🤝'];
 
 export default function EditablePartnerships() {
   const { t } = useLang();
@@ -30,10 +28,6 @@ export default function EditablePartnerships() {
       opps: p.opps,
     },
   });
-  const isEditableMode = useSelector(selectIsAuth);
-  const statsDrag = useDragReorder(sections.stats.stats || [], (next) => handleSaveSection('stats', { ...sections.stats, stats: next }));
-  const categoriesDrag = useDragReorder(sections.network.categories || [], (next) => handleSaveSection('network', { ...sections.network, categories: next }));
-  const oppsDrag = useDragReorder(sections.opportunities.opps || [], (next) => handleSaveSection('opportunities', { ...sections.opportunities, opps: next }));
 
   return (
     <div className="page">
@@ -62,20 +56,18 @@ export default function EditablePartnerships() {
             buttonClassName="stats-edit-btn"
           >
             <div className="partner-stats">
-              {sections.stats.stats && sections.stats.stats.map((s, idx) => {
-                const { dragClassName, ...dropProps } = statsDrag.itemProps(idx);
-                return (
-                  <div key={idx} className={`partner-stat glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                    {isEditableMode && (
-                      <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...statsDrag.gripProps(idx)}>
-                        <GripVertical size={14} />
-                      </button>
-                    )}
+              <EditableList
+                items={sections.stats.stats || []}
+                onSave={(newStats) => handleSaveSection('stats', { ...sections.stats, stats: newStats })}
+                defaultItem={{ val: '', label: '' }}
+                itemName="Statistika"
+                renderItem={(s) => (
+                  <div className="partner-stat glass-card">
                     <div className="partner-stat-val">{s.val}</div>
                     <div className="partner-stat-label">{s.label}</div>
                   </div>
-                );
-              })}
+                )}
+              />
             </div>
           </EditableSection>
 
@@ -90,23 +82,21 @@ export default function EditablePartnerships() {
               <div className="divider" />
               <p className="section-subtitle" style={{ marginBottom: 48 }}>{sections.network.networkSubtitle}</p>
               <div className="partner-grid">
-                {sections.network.categories && sections.network.categories.map((cat, i) => {
-                  const { dragClassName, ...dropProps } = categoriesDrag.itemProps(i);
-                  return (
-                    <div key={i} className={`partner-card glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                      {isEditableMode && (
-                        <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...categoriesDrag.gripProps(i)}>
-                          <GripVertical size={14} />
-                        </button>
-                      )}
+                <EditableList
+                  items={sections.network.categories || []}
+                  onSave={(newCategories) => handleSaveSection('network', { ...sections.network, categories: newCategories })}
+                  defaultItem={{ title: '', desc: '' }}
+                  itemName="Kategoriya"
+                  renderItem={(cat, i) => (
+                    <div className="partner-card glass-card">
                       <div className="partner-card-icon">
-                        {['🎓', '🏭', '🌐', '🤝'][i]}
+                        {CATEGORY_ICONS[i % CATEGORY_ICONS.length]}
                       </div>
                       <h3 className="partner-card-title">{cat.title}</h3>
                       <p className="partner-card-desc">{cat.desc}</p>
                     </div>
-                  );
-                })}
+                  )}
+                />
               </div>
             </div>
           </EditableSection>
@@ -121,20 +111,18 @@ export default function EditablePartnerships() {
               <h2 className="section-title">{sections.opportunities.oppTitle}</h2>
               <div className="divider" />
               <div className="opp-list">
-                {sections.opportunities.opps && sections.opportunities.opps.map((o, i) => {
-                  const { dragClassName, ...dropProps } = oppsDrag.itemProps(i);
-                  return (
-                    <div key={i} className={`opp-item glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                      {isEditableMode && (
-                        <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...oppsDrag.gripProps(i)}>
-                          <GripVertical size={14} />
-                        </button>
-                      )}
+                <EditableList
+                  items={sections.opportunities.opps || []}
+                  onSave={(newOpps) => handleSaveSection('opportunities', { ...sections.opportunities, opps: newOpps })}
+                  defaultItem=""
+                  itemName="Imkoniyat"
+                  renderItem={(o) => (
+                    <div className="opp-item glass-card">
                       <span className="opp-icon">✨</span>
                       <span>{o}</span>
                     </div>
-                  );
-                })}
+                  )}
+                />
               </div>
             </div>
           </EditableSection>

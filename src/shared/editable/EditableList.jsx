@@ -172,6 +172,11 @@ export default function EditableList({ items = [], onSave, renderItem, defaultIt
             .replace(/^./, (str) => str.toUpperCase());
     };
 
+    // Ba'zi ro'yxatlar (masalan "Qadriyatlar") elementlari oddiy matn (string), obyekt emas —
+    // bunday holda alohida maydonlar o'rniga bitta "Matn" maydoni ko'rsatiladi.
+    const currentSample = isCreating ? defaultItem : items[editingIndex];
+    const isPrimitiveList = typeof currentSample !== 'object' || currentSample === null;
+
     return (
         <>
             {/* List items - har birida edit/delete tugmalari */}
@@ -238,8 +243,29 @@ export default function EditableList({ items = [], onSave, renderItem, defaultIt
                         </div>
 
                         <div className="edit-modal-body">
-                            {Object.keys(isCreating ? defaultItem : items[editingIndex] || {}).map((key) =>
-                                renderField(key, formData[key])
+                            {isPrimitiveList ? (
+                                <div className="form-group">
+                                    <label className="form-label">Matn</label>
+                                    {typeof formData === 'string' && formData.length > 100 ? (
+                                        <textarea
+                                            className="form-input"
+                                            value={formData || ''}
+                                            onChange={(e) => setFormData(e.target.value)}
+                                            rows={4}
+                                        />
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData || ''}
+                                            onChange={(e) => setFormData(e.target.value)}
+                                        />
+                                    )}
+                                </div>
+                            ) : (
+                                Object.keys(isCreating ? defaultItem : items[editingIndex] || {}).map((key) =>
+                                    renderField(key, formData[key])
+                                )
                             )}
                         </div>
 

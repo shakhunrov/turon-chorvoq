@@ -1,10 +1,6 @@
-import { useSelector } from 'react-redux';
-import { GripVertical } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
+import { EditableSection, EditableList } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
-import { useDragReorder } from '../../shared/editable/useDragReorder';
-import { selectIsAuth } from '../../features/auth';
 import './AboutVision.css';
 
 export default function EditableAboutVision() {
@@ -32,9 +28,6 @@ export default function EditableAboutVision() {
     };
 
     const { sections, handleSaveSection } = useEditableSections('about-vision', defaultSections);
-    const isEditableMode = useSelector(selectIsAuth);
-    const valuesDrag = useDragReorder(sections.values.values || [], (next) => handleSaveSection('values', { ...sections.values, values: next }));
-    const outcomesDrag = useDragReorder(sections.outcomes.outcomes || [], (next) => handleSaveSection('outcomes', { ...sections.outcomes, outcomes: next }));
 
     return (
         <div className="page">
@@ -77,20 +70,18 @@ export default function EditableAboutVision() {
                             <h2 className="section-title">{sections.values.title}</h2>
                             <div className="divider" />
                             <div className="values-grid">
-                                {sections.values.values.map((val, i) => {
-                                    const { dragClassName, ...dropProps } = valuesDrag.itemProps(i);
-                                    return (
-                                        <div key={i} className={`value-tag glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                                            {isEditableMode && (
-                                                <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...valuesDrag.gripProps(i)}>
-                                                    <GripVertical size={14} />
-                                                </button>
-                                            )}
+                                <EditableList
+                                    items={sections.values.values || []}
+                                    onSave={(newValues) => handleSaveSection('values', { ...sections.values, values: newValues })}
+                                    defaultItem=""
+                                    itemName="Qadriyat"
+                                    renderItem={(val) => (
+                                        <div className="value-tag glass-card">
                                             <span className="value-dot" />
                                             {val}
                                         </div>
-                                    );
-                                })}
+                                    )}
+                                />
                             </div>
                         </div>
                     </EditableSection>
@@ -105,20 +96,18 @@ export default function EditableAboutVision() {
                             <h2 className="section-title">{sections.outcomes.title}</h2>
                             <div className="divider" />
                             <div className="outcomes-list">
-                                {sections.outcomes.outcomes.map((o, i) => {
-                                    const { dragClassName, ...dropProps } = outcomesDrag.itemProps(i);
-                                    return (
-                                        <div key={i} className={`outcome-item glass-card drag-reorder-host ${dragClassName}`} {...dropProps}>
-                                            {isEditableMode && (
-                                                <button type="button" className="drag-reorder-grip" title="Sudrab joyini o'zgartirish" {...outcomesDrag.gripProps(i)}>
-                                                    <GripVertical size={14} />
-                                                </button>
-                                            )}
+                                <EditableList
+                                    items={sections.outcomes.outcomes || []}
+                                    onSave={(newOutcomes) => handleSaveSection('outcomes', { ...sections.outcomes, outcomes: newOutcomes })}
+                                    defaultItem=""
+                                    itemName="Natija"
+                                    renderItem={(o, i) => (
+                                        <div className="outcome-item glass-card">
                                             <span className="outcome-num">{String(i + 1).padStart(2, '0')}</span>
                                             <p>{o}</p>
                                         </div>
-                                    );
-                                })}
+                                    )}
+                                />
                             </div>
                         </div>
                     </EditableSection>
