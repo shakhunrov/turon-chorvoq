@@ -648,8 +648,12 @@ export default function AdminDashboard() {
                 {/* ═══════════════════ PAGE SECTIONS (sayt matnlari, CMS) ═══════════════════ */}
                 {view === 'sections-list' && <PageSectionsManager branchId={branchId} />}
 
-                {/* ═══════════════════ SAYTNI KO'RISH (admin panel ichida, kattalashtiriladigan) ═══════════════════ */}
-                {view === 'site-preview' && <SitePreview />}
+                {/* ═══════════════════ SAYTNI KO'RISH (admin panel ichida, kattalashtiriladigan) ═══════════════════
+                     Har doim DOM'da qoladi (o'chirilmaydi) — shu sababli boshqa bo'limga o'tib qaytilganda
+                     iframe qaytadan yuklanmaydi, darhol (Figma'dagidek) ko'rinadi. Faqat ko'rinishi almashtiriladi. */}
+                <div style={{ display: view === 'site-preview' ? 'block' : 'none' }}>
+                    <SitePreview active={view === 'site-preview'} />
+                </div>
 
                 {/* ═══════════════════ ADMISSIONS LIST ═══════════════════ */}
                 {view === 'adm-list' && (

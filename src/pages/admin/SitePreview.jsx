@@ -11,7 +11,7 @@ const MAX_ZOOM = 1.5;
 // avtomatik baham ko'riladi — pensillar shu yerning o'zida ham ishlaydi.
 // Kattalashtirish shunchaki CSS transform: scale — Figma emas, lekin ko'rish/tekshirish
 // uchun qulay: kichraytirib butun sahifani ko'rish, kattalashtirib detallarni tekshirish.
-export default function SitePreview() {
+export default function SitePreview({ active = true }) {
     const [zoom, setZoom] = useState(1);
     const [reloadTick, setReloadTick] = useState(0);
     const [frameHeight, setFrameHeight] = useState(2000);
@@ -32,11 +32,13 @@ export default function SitePreview() {
         }
     };
 
-    // Iframe ichidagi sahifa o'zgarsa (SPA navigatsiya) balandlikni vaqti-vaqti bilan qayta o'lchaymiz
+    // Iframe ichidagi sahifa o'zgarsa (SPA navigatsiya) balandlikni vaqti-vaqti bilan qayta o'lchaymiz.
+    // Faqat bu bo'lim ko'rinib turganda (active) — fonda bekorga ishlamasin.
     useEffect(() => {
+        if (!active) return undefined;
         const id = setInterval(measure, 1000);
         return () => clearInterval(id);
-    }, []);
+    }, [active]);
 
     return (
         <div className="pgsec-preview">
