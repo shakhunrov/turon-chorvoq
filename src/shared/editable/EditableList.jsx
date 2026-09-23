@@ -1,19 +1,55 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
-import { Edit2, Trash2, Plus, Save, X } from 'lucide-react';
+import { Edit2, Trash2, Plus, Save, X, GripVertical } from 'lucide-react';
 import { selectIsAuth } from '../../features/auth';
 import './EditableList.css';
 
 /**
  * EditableList - Array elementlarini (cardlar, list items) edit/create/delete qilish uchun
- * Har bir card'da alohida edit tugmasi
+ * Har bir card'da alohida edit tugmasi. Editable rejimda kartaning tepa-chap burchagidagi
+ * tutqich (grip) orqali sudrab, kartalarning ketma-ketligini o'zgartirish mumkin — o'zgarish
+ * darhol onSave orqali saqlanadi (xuddi tahrirlash/o'chirishdek).
  */
 export default function EditableList({ items = [], onSave, renderItem, defaultItem = {}, itemName = "Item" }) {
     const isEditableMode = useSelector(selectIsAuth);
     const [editingIndex, setEditingIndex] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [formData, setFormData] = useState({});
+    const [dragIndex, setDragIndex] = useState(null);
+    const [overIndex, setOverIndex] = useState(null);
+
+    const handleDragStart = (index) => (e) => {
+        setDragIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+        // Ba'zi brauzerlarda dataTransfer to'ldirilmasa dragstart ishlamaydi
+        try { e.dataTransfer.setData('text/plain', String(index)); } catch { /* ignore */ }
+    };
+
+    const handleDragOver = (index) => (e) => {
+        e.preventDefault();
+        if (index !== overIndex) setOverIndex(index);
+    };
+
+    const handleDrop = (index) => (e) => {
+        e.preventDefault();
+        if (dragIndex === null || dragIndex === index) {
+            setDragIndex(null);
+            setOverIndex(null);
+            return;
+        }
+        const newItems = [...items];
+        const [moved] = newItems.splice(dragIndex, 1);
+        newItems.splice(index, 0, moved);
+        onSave(newItems);
+        setDragIndex(null);
+        setOverIndex(null);
+    };
+
+    const handleDragEnd = () => {
+        setDragIndex(null);
+        setOverIndex(null);
+    };
 
     const handleEdit = (index, e) => {
         e.stopPropagation();
@@ -140,15 +176,29 @@ export default function EditableList({ items = [], onSave, renderItem, defaultIt
         <>
             {/* List items - har birida edit/delete tugmalari */}
             {items.map((item, index) => (
-                <div key={index} className="editable-list-item">
+                <div
+                    key={index}
+                    className={`editable-list-item${dragIndex === index ? ' is-dragging' : ''}${overIndex === index && dragIndex !== null && dragIndex !== index ? ' is-drag-over' : ''}`}
+                    onDragOver={isEditableMode ? handleDragOver(index) : undefined}
+                    onDrop={isEditableMode ? handleDrop(index) : undefined}
+                >
                     {/* Item content */}
                     <div className="editable-list-item-content">
                         {renderItem(item, index)}
                     </div>
 
-                    {/* Edit/Delete buttons - faqat editable rejimda */}
+                    {/* Sudrab tartibini o'zgartirish tutqichi, tahrirlash/o'chirish - faqat editable rejimda */}
                     {isEditableMode && (
                         <div className="editable-list-item-actions">
+                            <button
+                                className="editable-list-action-btn drag"
+                                title="Sudrab joyini o'zgartirish"
+                                draggable
+                                onDragStart={handleDragStart(index)}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <GripVertical size={14} />
+                            </button>
                             <button
                                 className="editable-list-action-btn edit"
                                 onClick={(e) => handleEdit(index, e)}

@@ -44,6 +44,16 @@
     z-index: 10;
 }
 
+.editable-list-item.is-dragging {
+    opacity: 0.4;
+}
+
+.editable-list-item.is-drag-over {
+    outline: 2px dashed #4f46e5;
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
 .editable-list-item-content {
     position: relative;
     width: 100%;
@@ -89,6 +99,22 @@
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.editable-list-action-btn.drag {
+    color: #475569;
+    cursor: grab;
+}
+
+.editable-list-action-btn.drag:hover {
+    background: #475569;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
+}
+
+.editable-list-action-btn.drag:active {
+    cursor: grabbing;
 }
 
 .editable-list-action-btn.delete {
