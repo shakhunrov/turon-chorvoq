@@ -650,9 +650,12 @@ export default function AdminDashboard() {
 
                 {/* ═══════════════════ SAYTNI KO'RISH (admin panel ichida, kattalashtiriladigan) ═══════════════════
                      Har doim DOM'da qoladi (o'chirilmaydi) — shu sababli boshqa bo'limga o'tib qaytilganda
-                     iframe qaytadan yuklanmaydi, darhol (Figma'dagidek) ko'rinadi. Faqat ko'rinishi almashtiriladi. */}
-                <div style={{ display: view === 'site-preview' ? 'block' : 'none' }}>
-                    <SitePreview active={view === 'site-preview'} />
+                     iframe qaytadan yuklanmaydi, darhol (Figma'dagidek) ko'rinadi. Yashirilganda `display:none`
+                     ISHLATILMAYDI — bu iframe ichidagi hajmni 0 ga tushirib, saytdagi "scroll bilan paydo
+                     bo'lish" animatsiyalarini (IntersectionObserver) abadiy siniq holatda qoldirib ketardi.
+                     Buning o'rniga ekrandan tashqariga chiqarib qo'yiladi — hajmi hech qachon o'zgarmaydi. */}
+                <div style={view === 'site-preview' ? undefined : { position: 'fixed', top: 0, left: -99999 }}>
+                    <SitePreview />
                 </div>
 
                 {/* ═══════════════════ ADMISSIONS LIST ═══════════════════ */}

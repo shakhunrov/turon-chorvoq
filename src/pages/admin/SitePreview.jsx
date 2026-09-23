@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Minus, Plus, RotateCcw, RefreshCw } from 'lucide-react';
 
 const DESKTOP_WIDTH = 1440;
+const IFRAME_HEIGHT = 900; // Oddiy brauzer oynasi balandligiga o'xshash — ichida o'zining tabiiy skrolli bo'ladi
 const ZOOM_STEP = 0.1;
 const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 1.5;
@@ -11,34 +12,20 @@ const MAX_ZOOM = 1.5;
 // avtomatik baham ko'riladi — pensillar shu yerning o'zida ham ishlaydi.
 // Kattalashtirish shunchaki CSS transform: scale — Figma emas, lekin ko'rish/tekshirish
 // uchun qulay: kichraytirib butun sahifani ko'rish, kattalashtirib detallarni tekshirish.
-export default function SitePreview({ active = true }) {
+//
+// Diqqat: iframe balandligini saytning haqiqiy tarkib balandligiga moslab avtomatik
+// o'zgartirib turish ATAYLAB ishlatilmaydi — sinovda ma'lum bo'ldiki, saytdagi ba'zi
+// bo'limlar `100vh` (ya'ni "iframe balandligi") ga bog'liq, shuning uchun bunday avtomatik
+// moslashtirish o'z-o'zini kuchaytiruvchi halqaga aylanib, har safar ochilganda sahifa
+// tobora "cho'zilib" ketardi. Shuning uchun iframe qat'iy balandlikda — ichida oddiy
+// brauzerdagidek pastga skroll qilinadi.
+export default function SitePreview() {
     const [zoom, setZoom] = useState(1);
     const [reloadTick, setReloadTick] = useState(0);
-    const [frameHeight, setFrameHeight] = useState(2000);
-    const iframeRef = useRef(null);
 
     const zoomIn = () => setZoom((z) => Math.min(MAX_ZOOM, +(z + ZOOM_STEP).toFixed(2)));
     const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, +(z - ZOOM_STEP).toFixed(2)));
     const zoomReset = () => setZoom(1);
-
-    const measure = () => {
-        try {
-            const doc = iframeRef.current?.contentWindow?.document;
-            if (doc?.documentElement) {
-                setFrameHeight(Math.max(doc.documentElement.scrollHeight, 800));
-            }
-        } catch {
-            // Boshqa domen bo'lsa (kross-origin) o'lchab bo'lmaydi — standart balandlik qoladi
-        }
-    };
-
-    // Iframe ichidagi sahifa o'zgarsa (SPA navigatsiya) balandlikni vaqti-vaqti bilan qayta o'lchaymiz.
-    // Faqat bu bo'lim ko'rinib turganda (active) — fonda bekorga ishlamasin.
-    useEffect(() => {
-        if (!active) return undefined;
-        const id = setInterval(measure, 1000);
-        return () => clearInterval(id);
-    }, [active]);
 
     return (
         <div className="pgsec-preview">
@@ -60,20 +47,18 @@ export default function SitePreview({ active = true }) {
             </div>
 
             <div className="pgsec-preview-viewport">
-                <div className="pgsec-preview-canvas" style={{ width: DESKTOP_WIDTH * zoom, height: frameHeight * zoom }}>
+                <div className="pgsec-preview-canvas" style={{ width: DESKTOP_WIDTH * zoom, height: IFRAME_HEIGHT * zoom }}>
                     <iframe
                         key={reloadTick}
-                        ref={iframeRef}
                         src="/editable/"
                         title="Sayt ko'rinishi"
                         style={{
                             width: DESKTOP_WIDTH,
-                            height: frameHeight,
+                            height: IFRAME_HEIGHT,
                             transform: `scale(${zoom})`,
                             transformOrigin: 'top left',
                             border: 'none',
                         }}
-                        onLoad={() => setTimeout(measure, 400)}
                     />
                 </div>
             </div>
