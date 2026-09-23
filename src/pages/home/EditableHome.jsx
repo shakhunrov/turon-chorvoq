@@ -5,7 +5,7 @@ import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableSection, EditableList, EditableText } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -169,38 +169,38 @@ export default function EditableHome() {
                 </section>
             </EditableSection>
 
-            {/* Asosiy raqamlar - Editable */}
-            <EditableSection
-                sectionId="stats"
-                data={sections.stats}
-                onSave={(data) => handleSaveSection('stats', data)}
-            >
-                <section className="stats-section section">
-                    <div className="container">
-                        <div className="section-header center">
-                            <span className="section-label">Ta'sir</span>
-                            <h2 className="section-title">{sections.stats.title}</h2>
-                            <div className="divider center" />
-                        </div>
-                        <div className="stats-grid">
-                            <EditableList
-                                items={statsItems}
-                                onSave={(newItems) => handleSaveSection('stats', { ...sections.stats, items: newItems })}
-                                defaultItem={{ icon: '⭐', val: '', label: '', note: '' }}
-                                itemName="Statistika"
-                                renderItem={(s) => (
-                                    <div className="stat-card glass-card">
-                                        <div className="stat-icon">{s.icon}</div>
-                                        <div className="stat-val">{s.val}</div>
-                                        <div className="stat-label">{s.label}</div>
-                                        {s.note && <div className="stat-note">{s.note}</div>}
-                                    </div>
-                                )}
+            {/* Asosiy raqamlar - Editable (sarlavha alohida pen, kartalar EditableList orqali) */}
+            <section className="stats-section section">
+                <div className="container">
+                    <div className="section-header center">
+                        <span className="section-label">Ta'sir</span>
+                        <h2 className="section-title">
+                            <EditableText
+                                value={sections.stats.title}
+                                onSave={(newTitle) => handleSaveSection('stats', { ...sections.stats, title: newTitle })}
+                                label="Sarlavha"
                             />
-                        </div>
+                        </h2>
+                        <div className="divider center" />
                     </div>
-                </section>
-            </EditableSection>
+                    <div className="stats-grid">
+                        <EditableList
+                            items={statsItems}
+                            onSave={(newItems) => handleSaveSection('stats', { ...sections.stats, items: newItems })}
+                            defaultItem={{ icon: '⭐', val: '', label: '', note: '' }}
+                            itemName="Statistika"
+                            renderItem={(s) => (
+                                <div className="stat-card glass-card">
+                                    <div className="stat-icon">{s.icon}</div>
+                                    <div className="stat-val">{s.val}</div>
+                                    <div className="stat-label">{s.label}</div>
+                                    {s.note && <div className="stat-note">{s.note}</div>}
+                                </div>
+                            )}
+                        />
+                    </div>
+                </div>
+            </section>
 
             {/* Ta'lim falsafasi - Editable */}
             <EditableSection

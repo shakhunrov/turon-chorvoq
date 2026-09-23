@@ -1,0 +1,37 @@
+.editable-text-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.editable-text-pen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.editable-text-wrap:hover .editable-text-pen {
+    opacity: 1;
+}
+
+.editable-text-pen:hover {
+    background: #4f46e5;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .editable-text-pen {
+        opacity: 1;
+    }
+}
