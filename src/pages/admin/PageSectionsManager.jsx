@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Image as ImageIcon, Plus, Save, Sparkles, X } from 'lucide-react';
+import { Image as ImageIcon, Plus, Save, Sparkles, Trash2, X } from 'lucide-react';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 
 // Saytdagi har bir "pencil" bilan tahrirlanadigan joy shu ro'yxatdagi (page, section_id)
@@ -7,7 +7,7 @@ import { getPageSections, savePageSection } from '../../shared/api/pageSections'
 // chaqiruvlari). Yangi editable joy qo'shilsa, shu yerga ham qo'shib qo'yish kerak — aks holda
 // u saytda ko'rinadi-yu, admin panelda ko'rinmaydi.
 export const PAGES = [
-    { key: 'home', label: 'Bosh sahifa — Hero banner', hint: 'Katta sarlavha, tugmalar (EditableHeroBanner)' },
+    { key: 'home', label: 'Bosh sahifa — Hero banner', hint: 'Katta sarlavha, tugmalar' },
     { key: 'why-choose', label: 'Bosh sahifa — Nega TIS', hint: 'Afzalliklar bo\'limi' },
     { key: 'testimonials', label: 'Bosh sahifa — Fikrlar', hint: 'Ota-ona/o\'quvchi sharhlari' },
     { key: 'news-section', label: 'Bosh sahifa — Yangiliklar sarlavhasi', hint: 'Faqat sarlavha/label — yangiliklarning o\'zi "Yangiliklar" bo\'limida' },
@@ -25,27 +25,150 @@ const LANGS = [
     { key: 'en', label: 'English' },
 ];
 
+// Ko'p uchraydigan kalitlar uchun tushunarli o'zbekcha nomlar. Ro'yxatda yo'q kalit
+// avtomatik "sarlavhaSingari" -> "Sarlavha Singari" ko'rinishiga o'giriladi.
+const FRIENDLY_LABELS = {
+    title: 'Sarlavha', subtitle: 'Kichik sarlavha', label: 'Yorliq (belgi)',
+    text: 'Matn', desc: 'Tavsif', description: 'Tavsif', cta: 'Tugma matni',
+    buttonText: 'Tugma matni', val: 'Raqam/Qiymat', note: 'Izoh', icon: 'Ikonka (emoji)',
+    image: 'Rasm (havola)', name: 'Ism', role: 'Lavozim', suffix: 'Qo\'shimcha belgi (masalan +)',
+};
+
+const humanize = (key) => FRIENDLY_LABELS[key] || key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/^./, (c) => c.toUpperCase());
+
 const parseContent = (raw) => {
     if (!raw) return {};
     if (typeof raw === 'object') return raw;
     try {
-        return JSON.parse(raw);
+        const p = JSON.parse(raw);
+        return p && typeof p === 'object' ? p : {};
     } catch {
         return {};
     }
 };
 
-// Bitta section'ni tahrirlash formasi — har bir til uchun alohida JSON matn maydoni.
+const isLongText = (v) => typeof v === 'string' && (v.length > 70 || v.includes('\n'));
+
+const emptyLike = (sample) => {
+    if (Array.isArray(sample)) return sample.length ? emptyLike(sample[0]) : '';
+    if (sample && typeof sample === 'object') {
+        const o = {};
+        Object.keys(sample).forEach((k) => { o[k] = emptyLike(sample[k]); });
+        return o;
+    }
+    return '';
+};
+
+// ── Bitta maydon: qiymat turiga qarab input/textarea, ro'yxat yoki ichki guruh ──
+function Field({ label, value, onChange }) {
+    if (Array.isArray(value)) {
+        return (
+            <div className="pgsec-group">
+                <div className="pgsec-group-title">{label}</div>
+                {value.map((item, i) => (
+                    <div key={i} className="pgsec-array-item">
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            {item && typeof item === 'object' ? (
+                                <ObjectFields
+                                    value={item}
+                                    onChange={(next) => {
+                                        const copy = [...value];
+                                        copy[i] = next;
+                                        onChange(copy);
+                                    }}
+                                />
+                            ) : (
+                                <input
+                                    className="form-input"
+                                    value={item ?? ''}
+                                    onChange={(e) => {
+                                        const copy = [...value];
+                                        copy[i] = e.target.value;
+                                        onChange(copy);
+                                    }}
+                                />
+                            )}
+                        </div>
+                        <button type="button" className="action-btn delete" title="O'chirish"
+                                onClick={() => onChange(value.filter((_, idx) => idx !== i))}>
+                            <Trash2 size={14} />
+                        </button>
+                    </div>
+                ))}
+                <button type="button" className="btn btn-outline" style={{ marginTop: 8 }}
+                        onClick={() => onChange([...value, emptyLike(value[0] ?? '')])}>
+                    <Plus size={14} /> Qator qo'shish
+                </button>
+            </div>
+        );
+    }
+
+    if (value && typeof value === 'object') {
+        return (
+            <div className="pgsec-group">
+                <div className="pgsec-group-title">{label}</div>
+                <ObjectFields value={value} onChange={onChange} />
+            </div>
+        );
+    }
+
+    return (
+        <div className="form-group">
+            <label className="form-label">{label}</label>
+            {isLongText(value) ? (
+                <textarea className="form-input" rows={4} value={value ?? ''} onChange={(e) => onChange(e.target.value)} />
+            ) : (
+                <input className="form-input" value={value ?? ''} onChange={(e) => onChange(e.target.value)} />
+            )}
+        </div>
+    );
+}
+
+// ── Obyektning barcha kalitlarini Field sifatida chizadi + yangi maydon qo'shish ──
+function ObjectFields({ value, onChange }) {
+    const [newKey, setNewKey] = useState('');
+
+    const setField = (key, v) => onChange({ ...value, [key]: v });
+    const addField = () => {
+        const k = newKey.trim();
+        if (!k || k in value) return;
+        onChange({ ...value, [k]: '' });
+        setNewKey('');
+    };
+
+    return (
+        <div className="pgsec-fields">
+            {/* "image" pastdagi alohida "Rasm" yuklash maydoni orqali boshqariladi, bu yerda ko'rsatilmaydi */}
+            {Object.keys(value).filter((k) => k !== 'image').map((k) => (
+                <Field key={k} label={humanize(k)} value={value[k]} onChange={(v) => setField(k, v)} />
+            ))}
+            <div className="pgsec-add-field">
+                <input
+                    className="form-input"
+                    placeholder="Yangi maydon nomi (masalan: subtitle)"
+                    value={newKey}
+                    onChange={(e) => setNewKey(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addField())}
+                />
+                <button type="button" className="btn btn-outline" onClick={addField}>
+                    <Plus size={14} /> Qo'shish
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// ── Bitta section'ni tahrirlash — katta modal, tillar bo'yicha forma ──
 function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
     const isNew = !section.id;
     const [sectionId, setSectionId] = useState(section.section_id || '');
     const [lang, setLang] = useState('uz');
-    const [texts, setTexts] = useState(() => {
-        const t = {};
-        LANGS.forEach(({ key }) => {
-            t[key] = JSON.stringify(parseContent(section[`content_${key}`]), null, 2);
-        });
-        return t;
+    const [values, setValues] = useState(() => {
+        const v = {};
+        LANGS.forEach(({ key }) => { v[key] = parseContent(section[`content_${key}`]); });
+        return v;
     });
     const [imageFile, setImageFile] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -53,23 +176,8 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
 
     const save = async () => {
         if (!sectionId.trim()) {
-            setError("Section ID kiritilmagan (masalan: main)");
+            setError("Bo'lim nomi (Section ID) kiritilmagan — masalan: main");
             return;
-        }
-        // Har bir til matnini avval JSON sifatida tekshiramiz — noto'g'ri JSON bo'lsa saqlamaymiz
-        const parsed = {};
-        for (const { key } of LANGS) {
-            const raw = texts[key].trim();
-            if (!raw) {
-                parsed[key] = {};
-                continue;
-            }
-            try {
-                parsed[key] = JSON.parse(raw);
-            } catch {
-                setError(`${key.toUpperCase()} matni to'g'ri JSON emas`);
-                return;
-            }
         }
         setSaving(true);
         setError('');
@@ -78,9 +186,9 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
                 branch: branchId,
                 page: pageKey,
                 section_id: sectionId.trim(),
-                content_uz: JSON.stringify(parsed.uz),
-                content_ru: JSON.stringify(parsed.ru),
-                content_en: JSON.stringify(parsed.en),
+                content_uz: JSON.stringify(values.uz),
+                content_ru: JSON.stringify(values.ru),
+                content_en: JSON.stringify(values.en),
             };
             if (imageFile) payload.image = imageFile;
             await savePageSection(payload);
@@ -92,68 +200,70 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
         }
     };
 
+    const fieldCount = Object.keys(values[lang] || {}).filter((k) => k !== 'image').length;
+
     return (
-        <div className="news-form-wrap" style={{ maxWidth: 640, marginBottom: 20 }}>
-            <div className="news-form-header">
-                <h2>{isNew ? "Yangi bo'lim" : `"${section.section_id}" bo'limi`}</h2>
-                <button className="form-close" onClick={onCancel} title="Yopish"><X size={18} /></button>
-            </div>
+        <div className="modal-overlay" onClick={onCancel}>
+            <div className="modal-box" style={{ maxWidth: 860, width: '92vw', maxHeight: '88vh', overflowY: 'auto' }}
+                 onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close" onClick={onCancel}><X size={18} /></button>
 
-            <div className="form-group">
-                <label className="form-label">Section ID</label>
-                <input
-                    className="form-input"
-                    placeholder="masalan: main"
-                    value={sectionId}
-                    disabled={!isNew}
-                    onChange={(e) => setSectionId(e.target.value)}
-                />
-            </div>
-
-            {section.image && (
-                <img src={section.image} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, marginBottom: 12 }} />
-            )}
-
-            <div style={{ display: 'flex', gap: 8, margin: '4px 0 12px' }}>
-                {LANGS.map(({ key, label }) => (
-                    <button
-                        key={key}
-                        type="button"
-                        className={`btn ${lang === key ? 'btn-primary' : 'btn-outline'}`}
-                        style={{ padding: '6px 14px', fontSize: 13 }}
-                        onClick={() => setLang(key)}
-                    >
-                        {label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="form-group">
-                <textarea
-                    className="form-input"
-                    style={{ width: '100%', minHeight: 160, fontFamily: 'monospace', fontSize: 13 }}
-                    value={texts[lang]}
-                    onChange={(e) => setTexts((prev) => ({ ...prev, [lang]: e.target.value }))}
-                    placeholder='{"title": "...", "text": "..."}'
-                />
-                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>
-                    JSON ko'rinishida — saytdagi shu bo'lim qanday maydonlarni kutsa, o'sha kalitlarni yozing
-                    (masalan title, subtitle, text). Bo'sh qoldirilsa, shu til uchun saytdagi standart matn ko'rinadi.
+                <h2 style={{ marginTop: 0, marginBottom: 4 }}>
+                    {isNew ? "Yangi bo'lim" : `Bo'lim: ${section.section_id}`}
+                </h2>
+                <p style={{ color: '#94a3b8', marginTop: 0, marginBottom: 20, fontSize: 13 }}>
+                    Bu yerdagi yozuvlar saytda darhol ko'rinadi. Har bir maydonni to'g'ridan-to'g'ri o'zgartirishingiz mumkin.
                 </p>
-            </div>
 
-            <div className="form-group">
-                <label className="form-label"><ImageIcon size={14} style={{ verticalAlign: -2 }} /> Rasm (ixtiyoriy)</label>
-                <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
-            </div>
+                <div className="form-group">
+                    <label className="form-label">Bo'lim nomi (Section ID)</label>
+                    <input
+                        className="form-input"
+                        placeholder="masalan: main"
+                        value={sectionId}
+                        disabled={!isNew}
+                        onChange={(e) => setSectionId(e.target.value)}
+                    />
+                </div>
 
-            {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>{error}</p>}
+                {section.image && (
+                    <img src={section.image} alt="" style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 10, marginBottom: 16 }} />
+                )}
 
-            <div className="form-actions">
-                <button type="button" className="btn btn-outline" onClick={onCancel} disabled={saving}>Bekor qilish</button>
-                <button type="button" className="btn btn-primary" onClick={save} disabled={saving}>
-                    <Save size={15} /> {saving ? 'Saqlanmoqda...' : 'Saqlash'}
-                </button>
+                <div style={{ display: 'flex', gap: 8, margin: '4px 0 18px', borderBottom: '1px solid #e2e8f0', paddingBottom: 14 }}>
+                    {LANGS.map(({ key, label }) => (
+                        <button
+                            key={key}
+                            type="button"
+                            className={`btn ${lang === key ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '7px 18px', fontSize: 13 }}
+                            onClick={() => setLang(key)}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
+                {fieldCount === 0 && (
+                    <p style={{ color: '#94a3b8', marginBottom: 12 }}>
+                        Bu til uchun hali matn yo'q — saytda standart matn ko'rinadi. Quyidan maydon qo'shing.
+                    </p>
+                )}
+                <ObjectFields value={values[lang]} onChange={(v) => setValues((prev) => ({ ...prev, [lang]: v }))} />
+
+                <div className="form-group" style={{ marginTop: 20 }}>
+                    <label className="form-label"><ImageIcon size={14} style={{ verticalAlign: -2 }} /> Rasm (ixtiyoriy)</label>
+                    <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+                </div>
+
+                {error && <p style={{ color: '#ef4444', fontSize: 13, marginBottom: 8 }}>{error}</p>}
+
+                <div className="form-actions" style={{ marginTop: 20 }}>
+                    <button type="button" className="btn btn-outline" onClick={onCancel} disabled={saving}>Bekor qilish</button>
+                    <button type="button" className="btn btn-primary" onClick={save} disabled={saving}>
+                        <Save size={15} /> {saving ? 'Saqlanmoqda...' : 'Saqlash'}
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -166,7 +276,7 @@ export default function PageSectionsManager({ branchId }) {
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [editingId, setEditingId] = useState(null); // section.id yoki 'new'
+    const [editingId, setEditingId] = useState(null); // section.id yoki 'new' yoki null
     const [reloadTick, setReloadTick] = useState(0);
 
     const currentPage = useMemo(() => PAGES.find((p) => p.key === pageKey), [pageKey]);
@@ -184,6 +294,7 @@ export default function PageSectionsManager({ branchId }) {
     }, [branchId, pageKey, reloadTick]);
 
     const refresh = () => setReloadTick((t) => t + 1);
+    const editingSection = editingId && editingId !== 'new' ? sections.find((s) => s.id === editingId) : null;
 
     return (
         <>
@@ -200,7 +311,7 @@ export default function PageSectionsManager({ branchId }) {
 
             <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', marginTop: 20 }}>
                 {/* Sahifalar ro'yxati */}
-                <nav style={{ width: 260, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <nav style={{ width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {PAGES.map((p) => (
                         <button
                             key={p.key}
@@ -225,22 +336,22 @@ export default function PageSectionsManager({ branchId }) {
                     )}
                     {error && <p style={{ color: '#ef4444' }}>{error}</p>}
 
-                    {!loading && !error && sections.length === 0 && editingId !== 'new' && (
+                    {!loading && !error && sections.length === 0 && (
                         <p style={{ color: '#94a3b8' }}>
                             Bu sahifada hali hech qanday bo'lim tahrirlanmagan — saytda standart (kod ichidagi) matnlar ko'rinadi.
                         </p>
                     )}
 
-                    {!loading && sections.length > 0 && editingId === null && (
+                    {!loading && sections.length > 0 && (
                         <div className="admin-table-wrap">
                             <table className="admin-table">
-                                <thead><tr><th>Section ID</th><th>To'ldirilgan maydonlar</th><th>Harakatlar</th></tr></thead>
+                                <thead><tr><th>Bo'lim</th><th>To'ldirilgan maydonlar</th><th>Harakatlar</th></tr></thead>
                                 <tbody>
                                 {sections.map((s) => (
                                     <tr key={s.id}>
                                         <td><div className="post-title">{s.section_id}</div></td>
                                         <td style={{ color: '#94a3b8', fontSize: 13 }}>
-                                            {Object.keys(parseContent(s.content_uz)).join(', ') || 'bo\'sh'}
+                                            {Object.keys(parseContent(s.content_uz)).map(humanize).join(', ') || 'bo\'sh'}
                                         </td>
                                         <td style={{ width: 120 }}>
                                             <div className="action-btns">
@@ -254,33 +365,32 @@ export default function PageSectionsManager({ branchId }) {
                         </div>
                     )}
 
-                    {editingId !== null && editingId !== 'new' && (
-                        <SectionEditor
-                            branchId={branchId}
-                            pageKey={pageKey}
-                            section={sections.find((s) => s.id === editingId) || {}}
-                            onSaved={() => { setEditingId(null); refresh(); }}
-                            onCancel={() => setEditingId(null)}
-                        />
-                    )}
-
-                    {editingId === 'new' ? (
-                        <SectionEditor
-                            branchId={branchId}
-                            pageKey={pageKey}
-                            section={{}}
-                            onSaved={() => { setEditingId(null); refresh(); }}
-                            onCancel={() => setEditingId(null)}
-                        />
-                    ) : (
-                        editingId === null && !loading && (
-                            <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => setEditingId('new')}>
-                                <Plus size={15} /> Yangi bo'lim qo'shish
-                            </button>
-                        )
+                    {!loading && (
+                        <button className="btn btn-outline" style={{ marginTop: 12 }} onClick={() => setEditingId('new')}>
+                            <Plus size={15} /> Yangi bo'lim qo'shish
+                        </button>
                     )}
                 </div>
             </div>
+
+            {editingId === 'new' && (
+                <SectionEditor
+                    branchId={branchId}
+                    pageKey={pageKey}
+                    section={{}}
+                    onSaved={() => { setEditingId(null); refresh(); }}
+                    onCancel={() => setEditingId(null)}
+                />
+            )}
+            {editingSection && (
+                <SectionEditor
+                    branchId={branchId}
+                    pageKey={pageKey}
+                    section={editingSection}
+                    onSaved={() => { setEditingId(null); refresh(); }}
+                    onCancel={() => setEditingId(null)}
+                />
+            )}
         </>
     );
 }

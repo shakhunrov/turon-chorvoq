@@ -497,3 +497,17 @@
   .admin-stats { grid-template-columns: 1fr 1fr; }
   .form-row { flex-direction: column; }
 }
+
+/* ── Page Sections Manager ── */
+.pgsec-fields { display: flex; flex-direction: column; gap: 4px; }
+.pgsec-group {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  margin-bottom: 16px;
+  background: #f8fafc;
+}
+.pgsec-group-title { font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+.pgsec-array-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.pgsec-add-field { display: flex; gap: 8px; margin-top: 8px; }
+.pgsec-add-field .form-input { flex: 1; }
