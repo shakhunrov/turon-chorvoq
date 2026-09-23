@@ -212,9 +212,9 @@ function SectionEditor({ branchId, pageKey, section, onSaved, onCancel }) {
 
     return (
         <div className="modal-overlay" onClick={onCancel}>
-            <div className="modal-box" style={{ maxWidth: 860, width: '92vw', maxHeight: '88vh', overflowY: 'auto', overscrollBehavior: 'contain' }}
-                 onClick={(e) => e.stopPropagation()}
-                 onWheel={(e) => e.stopPropagation()}>
+            <div className="modal-box" data-lenis-prevent
+                 style={{ maxWidth: 860, width: '92vw', maxHeight: '88vh', overflowY: 'auto', overscrollBehavior: 'contain' }}
+                 onClick={(e) => e.stopPropagation()}>
                 <button className="modal-close" onClick={onCancel}><X size={18} /></button>
 
                 <h2 style={{ marginTop: 0, marginBottom: 4 }}>
