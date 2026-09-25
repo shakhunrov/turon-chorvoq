@@ -18,6 +18,8 @@ export function useSmoothScroll() {
       touchMultiplier: 1.8,
     });
 
+    window.__lenis = lenis; // ScrollToTop shu orqali Lenis ichki holatini ham nolga tushiradi
+
     let rafId;
     function raf(time) {
       lenis.raf(time);
@@ -27,6 +29,7 @@ export function useSmoothScroll() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      if (window.__lenis === lenis) window.__lenis = null;
       lenis.destroy();
     };
   }, []);

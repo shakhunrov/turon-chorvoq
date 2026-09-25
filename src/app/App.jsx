@@ -61,6 +61,7 @@ function ScrollToTop() {
     const prev = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto'; // globals.css dagi smooth animatsiya scrollni to'xtatib qo'ymasin
     const toTop = () => {
+      window.__lenis?.scrollTo(0, { immediate: true, force: true });
       window.scrollTo(0, 0);
       html.scrollTop = 0;
       document.body.scrollTop = 0;
