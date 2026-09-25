@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { LangProvider } from '../shared/i18n';
@@ -54,8 +54,22 @@ function PublicLayout({ children }) {
 // Sahifadan sahifaga o'tganda tepaga (hash bo'lsa tegmaymiz)
 function ScrollToTop() {
   const { key, hash } = useLocation();
-  useEffect(() => {
-    if (!hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  useLayoutEffect(() => {
+    if (hash) return;
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto'; // globals.css dagi smooth animatsiya scrollni to'xtatib qo'ymasin
+    const toTop = () => {
+      window.scrollTo(0, 0);
+      html.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+    toTop();
+    // sahifa kontenti keyin yuklansa/balandligi o'zgarsa ham tepada qolsin
+    const t1 = setTimeout(toTop, 50);
+    const t2 = setTimeout(() => { toTop(); html.style.scrollBehavior = prev; }, 250);
+    return () => { clearTimeout(t1); clearTimeout(t2); html.style.scrollBehavior = prev; };
   }, [key]);
   return null;
 }
