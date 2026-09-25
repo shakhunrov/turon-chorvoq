@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
+import { EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { fetchPublicNews, selectNewsList, selectNewsLoading } from '../../features/news';
 import { selectIsAuth } from '../../features/auth';
@@ -36,20 +36,18 @@ export default function EditableNewsSection() {
         // .sort((a, b) => new Date(b.date) - new Date(a.date))
         .slice(0, 3);
 
-  console.log('newsList:', newsList);
-  console.log('latestNews:', latestNews);
 
   return (
     <section className="news-section section">
       <div className="container">
-        <EditableSection
-          sectionId="main"
-          data={sections.main}
-          onSave={(data) => handleSaveSection('main', data)}
-        >
+        <>
           <div className="section-header">
-            <span className="section-label">{sections.main.label}</span>
-            <h2 className="section-title">{sections.main.title}</h2>
+            <span className="section-label">
+              <EditableText value={sections.main.label} onSave={(v) => handleSaveSection('main', { ...sections.main, label: v })} label="Yorliq" />
+            </span>
+            <h2 className="section-title">
+              <EditableText value={sections.main.title} onSave={(v) => handleSaveSection('main', { ...sections.main, title: v })} label="Sarlavha" />
+            </h2>
             <div className="divider" />
           </div>
 
@@ -92,7 +90,7 @@ export default function EditableNewsSection() {
               </div>
             </>
           )}
-        </EditableSection>
+        </>
       </div>
     </section>
   );

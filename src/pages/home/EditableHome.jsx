@@ -5,7 +5,7 @@ import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
-import { EditableSection, EditableList, EditableText } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -141,33 +141,35 @@ export default function EditableHome() {
         <div className="page">
             <EditableHeroBanner />
 
-            {/* Biz haqimizda - Editable */}
-            <EditableSection
-                sectionId="whoWeAre"
-                data={sections.whoWeAre}
-                onSave={(data) => handleSaveSection('whoWeAre', data)}
-            >
-                <section className="section">
-                    <div className="container who-we-are">
-                        <div className="wwa-content">
-                            <span className="section-label">{sections.whoWeAre.label}</span>
-                            <h2 className="section-title">{sections.whoWeAre.title}</h2>
-                            <div className="divider" />
-                            <p className="wwa-text">{sections.whoWeAre.text}</p>
-                            <Link to={`${basePrefix}/about/vision`} className="btn btn-primary" style={{ marginTop: 16 }}>
-                                Batafsil →
-                            </Link>
-                        </div>
-                        <div className="wwa-image-side">
+            {/* Biz haqimizda — matnlar alohida pen, rasm alohida tugma */}
+            <section className="section">
+                <div className="container who-we-are">
+                    <div className="wwa-content">
+                        <span className="section-label">
+                            <EditableText value={sections.whoWeAre.label} onSave={(v) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, label: v })} label="Yorliq" />
+                        </span>
+                        <h2 className="section-title">
+                            <EditableText value={sections.whoWeAre.title} onSave={(v) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, title: v })} label="Sarlavha" />
+                        </h2>
+                        <div className="divider" />
+                        <p className="wwa-text">
+                            <EditableText value={sections.whoWeAre.text} onSave={(v) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, text: v })} label="Matn" multiline />
+                        </p>
+                        <Link to={`${basePrefix}/about/vision`} className="btn btn-primary" style={{ marginTop: 16 }}>
+                            Batafsil →
+                        </Link>
+                    </div>
+                    <div className="wwa-image-side">
+                        <EditableImage onSave={(file) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, image: file })}>
                             <img
-                                src={typeof sections.whoWeAre.image === 'string' ? sections.whoWeAre.image : schoolImg}
+                                src={typeof sections.whoWeAre.image === 'string' ? sections.whoWeAre.image : (sections.whoWeAre.image instanceof File ? URL.createObjectURL(sections.whoWeAre.image) : schoolImg)}
                                 alt="Turon International School"
                                 className="wwa-school-img"
                             />
-                        </div>
+                        </EditableImage>
                     </div>
-                </section>
-            </EditableSection>
+                </div>
+            </section>
 
             {/* Asosiy raqamlar - Editable (sarlavha alohida pen, kartalar EditableList orqali) */}
             <section className="stats-section section">
@@ -254,29 +256,25 @@ export default function EditableHome() {
             <EditableTestimonials />
             <EditableNewsSection />
 
-            {/* CTA Banner - Editable */}
-            <EditableSection
-                sectionId="cta"
-                data={sections.cta}
-                onSave={(data) => handleSaveSection('cta', data)}
-            >
-                <section className="cta-banner section">
-                    <div className="container">
-                        <div className="cta-box glass-card">
-                            <div className="cta-glow" />
-                            <h2 className="cta-title">{sections.cta.title}</h2>
-                            <div className="cta-actions">
-                                <Link to={`${basePrefix}/admissions`} className="btn btn-primary">
-                                    {sections.cta.button}
-                                </Link>
-                                <Link to={`${basePrefix}/contact`} className="btn btn-outline">
-                                    {sections.cta.consult}
-                                </Link>
-                            </div>
+            {/* CTA Banner — har bir matn alohida pen */}
+            <section className="cta-banner section">
+                <div className="container">
+                    <div className="cta-box glass-card">
+                        <div className="cta-glow" />
+                        <h2 className="cta-title">
+                            <EditableText value={sections.cta.title} onSave={(v) => handleSaveSection('cta', { ...sections.cta, title: v })} label="Sarlavha" multiline />
+                        </h2>
+                        <div className="cta-actions">
+                            <Link to={`${basePrefix}/admissions`} className="btn btn-primary">
+                                <EditableText value={sections.cta.button} onSave={(v) => handleSaveSection('cta', { ...sections.cta, button: v })} label="Birinchi tugma matni" />
+                            </Link>
+                            <Link to={`${basePrefix}/contact`} className="btn btn-outline">
+                                <EditableText value={sections.cta.consult} onSave={(v) => handleSaveSection('cta', { ...sections.cta, consult: v })} label="Ikkinchi tugma matni" />
+                            </Link>
                         </div>
                     </div>
-                </section>
-            </EditableSection>
+                </div>
+            </section>
         </div>
     );
 }
