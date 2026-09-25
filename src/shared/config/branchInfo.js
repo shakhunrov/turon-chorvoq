@@ -7,8 +7,7 @@
 //
 // Manba: "turon sayt malumot.xlsx" (Chirchiq) va "turon_sayt_chek-list_uz_sodda.xlsx"
 // (Sergeli) — 2026-09-22 da foydalanuvchi tomonidan yuborilgan.
-// Chorvoq uchun hali real ma'lumot yo'q — pastdagi qiymatlar eski placeholder,
-// TODO: Chorvoq filialidan xuddi shu anketani to'ldirib olish kerak.
+// Chorvoq: "turon_sayt_chek-list_uz_sodda (2) (2).ods" (2026-09-25).
 
 const DEFAULT_EMAIL = 'info@tisedu.uz';
 
@@ -41,14 +40,19 @@ export const BRANCH_INFO = {
       youtube: '',
     },
   },
-  // Chorvoq — TODO: haqiqiy ma'lumot hali kelmagan, joriy (placeholder) qiymatlar qoldirilgan
+  // Chorvoq
   6: {
     name: 'Chorvoq',
-    address: '',
-    phone: '',
+    address: "Toshkent viloyati, Bo'stonliq tumani, Besh-tut mahallasi, 16-maktab yonida",
+    phone: '+998 94 310 33 33',
     email: DEFAULT_EMAIL,
-    mapUrl: '',
-    social: { instagram: '', telegram: '', facebook: '', youtube: '' },
+    mapUrl: '', // anketada faqat umumiy maps.google.com berilgan — aniq joylashuv havolasi kelgach qo'shiladi
+    social: {
+      instagram: 'https://www.instagram.com/tis_chorvoq',
+      telegram: 'https://t.me/+HiwBiPHPPl9iZGQy',
+      facebook: '',
+      youtube: '',
+    },
   },
 };
 
