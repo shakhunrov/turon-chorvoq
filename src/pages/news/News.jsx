@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
 import {
   fetchPublicNews,
+  uploadNewsImage,
   selectNewsList,
   selectNewsLoading,
 } from '../../features/news';
 import { X } from 'lucide-react';
+import { EditableImage } from '../../shared/editable';
 import { RevealOnScroll } from '../../shared/components/kinetic';
 import './News.css';
 
@@ -163,6 +165,7 @@ export default function News() {
                         onError={(e) => { e.target.src = PLACEHOLDER; }}
                       />
                     </div>
+                    <EditableImage overlay style={{ top: 16, right: 16, zIndex: 40 }} onSave={(file) => dispatch(uploadNewsImage({ id: featuredPost.id, imageFile: file }))} />
 
                     {/* Editorial gradient overlay */}
                     <div className="nws-feat-overlay" />
@@ -225,6 +228,7 @@ export default function News() {
                             {post.category?.name && (
                               <span className="news-cat-badge">{post.category.name}</span>
                             )}
+                            <EditableImage overlay onSave={(file) => dispatch(uploadNewsImage({ id: post.id, imageFile: file }))} />
                           </div>
 
                           <div className="news-card-body">

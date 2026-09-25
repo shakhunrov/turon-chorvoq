@@ -9,7 +9,7 @@ import './EditableText.css';
  * EditableImage - rasm yonida kichik tugma: bosilsa fayl tanlanadi va onSave(file) chaqiriladi.
  * Butun section'ni qamrab oluvchi katta pen o'rniga faqat shu rasm uchun.
  */
-export default function EditableImage({ children, onSave, alwaysVisible = false, style }) {
+export default function EditableImage({ children, onSave, alwaysVisible = false, style, overlay = false }) {
     const isEditableMode = useSelector(selectIsAuth);
     const inputRef = useRef(null);
 
@@ -25,6 +25,23 @@ export default function EditableImage({ children, onSave, alwaysVisible = false,
         }
         onSave(file);
     };
+
+    if (overlay) {
+        // Rasmni o'rab olmaydi — ota-element (position: relative) ichida rasm ustidagi burchakka joylashadigan tugma.
+        return (
+            <span className="editable-image-overlay" style={style}>
+                <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
+                <button
+                    type="button"
+                    className="editable-image-pen"
+                    title="Rasmni almashtirish"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); inputRef.current?.click(); }}
+                >
+                    <ImagePlus size={16} />
+                </button>
+            </span>
+        );
+    }
 
     return (
         <div className={`editable-image-wrap${alwaysVisible ? ' always-visible' : ''}`} style={style}>

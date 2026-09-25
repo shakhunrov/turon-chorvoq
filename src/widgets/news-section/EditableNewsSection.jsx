@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useLang } from '../../shared/i18n';
-import { EditableText } from '../../shared/editable';
+import { EditableText, EditableImage } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
-import { fetchPublicNews, selectNewsList, selectNewsLoading } from '../../features/news';
+import { fetchPublicNews, uploadNewsImage, selectNewsList, selectNewsLoading } from '../../features/news';
 import { selectIsAuth } from '../../features/auth';
 import './NewsSection.css';
 
@@ -65,7 +65,8 @@ export default function EditableNewsSection() {
                   </div>
                 ) : (
                   latestNews.map((item, i) => (
-                    <article key={item.id} className="news-card glass-card">
+                    <article key={item.id} className="news-card glass-card" style={{ position: 'relative' }}>
+                      <EditableImage overlay onSave={(file) => dispatch(uploadNewsImage({ id: item.id, imageFile: file }))} />
                       <div
                         className="news-img-placeholder"
                         style={{
