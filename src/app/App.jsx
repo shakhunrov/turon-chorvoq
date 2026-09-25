@@ -53,10 +53,10 @@ function PublicLayout({ children }) {
 
 // Sahifadan sahifaga o'tganda tepaga (hash bo'lsa tegmaymiz)
 function ScrollToTop() {
-  const { pathname, hash } = useLocation();
+  const { key, hash } = useLocation();
   useEffect(() => {
     if (!hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [pathname]);
+  }, [key]);
   return null;
 }
 
