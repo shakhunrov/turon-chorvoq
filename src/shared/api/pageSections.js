@@ -1,4 +1,4 @@
-import api from './axiosInstance';
+import api from './adminTisApi';
 
 /**
  * Page Sections API
