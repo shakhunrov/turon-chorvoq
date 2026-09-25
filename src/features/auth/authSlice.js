@@ -20,18 +20,10 @@ export const loginThunk = createAsyncThunk(
       );
     }
 
-    // 2) school.gennis.uz — faqat sahifa matnlarini (page-sections) saqlash uchun kerak.
-    // Bu akkaunt u yerda bo'lmasa ham kirish davom etadi, faqat matn saqlash ishlamaydi.
-    try {
-      const { data } = await api.post('/token/', { username, password });
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-      return { access: data.access, refresh: data.refresh };
-    } catch {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      return { access: null, refresh: null };
-    }
+    // school.gennis.uz'ga so'rov yuborilmaydi — hamma narsa admin.tisedu.uz orqali.
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    return { access: null, refresh: null };
   },
 );
 
