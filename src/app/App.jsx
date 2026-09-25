@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { LangProvider } from '../shared/i18n';
 import { AdminAuthProvider } from '../shared/admin/adminAuth';
@@ -50,6 +51,15 @@ function PublicLayout({ children }) {
   );
 }
 
+// Sahifadan sahifaga o'tganda tepaga (hash bo'lsa tegmaymiz)
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   useSmoothScroll();
 
@@ -58,6 +68,7 @@ export default function App() {
       <AdminAuthProvider>
         <ToastHost />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* Admin routes (no public navbar/footer) */}
             <Route path="/admin" element={<AdminLogin />} />
