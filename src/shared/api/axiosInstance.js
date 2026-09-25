@@ -43,6 +43,9 @@ api.interceptors.response.use(
 
     const refreshToken = localStorage.getItem('refresh_token');
     if (!refreshToken) {
+      // Faqat admin.tisedu.uz orqali kirgan admin (school.gennis.uz hisobi yo'q) —
+      // sahifa matnini saqlash rad etiladi, lekin sessiyani buzmaymiz.
+      if (localStorage.getItem('tis_admin_access_token')) return Promise.reject(error);
       // No refresh token — force logout
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');

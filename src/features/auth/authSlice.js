@@ -7,26 +7,30 @@ import { clearAdminTisTokens, isAdminTisAuthed, loginAdminTis } from '../../shar
 export const loginThunk = createAsyncThunk(
   'auth/login',
   async ({ username, password }, { rejectWithValue }) => {
+    // 1) Asosiy login — admin.tisedu.uz (majburiy). Kira olmasa, umuman kiritmaymiz.
+    try {
+      await loginAdminTis(username, password);
+    } catch (err) {
+      clearAdminTisTokens();
+      const detail = err.response?.data?.detail;
+      return rejectWithValue(
+        typeof detail === 'string' && err.response?.status !== 401
+          ? detail
+          : "Login yoki parol noto'g'ri (admin.tisedu.uz)",
+      );
+    }
+
+    // 2) school.gennis.uz — faqat sahifa matnlarini (page-sections) saqlash uchun kerak.
+    // Bu akkaunt u yerda bo'lmasa ham kirish davom etadi, faqat matn saqlash ishlamaydi.
     try {
       const { data } = await api.post('/token/', { username, password });
-      // Persist tokens
-      // admin.tisedu.uz (yangiliklar/kategoriyalar) ham majburiy: u yerga kira olmasa
-      // to'liq kirishga ruxsat bermaymiz — aks holda panel 401 xatolari bilan ochilib qoladi.
-      try {
-        await loginAdminTis(username, password);
-      } catch (err) {
-        clearAdminTisTokens();
-        return rejectWithValue(
-          "Bu akkaunt admin.tisedu.uz tizimida topilmadi yoki parol mos kelmadi. Administrator bilan bog'laning.",
-        );
-      }
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
-      return data; // { access, refresh }
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.detail || 'Login failed. Check your credentials.',
-      );
+      return { access: data.access, refresh: data.refresh };
+    } catch {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      return { access: null, refresh: null };
     }
   },
 );
@@ -75,7 +79,7 @@ export const refreshTokenThunk = createAsyncThunk(
 const initialState = {
   accessToken: localStorage.getItem('access_token') || null,
   refreshToken: localStorage.getItem('refresh_token') || null,
-  isAuth: !!localStorage.getItem('access_token'),
+  isAuth: !!localStorage.getItem('access_token') || isAdminTisAuthed(),
   adminTisAuthed: isAdminTisAuthed(),
   loading: false,
   error: null,
@@ -136,7 +140,7 @@ const authSlice = createSlice({
       .addCase(refreshTokenThunk.rejected, (state) => {
         state.accessToken = null;
         state.refreshToken = null;
-        state.isAuth = false;
+        state.isAuth = isAdminTisAuthed();
       });
   },
 });

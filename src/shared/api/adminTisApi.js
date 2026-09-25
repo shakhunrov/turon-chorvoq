@@ -21,8 +21,9 @@ export const clearAdminTisTokens = () => {
 // yaroqsiz: ikkala tizimning tokenlarini o'chirib, login sahifasiga qaytaramiz.
 // Oddiy tashrifchilar (asosiy login yo'q) — jamoat yangiliklari endpointi ochiq,
 // ularga tegmaymiz.
-const forceRelogin = () => {
-  if (!localStorage.getItem('access_token')) return;
+const isAdminSession = () => !!getAdminTisAccess() || !!localStorage.getItem('access_token');
+const forceRelogin = (wasAdmin) => {
+  if (!wasAdmin) return;
   clearAdminTisTokens();
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
@@ -66,10 +67,11 @@ adminTisApi.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    const wasAdmin = isAdminSession();
     const refreshToken = localStorage.getItem(REFRESH_KEY);
     if (!refreshToken) {
       clearAdminTisTokens();
-      forceRelogin();
+      forceRelogin(wasAdmin);
       return Promise.reject(error);
     }
 
@@ -94,7 +96,7 @@ adminTisApi.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       clearAdminTisTokens();
-      forceRelogin();
+      forceRelogin(wasAdmin);
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
