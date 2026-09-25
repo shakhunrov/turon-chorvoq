@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../shared/api';
 import adminTisApi from '../../shared/api/adminTisApi';
 
 const ENDPOINT = '/website-sources/public/news/';
@@ -39,21 +38,6 @@ export const fetchNews = createAsyncThunk(
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to fetch news');
-    }
-  },
-);
-
-// GET single news profile — hozircha hech qayerda chaqirilmaydi (dead code,
-// eski `api` da qoldirilgan; admin.tisedu.uz da bitta-yangilik public
-// endpointi yo'q).
-export const fetchNewsById = createAsyncThunk(
-  'news/fetchById',
-  async (id, { rejectWithValue }) => {
-    try {
-      const { data } = await api.get(`${ENDPOINT}${id}/`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || 'Failed to fetch news item');
     }
   },
 );
@@ -202,12 +186,6 @@ const newsSlice = createSlice({
   .addCase(uploadNewsImage.fulfilled, (state, { payload }) => {
           const idx = state.newsList.findIndex((n) => n.id === payload.id);
           if (idx !== -1) state.newsList[idx] = payload;
-      })
-
-    // ── fetch by id ──
-    builder
-      .addCase(fetchNewsById.fulfilled, (state, { payload }) => {
-        state.currentNews = payload;
       });
 
     // ── create ──

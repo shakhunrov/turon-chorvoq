@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // admin.tisedu.uz (new-turon) — yangiliklar va kategoriyalar shu backend'ga
-// ko'chirildi (eski school.gennis.uz o'rniga). Token'lari axiosInstance.js
+// ko'chirildi (eski school.gennis.uz o'rniga). Token'lari
 // dagi asosiy login'dan mustaqil: bu yerda alohida saqlanadi, chunki ikki
 // tizim boshqa-boshqa foydalanuvchi bazasiga ega (SMM akkaunti bo'lmagan
 // filial admini asosiy tizimga kira olishi kerak, faqat yangiliklarni

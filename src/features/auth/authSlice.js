@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../shared/api';
 import { clearAdminTisTokens, isAdminTisAuthed, loginAdminTis } from '../../shared/api/adminTisApi';
 
 // ── Thunks ────────────────────────────────────────────────────────
@@ -40,28 +39,6 @@ export const loginAdminTisThunk = createAsyncThunk(
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.detail || 'Admin tis login failed');
-    }
-  },
-);
-
-export const refreshTokenThunk = createAsyncThunk(
-  'auth/refreshToken',
-  async (_, { rejectWithValue }) => {
-    try {
-      const refresh = localStorage.getItem('refresh_token');
-      if (!refresh) return rejectWithValue('No refresh token');
-
-      const { data } = await api.post('/token/refresh/', { refresh });
-      localStorage.setItem('access_token', data.access);
-      if (data.refresh) {
-        localStorage.setItem('refresh_token', data.refresh);
-
-      }
-      return data;
-    } catch (err) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      return rejectWithValue('Session expired');
     }
   },
 );
@@ -121,18 +98,6 @@ const authSlice = createSlice({
       })
       .addCase(loginAdminTisThunk.rejected, (state) => {
         state.adminTisAuthed = false;
-      });
-
-    // ── refresh ──
-    builder
-      .addCase(refreshTokenThunk.fulfilled, (state, { payload }) => {
-        state.accessToken = payload.access;
-        if (payload.refresh) state.refreshToken = payload.refresh;
-      })
-      .addCase(refreshTokenThunk.rejected, (state) => {
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.isAuth = isAdminTisAuthed();
       });
   },
 });
