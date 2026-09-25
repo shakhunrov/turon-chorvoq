@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../shared/api';
+import api from '../../shared/api/adminTisApi';
 
 const ENDPOINT = '/website-sources/contact/';
 

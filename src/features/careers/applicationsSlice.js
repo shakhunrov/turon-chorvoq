@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../../shared/api';
+import api from '../../shared/api/adminTisApi';
 
 const APPLY_ENDPOINT = '/website-sources/careers/apply/';
 const ADMIN_LIST_ENDPOINT = '/website-sources/admin/careers/applications/';
