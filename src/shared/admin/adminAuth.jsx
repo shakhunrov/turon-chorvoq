@@ -12,6 +12,7 @@ let branchId = 6; // Default for Chorvoq
 if (host.includes('chorvoq')) branchId = 6;
 if (host.includes('sergeli')) branchId = 9;
 if (host.includes('chirchiq')) branchId = 8;
+if (host.includes('nurafshon')) branchId = 10;
 
 localStorage.setItem("globalBranchId", branchId);
 

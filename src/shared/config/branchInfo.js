@@ -1,6 +1,6 @@
 // Filial bo'yicha haqiqiy aloqa ma'lumotlari (manzil, telefon, ijtimoiy tarmoqlar).
 // Domen filialni avtomatik aniqlaydi (src/shared/admin/adminAuth.jsx bilan bir xil
-// mantiq: chorvoq=6, sergeli=9, chirchiq=8), shuning uchun bu yerda ham branchId
+// mantiq: chorvoq=6, sergeli=9, chirchiq=8, nurafshon=10), shuning uchun bu yerda ham branchId
 // bo'yicha ajratilgan — Contact/Footer shu yerdan o'qiydi, i18n fayllaridagi
 // (uz/ru/en.js) contact.address/phone/email endi FAQAT "ma'lumot topilmasa"gi
 // zaxira (fallback) sifatida ishlatiladi.
@@ -50,6 +50,21 @@ export const BRANCH_INFO = {
     social: {
       instagram: 'https://www.instagram.com/tis_chorvoq',
       telegram: 'https://t.me/+HiwBiPHPPl9iZGQy',
+      facebook: '',
+      youtube: '',
+    },
+  },
+  // Nurafshon (NTA): "nta.xlsx1.xlsx" (2026-09-25). Telefon, Facebook, YouTube hali berilmagan.
+  10: {
+    name: 'Nurafshon',
+    mapTitle: 'Nurafshon, Tashkent Region',
+    address: "Toshkent viloyati, Nurafshon shahar, Toshkent yo'li ko'chasi 60-uy",
+    phone: '',
+    email: DEFAULT_EMAIL,
+    mapUrl: 'https://maps.app.goo.gl/TstXjfPLQ3RH4MFV7',
+    social: {
+      instagram: '',
+      telegram: 'https://t.me/nta_qabulxona',
       facebook: '',
       youtube: '',
     },

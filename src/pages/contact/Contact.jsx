@@ -186,7 +186,7 @@ export default function Contact() {
                 </div>
                 <div className="con-map-footer">
                   <div>
-                    <div className="con-map-title">{c.mapTitle || 'Chorvoq, Tashkent Region'}</div>
+                    <div className="con-map-title">{bi?.mapTitle || c.mapTitle || 'Chorvoq, Tashkent Region'}</div>
                     <div className="con-map-sub">Uzbekistan</div>
                   </div>
                   <a
