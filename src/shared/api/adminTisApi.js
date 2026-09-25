@@ -17,6 +17,18 @@ export const clearAdminTisTokens = () => {
   localStorage.removeItem(REFRESH_KEY);
 };
 
+// Admin (login qilgan) foydalanuvchi uchun admin.tisedu.uz 401 qaytarsa — sessiya
+// yaroqsiz: ikkala tizimning tokenlarini o'chirib, login sahifasiga qaytaramiz.
+// Oddiy tashrifchilar (asosiy login yo'q) — jamoat yangiliklari endpointi ochiq,
+// ularga tegmaymiz.
+const forceRelogin = () => {
+  if (!localStorage.getItem('access_token')) return;
+  clearAdminTisTokens();
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  if (window.location.pathname !== '/admin') window.location.href = '/admin';
+};
+
 // FastAPI OAuth2PasswordRequestForm — form-urlencoded, {access_token, refresh_token}
 export async function loginAdminTis(username, password) {
   const body = new URLSearchParams({ username, password });
@@ -57,6 +69,7 @@ adminTisApi.interceptors.response.use(
     const refreshToken = localStorage.getItem(REFRESH_KEY);
     if (!refreshToken) {
       clearAdminTisTokens();
+      forceRelogin();
       return Promise.reject(error);
     }
 
@@ -81,6 +94,7 @@ adminTisApi.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       clearAdminTisTokens();
+      forceRelogin();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

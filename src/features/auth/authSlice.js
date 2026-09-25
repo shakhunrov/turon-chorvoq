@@ -10,6 +10,16 @@ export const loginThunk = createAsyncThunk(
     try {
       const { data } = await api.post('/token/', { username, password });
       // Persist tokens
+      // admin.tisedu.uz (yangiliklar/kategoriyalar) ham majburiy: u yerga kira olmasa
+      // to'liq kirishga ruxsat bermaymiz — aks holda panel 401 xatolari bilan ochilib qoladi.
+      try {
+        await loginAdminTis(username, password);
+      } catch (err) {
+        clearAdminTisTokens();
+        return rejectWithValue(
+          "Bu akkaunt admin.tisedu.uz tizimida topilmadi yoki parol mos kelmadi. Administrator bilan bog'laning.",
+        );
+      }
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
       return data; // { access, refresh }
@@ -101,6 +111,7 @@ const authSlice = createSlice({
         state.accessToken = payload.access;
         state.refreshToken = payload.refresh;
         state.isAuth = true;
+        state.adminTisAuthed = true;
       })
       .addCase(loginThunk.rejected, (state, { payload }) => {
         state.loading = false;
