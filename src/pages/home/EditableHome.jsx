@@ -202,34 +202,53 @@ export default function EditableHome() {
                 </div>
             </section>
 
-            {/* Ta'lim falsafasi - Editable */}
-            <EditableSection
-                sectionId="philosophy"
-                data={sections.philosophy}
-                onSave={(data) => handleSaveSection('philosophy', data)}
-            >
-                <section className="section">
-                    <div className="container philosophy-section">
-                        <div className="philosophy-content">
-                            <span className="section-label">{sections.philosophy.label}</span>
-                            <h2 className="section-title">{sections.philosophy.title}</h2>
-                            <div className="divider" />
-                            <p className="section-subtitle">{sections.philosophy.text}</p>
-                            <Link to={`${basePrefix}/education`} className="btn btn-outline" style={{ marginTop: 24 }}>
-                                Bizning yondashuvimiz →
-                            </Link>
-                        </div>
-                        <div className="philosophy-cards">
-                            {sections.philosophy.tags.map((tag, idx) => (
-                                <div key={idx} className="phil-tag glass-card">
+            {/* Ta'lim falsafasi — matnlar alohida pen, kartalar EditableList */}
+            <section className="section">
+                <div className="container philosophy-section">
+                    <div className="philosophy-content">
+                        <span className="section-label">
+                            <EditableText
+                                value={sections.philosophy.label}
+                                onSave={(v) => handleSaveSection('philosophy', { ...sections.philosophy, label: v })}
+                                label="Yorliq"
+                            />
+                        </span>
+                        <h2 className="section-title">
+                            <EditableText
+                                value={sections.philosophy.title}
+                                onSave={(v) => handleSaveSection('philosophy', { ...sections.philosophy, title: v })}
+                                label="Sarlavha"
+                            />
+                        </h2>
+                        <div className="divider" />
+                        <p className="section-subtitle">
+                            <EditableText
+                                value={sections.philosophy.text}
+                                onSave={(v) => handleSaveSection('philosophy', { ...sections.philosophy, text: v })}
+                                label="Matn"
+                                multiline
+                            />
+                        </p>
+                        <Link to={`${basePrefix}/education`} className="btn btn-outline" style={{ marginTop: 24 }}>
+                            Bizning yondashuvimiz →
+                        </Link>
+                    </div>
+                    <div className="philosophy-cards">
+                        <EditableList
+                            items={sections.philosophy.tags || []}
+                            onSave={(newTags) => handleSaveSection('philosophy', { ...sections.philosophy, tags: newTags })}
+                            defaultItem={{ name: '', icon: '' }}
+                            itemName="Teg"
+                            renderItem={(tag) => (
+                                <div className="phil-tag glass-card">
                                     {tag.icon && <span style={{ marginRight: '8px' }}>{tag.icon}</span>}
                                     {tag.name || tag}
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        />
                     </div>
-                </section>
-            </EditableSection>
+                </div>
+            </section>
 
             <EditableWhyChoose />
             <EditableTestimonials />
