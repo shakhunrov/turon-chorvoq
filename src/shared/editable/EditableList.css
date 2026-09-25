@@ -219,3 +219,15 @@ textarea.form-input {
         justify-content: center;
     }
 }
+
+/* Kichik kartalar (teglar) — tugmalar matnni yopmasligi uchun karta ustki chetiga chiqariladi */
+.philosophy-cards .editable-list-item-actions {
+    top: -13px;
+    right: 8px;
+    gap: 4px;
+}
+
+.philosophy-cards .editable-list-action-btn {
+    width: 26px;
+    height: 26px;
+}
