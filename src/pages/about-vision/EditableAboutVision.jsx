@@ -1,5 +1,5 @@
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList, EditableText } from '../../shared/editable';
+import { EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './AboutVision.css';
 
@@ -31,34 +31,32 @@ export default function EditableAboutVision() {
 
     return (
         <div className="page">
-            <EditableSection
-                sectionId="hero"
-                data={sections.hero}
-                onSave={(data) => handleSaveSection('hero', data)}
-            >
-                <div className="page-hero">
-                    <div className="container">
-                        <span className="section-label">{sections.hero.label}</span>
-                        <h1 className="section-title">{sections.hero.title}</h1>
-                        <div className="divider" />
-                    </div>
+            <div className="page-hero">
+                <div className="container">
+                    <span className="section-label">
+                        <EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" />
+                    </span>
+                    <h1 className="section-title">
+                        <EditableText value={sections.hero.title} onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })} label="Sarlavha" />
+                    </h1>
+                    <div className="divider" />
                 </div>
-            </EditableSection>
+            </div>
 
             <section className="section">
                 <div className="container">
                     {/* Vision */}
-                    <EditableSection
-                        sectionId="vision"
-                        data={sections.vision}
-                        onSave={(data) => handleSaveSection('vision', data)}
-                    >
-                        <div className="vision-block glass-card">
-                            <div className="vision-icon">{sections.vision.icon}</div>
-                            <h2 className="vision-block-title">{sections.vision.title}</h2>
-                            <p className="vision-text">{sections.vision.text}</p>
+                    <div className="vision-block glass-card">
+                        <div className="vision-icon">
+                            <EditableText value={sections.vision.icon} onSave={(v) => handleSaveSection('vision', { ...sections.vision, icon: v })} label="Emoji" />
                         </div>
-                    </EditableSection>
+                        <h2 className="vision-block-title">
+                            <EditableText value={sections.vision.title} onSave={(v) => handleSaveSection('vision', { ...sections.vision, title: v })} label="Sarlavha" />
+                        </h2>
+                        <p className="vision-text">
+                            <EditableText value={sections.vision.text} onSave={(v) => handleSaveSection('vision', { ...sections.vision, text: v })} label="Matn" multiline />
+                        </p>
+                    </div>
 
                     {/* Values */}
                     <div className="vision-values-section">

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage } from '../../shared/editable';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
 import schoolImg from '../../shared/assets/img/school.png';
@@ -160,39 +160,51 @@ export default function EditableHeroBanner() {
     : HERO_STAT_KEYS_DEFAULT.map((k) => statsData[k]).filter(Boolean);
 
   return (
-    <EditableSection
-      sectionId="hero"
-      data={heroData}
-      onSave={handleSaveHero}
-      buttonStyle={{ top: '80px', right: '20px' }}
-    >
+    <>
       <section className="hero">
         <div className="hero-bg-container" style={bgStyle}>
           <div className="hero-overlay" />
         </div>
+        <EditableImage
+          alwaysVisible
+          style={{ position: 'absolute', top: 90, right: 24, zIndex: 30, width: 0, height: 0 }}
+          onSave={(file) => handleSaveHero({ ...heroData, image: file })}
+        >
+          <span />
+        </EditableImage>
 
         <div className="container hero-container">
           <div className="hero-content">
             <div className="hero-badge fade-up">
               <span className="badge badge-primary">
-                <Sparkles size={14} className="badge-icon" /> {heroData.subtitle}
+                <Sparkles size={14} className="badge-icon" /> <EditableText value={heroData.subtitle} onSave={(v) => handleSaveHero({ ...heroData, subtitle: v })} label="Yorliq" />
               </span>
             </div>
 
             <h1 className="hero-title fade-up-d1">
-              {heroData.vision.split(' ').slice(0, 5).join(' ')}{' '}
-              <span className="text-gradient-vibrant">{heroData.vision.split(' ').slice(5, 9).join(' ')}</span>{' '}
-              {heroData.vision.split(' ').slice(9).join(' ')}
+              <EditableText
+                value={heroData.vision}
+                onSave={(v) => handleSaveHero({ ...heroData, vision: v })}
+                label="Bosh sarlavha"
+                multiline
+                render={(v) => (
+                  <>
+                    {v.split(' ').slice(0, 5).join(' ')}{' '}
+                    <span className="text-gradient-vibrant">{v.split(' ').slice(5, 9).join(' ')}</span>{' '}
+                    {v.split(' ').slice(9).join(' ')}
+                  </>
+                )}
+              />
             </h1>
 
-            <p className="hero-sub fade-up-d2">{heroData.text}</p>
+            <p className="hero-sub fade-up-d2"><EditableText value={heroData.text} onSave={(v) => handleSaveHero({ ...heroData, text: v })} label="Matn" multiline /></p>
 
             <div className="hero-actions fade-up-d3">
               <div className="btn btn-primary">
-                {heroData.cta} <ArrowRight size={18} />
+                <EditableText value={heroData.cta} onSave={(v) => handleSaveHero({ ...heroData, cta: v })} label="Birinchi tugma" /> <ArrowRight size={18} />
               </div>
               <div className="btn btn-outline">
-                {heroData.apply}
+                <EditableText value={heroData.apply} onSave={(v) => handleSaveHero({ ...heroData, apply: v })} label="Ikkinchi tugma" />
               </div>
             </div>
 
@@ -217,7 +229,7 @@ export default function EditableHeroBanner() {
           <div className="scroll-dot" />
         </div>
       </section>
-    </EditableSection>
+    </>
   );
 }
 

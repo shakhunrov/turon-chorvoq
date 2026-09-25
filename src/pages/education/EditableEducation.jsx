@@ -1,5 +1,5 @@
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Education.css';
 
@@ -52,58 +52,42 @@ export default function EditableEducation() {
 
     return (
         <div className="page">
-            <EditableSection
-                sectionId="hero"
-                data={sections.hero}
-                onSave={(data) => handleSaveSection('hero', data)}
-            >
+            <>
                 <div className="page-hero-simple">
                     <div className="container">
-                        <span className="section-label">{sections.hero.label}</span>
-                        <h1 className="section-title">{sections.hero.title}</h1>
+                        <span className="section-label"><EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" /></span>
+                        <h1 className="section-title"><EditableText value={sections.hero.title} onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })} label="Sarlavha" /></h1>
                         <div className="divider" />
                     </div>
                 </div>
-            </EditableSection>
+            </>
 
             <section className="section">
                 <div className="container">
                     {/* Truth about education */}
-                    <EditableSection
-                        sectionId="truth"
-                        data={sections.truth}
-                        onSave={(data) => handleSaveSection('truth', data)}
-                    >
+                    <>
                         <div className="edu-truth glass-card">
-                            <div className="edu-truth-num">{sections.truth.num}</div>
+                            <div className="edu-truth-num"><EditableText value={sections.truth.num} onSave={(v) => handleSaveSection('truth', { ...sections.truth, num: v })} label="Raqam" /></div>
                             <div>
-                                <h2 className="edu-truth-title">{sections.truth.title}</h2>
-                                <p className="edu-truth-text">{sections.truth.text}</p>
+                                <h2 className="edu-truth-title"><EditableText value={sections.truth.title} onSave={(v) => handleSaveSection('truth', { ...sections.truth, title: v })} label="Sarlavha" /></h2>
+                                <p className="edu-truth-text"><EditableText value={sections.truth.text} onSave={(v) => handleSaveSection('truth', { ...sections.truth, text: v })} label="Matn" multiline /></p>
                             </div>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Educational Approach */}
-                    <EditableSection
-                        sectionId="approach"
-                        data={sections.approach}
-                        onSave={(data) => handleSaveSection('approach', data)}
-                    >
+                    <>
                         <div className="edu-approach">
-                            <h2 className="section-title">{sections.approach.title}</h2>
+                            <h2 className="section-title"><EditableText value={sections.approach.title} onSave={(v) => handleSaveSection('approach', { ...sections.approach, title: v })} label="Sarlavha" /></h2>
                             <div className="divider" />
-                            <p className="section-subtitle">{sections.approach.text}</p>
+                            <p className="section-subtitle"><EditableText value={sections.approach.text} onSave={(v) => handleSaveSection('approach', { ...sections.approach, text: v })} label="Matn" multiline /></p>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Future Skills */}
-                    <EditableSection
-                        sectionId="skills"
-                        data={sections.skills}
-                        onSave={(data) => handleSaveSection('skills', data)}
-                    >
+                    <>
                         <div className="skills-section">
-                            <h2 className="section-title">{sections.skills.title}</h2>
+                            <h2 className="section-title"><EditableText value={sections.skills.title} onSave={(v) => handleSaveSection('skills', { ...sections.skills, title: v })} label="Sarlavha" /></h2>
                             <div className="divider" />
                             <div className="skills-grid">
                                 <EditableList
@@ -126,21 +110,17 @@ export default function EditableEducation() {
                                 />
                             </div>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Skills → Classroom table */}
-                    <EditableSection
-                        sectionId="classroom"
-                        data={sections.classroom}
-                        onSave={(data) => handleSaveSection('classroom', data)}
-                    >
+                    <>
                         <div className="classroom-section">
-                            <h2 className="section-title">{sections.classroom.title}</h2>
+                            <h2 className="section-title"><EditableText value={sections.classroom.title} onSave={(v) => handleSaveSection('classroom', { ...sections.classroom, title: v })} label="Sarlavha" /></h2>
                             <div className="divider" />
                             <div className="classroom-table glass-card">
                                 <div className="classroom-header">
-                                    <span>{sections.classroom.skillLabel}</span>
-                                    <span>{sections.classroom.practiceLabel}</span>
+                                    <span><EditableText value={sections.classroom.skillLabel} onSave={(v) => handleSaveSection('classroom', { ...sections.classroom, skillLabel: v })} label="Birinchi ustun nomi" /></span>
+                                    <span><EditableText value={sections.classroom.practiceLabel} onSave={(v) => handleSaveSection('classroom', { ...sections.classroom, practiceLabel: v })} label="Ikkinchi ustun nomi" /></span>
                                 </div>
                                 <EditableList
                                     items={sections.classroom.rows || []}
@@ -158,28 +138,20 @@ export default function EditableEducation() {
                                 />
                             </div>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Assessment */}
-                    <EditableSection
-                        sectionId="assessment"
-                        data={sections.assessment}
-                        onSave={(data) => handleSaveSection('assessment', data)}
-                    >
+                    <>
                         <div className="assess-section glass-card">
-                            <h2 className="assess-title">{sections.assessment.title}</h2>
-                            <p className="assess-text">{sections.assessment.text}</p>
+                            <h2 className="assess-title"><EditableText value={sections.assessment.title} onSave={(v) => handleSaveSection('assessment', { ...sections.assessment, title: v })} label="Sarlavha" /></h2>
+                            <p className="assess-text"><EditableText value={sections.assessment.text} onSave={(v) => handleSaveSection('assessment', { ...sections.assessment, text: v })} label="Matn" multiline /></p>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Curriculum */}
-                    <EditableSection
-                        sectionId="curriculum"
-                        data={sections.curriculum}
-                        onSave={(data) => handleSaveSection('curriculum', data)}
-                    >
+                    <>
                         <div className="curriculum-section">
-                            <h2 className="section-title">{sections.curriculum.title}</h2>
+                            <h2 className="section-title"><EditableText value={sections.curriculum.title} onSave={(v) => handleSaveSection('curriculum', { ...sections.curriculum, title: v })} label="Sarlavha" /></h2>
                             <div className="divider" />
                             <div className="curriculum-grid">
                                 <EditableList
@@ -201,19 +173,15 @@ export default function EditableEducation() {
                                 />
                             </div>
                         </div>
-                    </EditableSection>
+                    </>
 
                     {/* Closing */}
-                    <EditableSection
-                        sectionId="closing"
-                        data={sections.closing}
-                        onSave={(data) => handleSaveSection('closing', data)}
-                    >
+                    <>
                         <div className="edu-closing glass-card">
-                            <h2 className="edu-closing-title">{sections.closing.title}</h2>
-                            <p className="edu-closing-text">{sections.closing.text}</p>
+                            <h2 className="edu-closing-title"><EditableText value={sections.closing.title} onSave={(v) => handleSaveSection('closing', { ...sections.closing, title: v })} label="Sarlavha" /></h2>
+                            <p className="edu-closing-text"><EditableText value={sections.closing.text} onSave={(v) => handleSaveSection('closing', { ...sections.closing, text: v })} label="Matn" multiline /></p>
                         </div>
-                    </EditableSection>
+                    </>
                 </div>
             </section>
         </div>

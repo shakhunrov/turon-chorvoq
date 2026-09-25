@@ -1,5 +1,5 @@
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList, EditableText } from '../../shared/editable';
+import { EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Partnerships.css';
 
@@ -31,20 +31,20 @@ export default function EditablePartnerships() {
 
   return (
     <div className="page">
-      <EditableSection
-        sectionId="hero"
-        data={sections.hero}
-        onSave={(data) => handleSaveSection('hero', data)}
-      >
-        <div className="page-hero-simple">
-          <div className="container">
-            <span className="section-label">{sections.hero.label}</span>
-            <h1 className="section-title">{sections.hero.title}</h1>
-            <div className="divider" />
-            <p className="section-subtitle">{sections.hero.subtitle}</p>
-          </div>
+      <div className="page-hero-simple">
+        <div className="container">
+          <span className="section-label">
+            <EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" />
+          </span>
+          <h1 className="section-title">
+            <EditableText value={sections.hero.title} onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })} label="Sarlavha" />
+          </h1>
+          <div className="divider" />
+          <p className="section-subtitle">
+            <EditableText value={sections.hero.subtitle} onSave={(v) => handleSaveSection('hero', { ...sections.hero, subtitle: v })} label="Subtitr" multiline />
+          </p>
         </div>
-      </EditableSection>
+      </div>
 
       <section className="section">
         <div className="container">

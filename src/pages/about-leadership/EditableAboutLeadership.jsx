@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
@@ -72,7 +72,9 @@ export default function EditableAboutLeadership() {
   const directorPhoto =
     typeof sections.director.image === 'string' && sections.director.image
       ? sections.director.image
-      : directorImg;
+      : sections.director.image instanceof File
+        ? URL.createObjectURL(sections.director.image)
+        : directorImg;
 
   return (
     <div className="page ls-page">
@@ -80,11 +82,7 @@ export default function EditableAboutLeadership() {
       {/* ════════════════════════════════════════
           CINEMATIC HERO  (director photo + title)
       ════════════════════════════════════════ */}
-      <EditableSection
-        sectionId="hero"
-        data={sections.hero}
-        onSave={(data) => handleSaveSection('hero', data)}
-      >
+      <>
         <div className="ls-hero">
           <div className="ls-hero-mesh" />
           <div className="ls-orb ls-orb-1" />
@@ -93,54 +91,52 @@ export default function EditableAboutLeadership() {
           <div className="container ls-hero-inner">
             {/* Left: director photo with gold rings */}
             <div className="ls-hero-photo-col">
-              <div className="ls-director-frame">
-                <div className="ls-ring ls-ring-1" />
-                <div className="ls-ring ls-ring-2" />
-                <div className="ls-ring ls-ring-3" />
-                <img
-                  src={directorPhoto}
-                  alt={sections.director.name}
-                  className="ls-director-photo"
-                />
-              </div>
+              <EditableImage onSave={(file) => handleSaveSection('director', { ...sections.director, image: file })}>
+                <div className="ls-director-frame">
+                  <div className="ls-ring ls-ring-1" />
+                  <div className="ls-ring ls-ring-2" />
+                  <div className="ls-ring ls-ring-3" />
+                  <img
+                    src={directorPhoto}
+                    alt={sections.director.name}
+                    className="ls-director-photo"
+                  />
+                </div>
+              </EditableImage>
               <div className="ls-hero-role-badge">
                 <span className="ls-role-dot" />
-                {sections.director.title}
+                <EditableText value={sections.director.title} onSave={(v) => handleSaveSection('director', { ...sections.director, title: v })} label="Lavozim" />
               </div>
             </div>
 
             {/* Right: name + subtitle */}
             <div className="ls-hero-text-col">
-              <span className="ls-eyebrow">{sections.hero.label}</span>
-              <h1 className="ls-hero-name">{sections.director.name}</h1>
+              <span className="ls-eyebrow"><EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" /></span>
+              <h1 className="ls-hero-name"><EditableText value={sections.director.name} onSave={(v) => handleSaveSection('director', { ...sections.director, name: v })} label="Ism" /></h1>
               <div className="ls-hero-title-line" />
-              <p className="ls-hero-subtitle">{sections.hero.title}</p>
+              <p className="ls-hero-subtitle"><EditableText value={sections.hero.title} onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })} label="Sarlavha" multiline /></p>
             </div>
           </div>
 
           <div className="ls-scroll-hint">↓</div>
         </div>
-      </EditableSection>
+      </>
 
       {/* ════════════════════════════════════════
           DIRECTOR QUOTE
       ════════════════════════════════════════ */}
-      <EditableSection
-        sectionId="director"
-        data={sections.director}
-        onSave={(data) => handleSaveSection('director', data)}
-      >
+      <>
         <div className="ls-quote-section">
           <div className="container">
             <div className="ls-quote-card">
               <div className="ls-giant-quote">"</div>
               <div className="ls-quote-inner">
-                <p className="ls-quote-text">{sections.director.message}</p>
+                <p className="ls-quote-text"><EditableText value={sections.director.message} onSave={(v) => handleSaveSection('director', { ...sections.director, message: v })} label="Xabar" multiline /></p>
                 <div className="ls-quote-sig">
                   <div className="ls-sig-line" />
                   <div>
-                    <div className="ls-sig-name">{sections.director.name}</div>
-                    <div className="ls-sig-role">{sections.director.title}</div>
+                    <div className="ls-sig-name"><EditableText value={sections.director.name} onSave={(v) => handleSaveSection('director', { ...sections.director, name: v })} label="Ism" /></div>
+                    <div className="ls-sig-role"><EditableText value={sections.director.title} onSave={(v) => handleSaveSection('director', { ...sections.director, title: v })} label="Lavozim" /></div>
                   </div>
                 </div>
               </div>
@@ -148,25 +144,21 @@ export default function EditableAboutLeadership() {
             </div>
           </div>
         </div>
-      </EditableSection>
+      </>
 
       {/* ════════════════════════════════════════
           ADVISORY BOARD
       ════════════════════════════════════════ */}
-      <EditableSection
-        sectionId="board"
-        data={sections.board}
-        onSave={(data) => handleSaveSection('board', data)}
-      >
+      <>
         {/* Board intro */}
         <section className="ls-board-intro-section">
           <div className="container">
             <div className="ls-board-intro">
               <div className="ls-board-intro-left">
                 <span className="ls-section-eyebrow">Bizning Jamoamiz</span>
-                <h2 className="ls-board-title">{sections.board.title}</h2>
+                <h2 className="ls-board-title"><EditableText value={sections.board.title} onSave={(v) => handleSaveSection('board', { ...sections.board, title: v })} label="Sarlavha" /></h2>
               </div>
-              <p className="ls-board-desc-text">{sections.board.desc}</p>
+              <p className="ls-board-desc-text"><EditableText value={sections.board.desc} onSave={(v) => handleSaveSection('board', { ...sections.board, desc: v })} label="Matn" multiline /></p>
             </div>
           </div>
         </section>
@@ -215,7 +207,7 @@ export default function EditableAboutLeadership() {
             </div>
           </div>
         </section>
-      </EditableSection>
+      </>
 
       {/* ════════════════════════════════════════
           BOTTOM CTA

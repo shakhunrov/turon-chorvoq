@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
-import { EditableSection, EditableList } from '../../shared/editable';
+import { EditableList, EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import {
   fetchPositions,
@@ -117,11 +117,7 @@ export default function EditableCareers() {
     <div className="page car-page">
 
       {/* ── Cinematic Hero ── */}
-      <EditableSection
-        sectionId="hero"
-        data={sections.hero}
-        onSave={(data) => handleSaveSection('hero', data)}
-      >
+      <>
         <div className="car-hero">
           <GradientBlob position="top-right"   color="gold" size={380} opacity={0.16} />
           <GradientBlob position="bottom-left" color="blue" size={260} opacity={0.10} />
@@ -132,9 +128,14 @@ export default function EditableCareers() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45 }}
             >
-              {sections.hero.label}
+              <EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" />
             </motion.span>
-            <TextSplit text={sections.hero.title} as="h1" className="section-title" style={{ marginTop: 12 }} />
+            <EditableText
+              value={sections.hero.title}
+              onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })}
+              label="Sarlavha"
+              render={(v) => <TextSplit text={v} as="h1" className="section-title" style={{ marginTop: 12 }} />}
+            />
             <motion.p
               className="section-subtitle"
               initial={{ opacity: 0, y: 12 }}
@@ -142,7 +143,7 @@ export default function EditableCareers() {
               transition={{ duration: 0.55, delay: 0.4 }}
               style={{ marginTop: 16 }}
             >
-              {sections.hero.subtitle}
+              <EditableText value={sections.hero.subtitle} onSave={(v) => handleSaveSection('hero', { ...sections.hero, subtitle: v })} label="Subtitr" multiline />
             </motion.p>
             <motion.div
               className="divider"
@@ -153,7 +154,7 @@ export default function EditableCareers() {
             />
           </div>
         </div>
-      </EditableSection>
+      </>
 
       {/* ── Content wrapper with cross-grid background ── */}
       <div className="car-content-bg">
@@ -164,14 +165,10 @@ export default function EditableCareers() {
           <div className="container">
 
             {/* ── Intro + Stats ── */}
-            <EditableSection
-              sectionId="intro"
-              data={sections.intro}
-              onSave={(data) => handleSaveSection('intro', data)}
-            >
+            <>
               <RevealOnScroll variant="fadeUp">
                 <div className="car-intro-block">
-                  <p className="car-intro-text">{sections.intro.text}</p>
+                  <p className="car-intro-text"><EditableText value={sections.intro.text} onSave={(v) => handleSaveSection('intro', { ...sections.intro, text: v })} label="Matn" multiline /></p>
                   <div className="car-intro-stats">
                     {introStats.map((s, i) => (
                       <div key={i} className="car-istat">
@@ -184,17 +181,13 @@ export default function EditableCareers() {
                   </div>
                 </div>
               </RevealOnScroll>
-            </EditableSection>
+            </>
 
             {/* ══ Why Work With Us ══ */}
-            <EditableSection
-              sectionId="why"
-              data={sections.why}
-              onSave={(data) => handleSaveSection('why', data)}
-            >
+            <>
               <div className="car-why-section">
                 <RevealOnScroll>
-                  <h2 className="section-title">{sections.why.title}</h2>
+                  <h2 className="section-title"><EditableText value={sections.why.title} onSave={(v) => handleSaveSection('why', { ...sections.why, title: v })} label="Sarlavha" /></h2>
                   <div className="divider" style={{ marginBottom: 28 }} />
                 </RevealOnScroll>
 
@@ -236,14 +229,10 @@ export default function EditableCareers() {
                   />
                 </div>
               </div>
-            </EditableSection>
+            </>
 
             {/* ══ Career Pathway ══ */}
-            <EditableSection
-              sectionId="pathway"
-              data={sections.pathway}
-              onSave={(data) => handleSaveSection('pathway', data)}
-            >
+            <>
               <RevealOnScroll variant="scaleUp">
                 <div className="car-pathway-hero">
                   <div className="car-path-mesh" />
@@ -251,7 +240,16 @@ export default function EditableCareers() {
 
                   <div className="car-path-header">
                     <span className="car-path-eyebrow">Your Journey</span>
-                    <h3 className="car-path-title">{sections.pathway.title}</h3>
+                    <h3 className="car-path-title">
+                      <EditableText value={sections.pathway.title} onSave={(v) => handleSaveSection('pathway', { ...sections.pathway, title: v })} label="Sarlavha" />
+                      <EditableText
+                        value={sections.pathway.pathway || ''}
+                        onSave={(v) => handleSaveSection('pathway', { ...sections.pathway, pathway: v })}
+                        label="Bosqichlar (' → ' belgisi bilan ajrating)"
+                        multiline
+                        render={() => null}
+                      />
+                    </h3>
                   </div>
 
                   <div className="car-path-steps">
@@ -269,7 +267,7 @@ export default function EditableCareers() {
                   </div>
                 </div>
               </RevealOnScroll>
-            </EditableSection>
+            </>
 
             {/* ══ Open Positions ══ */}
             <div className="positions-section">
@@ -351,33 +349,34 @@ export default function EditableCareers() {
             </div>
 
             {/* ══ Recruitment Process ══ */}
-            <EditableSection
-              sectionId="process"
-              data={sections.process}
-              onSave={(data) => handleSaveSection('process', data)}
-            >
+            <>
               <div className="process-section">
                 <RevealOnScroll>
-                  <h2 className="section-title">{sections.process.title}</h2>
+                  <h2 className="section-title">
+                    <EditableText value={sections.process.title} onSave={(v) => handleSaveSection('process', { ...sections.process, title: v })} label="Sarlavha" />
+                    <EditableText
+                      value={(sections.process.steps || []).join(String.fromCharCode(10))}
+                      onSave={(v) => handleSaveSection('process', { ...sections.process, steps: v.split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean) })}
+                      label="Bosqichlar (har qatorga bittadan)"
+                      multiline
+                      render={() => null}
+                    />
+                  </h2>
                   <div className="divider" style={{ marginBottom: 32 }} />
                 </RevealOnScroll>
                 <TimelineRail steps={processSteps} />
               </div>
-            </EditableSection>
+            </>
 
             {/* ══ CTA Banner ══ */}
-            <EditableSection
-              sectionId="join"
-              data={sections.join}
-              onSave={(data) => handleSaveSection('join', data)}
-            >
+            <>
               <RevealOnScroll variant="scaleUp">
                 <div className="careers-cta">
                   <div className="careers-cta-mesh" />
                   <div className="careers-cta-orb" />
                   <div className="careers-cta-inner">
-                    <h2 className="careers-cta-title">{sections.join.title}</h2>
-                    <p className="careers-cta-sub">{sections.join.subtitle}</p>
+                    <h2 className="careers-cta-title"><EditableText value={sections.join.title} onSave={(v) => handleSaveSection('join', { ...sections.join, title: v })} label="Sarlavha" /></h2>
+                    <p className="careers-cta-sub"><EditableText value={sections.join.subtitle} onSave={(v) => handleSaveSection('join', { ...sections.join, subtitle: v })} label="Subtitr" multiline /></p>
                     <button
                       className="car-cta-btn"
                       onClick={() =>
@@ -390,7 +389,7 @@ export default function EditableCareers() {
                   </div>
                 </div>
               </RevealOnScroll>
-            </EditableSection>
+            </>
 
           </div>
         </section>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useLang } from '../../shared/i18n';
-import { EditableSection } from '../../shared/editable';
+import { EditableText } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { getPageSections, uploadSectionImages, deleteSectionImage } from '../../shared/api/pageSections';
 import { selectIsAuth } from '../../features/auth';
@@ -153,19 +153,17 @@ export default function EditableAboutCampus() {
 
   return (
     <div className="page">
-      <EditableSection
-        sectionId="hero"
-        data={sections.hero}
-        onSave={(data) => handleSaveSection('hero', data)}
-      >
-        <div className="page-hero glass-card campus-hero">
-          <div className="container">
-            <span className="section-label">{sections.hero.label}</span>
-            <h1 className="section-title">{sections.hero.title}</h1>
-            <div className="divider" />
-          </div>
+      <div className="page-hero glass-card campus-hero">
+        <div className="container">
+          <span className="section-label">
+            <EditableText value={sections.hero.label} onSave={(v) => handleSaveSection('hero', { ...sections.hero, label: v })} label="Yorliq" />
+          </span>
+          <h1 className="section-title">
+            <EditableText value={sections.hero.title} onSave={(v) => handleSaveSection('hero', { ...sections.hero, title: v })} label="Sarlavha" />
+          </h1>
+          <div className="divider" />
         </div>
-      </EditableSection>
+      </div>
 
       <section className="section">
         <div className="container">
@@ -183,15 +181,16 @@ export default function EditableAboutCampus() {
           </div>
 
           {/* Content */}
-          <EditableSection
-            sectionId={activeTab}
-            data={current}
-            onSave={(data) => handleSaveSection(activeTab, data)}
-          >
+          <>
             <div className="campus-content">
               <div className="campus-desc glass-card">
-                <h2 className="campus-desc-title">{current.label}</h2>
-                <p>{current.desc}</p>
+                <h2 className="campus-desc-title">
+                  <EditableText value={current.icon || ''} onSave={(v) => handleSaveSection(activeTab, { ...current, icon: v })} label="Emoji (tab belgisi)" />{' '}
+                  <EditableText value={current.label} onSave={(v) => handleSaveSection(activeTab, { ...current, label: v })} label="Sarlavha" />
+                </h2>
+                <p>
+                  <EditableText value={current.desc} onSave={(v) => handleSaveSection(activeTab, { ...current, desc: v })} label="Tavsif" multiline />
+                </p>
               </div>
 
               {/* Upload button - faqat editable rejimda */}
@@ -250,7 +249,7 @@ export default function EditableAboutCampus() {
                 </div>
               )}
             </div>
-          </EditableSection>
+          </>
         </div>
       </section>
     </div>

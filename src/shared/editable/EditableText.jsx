@@ -35,7 +35,7 @@ export default function EditableText({ value, onSave, as: Tag = 'span', classNam
 
     return (
         <span className="editable-text-wrap">
-            <Tag className={className}>{value}</Tag>
+            <Tag className={className}>{value || '…'}</Tag>
             <button type="button" className="editable-text-pen" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleOpen(); }} title="Tahrirlash">
                 <Edit2 size={14} />
             </button>

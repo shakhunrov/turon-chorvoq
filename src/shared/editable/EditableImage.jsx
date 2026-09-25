@@ -9,7 +9,7 @@ import './EditableText.css';
  * EditableImage - rasm yonida kichik tugma: bosilsa fayl tanlanadi va onSave(file) chaqiriladi.
  * Butun section'ni qamrab oluvchi katta pen o'rniga faqat shu rasm uchun.
  */
-export default function EditableImage({ children, onSave }) {
+export default function EditableImage({ children, onSave, alwaysVisible = false, style }) {
     const isEditableMode = useSelector(selectIsAuth);
     const inputRef = useRef(null);
 
@@ -27,7 +27,7 @@ export default function EditableImage({ children, onSave }) {
     };
 
     return (
-        <div className="editable-image-wrap">
+        <div className={`editable-image-wrap${alwaysVisible ? ' always-visible' : ''}`} style={style}>
             {children}
             <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
             <button

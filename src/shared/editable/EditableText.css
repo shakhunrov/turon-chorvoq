@@ -63,3 +63,7 @@
 .editable-image-wrap:hover .editable-image-pen {
     opacity: 1;
 }
+
+.editable-image-wrap.always-visible .editable-image-pen {
+    opacity: 1;
+}
