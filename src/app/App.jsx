@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { LangProvider } from '../shared/i18n';
@@ -53,7 +53,13 @@ function PublicLayout({ children }) {
 
 // Sahifadan sahifaga o'tganda tepaga (hash bo'lsa tegmaymiz)
 function ScrollToTop() {
-  const { key, hash } = useLocation();
+  const { key, hash, pathname } = useLocation();
+  // Meta Pixel: SPA'da sahifa almashganda PageView (birinchisini index.html'dagi kod yuboradi)
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    if (firstRoute.current) { firstRoute.current = false; return; }
+    if (typeof window.fbq === 'function') window.fbq('track', 'PageView');
+  }, [pathname]);
   useLayoutEffect(() => {
     if (hash) return;
     if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
