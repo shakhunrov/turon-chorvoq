@@ -1,16 +1,42 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
-import { MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
+import { ChevronUp, ChevronDown, MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
 import { useBranchInfo } from '../../shared/config/useBranchInfo';
-import { EditableText, EditableList } from '../../shared/editable';
+import { EditableText, EditableList, EditableImage } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Footer.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
+
+const CONTACT_KEYS = ['address', 'email', 'phone'];
+const SOCIAL_KEYS = ['instagram', 'telegram', 'facebook', 'youtube'];
+
+// Tartibni saqlangan massiv bo'yicha chiqaradi (yangi/yo'qolgan kalitlar oxiriga qo'shiladi)
+const ordered = (saved, all) => [...(saved || []).filter((k) => all.includes(k)), ...all.filter((k) => !(saved || []).includes(k))];
+
+// Edit rejimida element yonidagi yuqoriga/pastga tugmalari
+function MoveButtons({ index, total, onMove }) {
+  const btn = { display: 'inline-flex', width: 22, height: 22, alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: 6, background: 'rgba(255,255,255,0.16)', color: '#fff', cursor: 'pointer', padding: 0 };
+  return (
+    <span style={{ display: 'inline-flex', gap: 4, marginLeft: 6 }}>
+      <button type="button" style={{ ...btn, opacity: index === 0 ? 0.3 : 1 }} disabled={index === 0} title="Yuqoriga" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMove(-1); }}><ChevronUp size={14} /></button>
+      <button type="button" style={{ ...btn, opacity: index === total - 1 ? 0.3 : 1 }} disabled={index === total - 1} title="Pastga" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMove(1); }}><ChevronDown size={14} /></button>
+    </span>
+  );
+}
+
+const move = (list, i, d) => {
+  const next = [...list];
+  const j = i + d;
+  if (j < 0 || j >= next.length) return list;
+  [next[i], next[j]] = [next[j], next[i]];
+  return next;
+};
 
 export default function Footer() {
   const { t } = useLang();
@@ -44,6 +70,13 @@ export default function Footer() {
   const linkItems = sections.links?.items || defaultLinks;
   const accredItems = sections.accred?.items || defaultAccred;
   const withPrefix = (h) => (h.startsWith('/') && !h.startsWith('/editable') ? basePrefix + h : h);
+  const logoFile = sections.brand?.image;
+  const logoSrc = useMemo(() => {
+    if (logoFile instanceof File) return URL.createObjectURL(logoFile);
+    return typeof logoFile === 'string' && logoFile ? logoFile : logo;
+  }, [logoFile]);
+  const contactOrder = ordered(bi?.order, CONTACT_KEYS);
+  const socialOrder = ordered(bi?.socialOrder, SOCIAL_KEYS);
   const tagline = sections.brand?.tagline || t.footer.tagline;
   const branchName = bi?.name || 'Chorvoq';
   const address = bi?.address || t.contact.address;
@@ -56,7 +89,7 @@ export default function Footer() {
     { key: 'telegram', label: 'Telegram', Icon: ExternalLink, href: bi?.social?.telegram },
     { key: 'facebook', label: 'Facebook', Icon: ThumbsUp, href: bi?.social?.facebook },
     { key: 'youtube', label: 'YouTube', Icon: Play, href: bi?.social?.youtube },
-  ].filter((s) => s.href);
+  ].filter((s) => s.href).sort((a, b) => socialOrder.indexOf(a.key) - socialOrder.indexOf(b.key));
 
 
   return (
@@ -72,7 +105,10 @@ export default function Footer() {
         {/* Brand */}
         <motion.div className="footer-brand" variants={fadeUp}>
           <div className="footer-logo">
-            <img width={70} src={logo} alt="" />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img width={70} src={logoSrc} alt="" />
+              <EditableImage overlay style={{ top: -8, right: -8 }} onSave={(file) => brandSave({ image: file })} />
+            </div>
             <div>
               <div className="footer-logo-name"><EditableText value={sections.brand?.name || 'TURON'} onSave={(v) => brandSave({ name: v })} label="Nomi" /></div>
               <div className="footer-logo-sub"><EditableText value={sections.brand?.sub || `International School · ${branchName}`} onSave={(v) => brandSave({ sub: v })} label="Tagnomi" /></div>
@@ -82,24 +118,25 @@ export default function Footer() {
             <EditableText value={tagline} onSave={(v) => brandSave({ tagline: v })} label="Shior" multiline />
           </p>
           <div className="footer-contact-items">
-            <a href={mapUrl} className="footer-contact-item" target="_blank" rel="noreferrer">
-              <MapPin size={14} />
-              <EditableText value={address} onSave={(v) => saveInfo({ address: v })} label="Manzil" />
-            </a>
-            <a href={`mailto:${email}`} className="footer-contact-item">
-              <Mail size={14} />
-              <EditableText value={email} onSave={(v) => saveInfo({ email: v })} label="Email" />
-            </a>
-            {(phone || isEditableMode) && (
-              <a href={`tel:${phone}`} className="footer-contact-item">
-                <Phone size={14} />
-                <EditableText value={phone} onSave={(v) => saveInfo({ phone: v })} label="Telefon" />
-              </a>
-            )}
+            {contactOrder.map((k, i) => {
+              if (k === 'phone' && !phone && !isEditableMode) return null;
+              const cfg = {
+                address: { href: mapUrl, Icon: MapPin, value: address, label: 'Manzil', ext: true },
+                email: { href: `mailto:${email}`, Icon: Mail, value: email, label: 'Email' },
+                phone: { href: `tel:${phone}`, Icon: Phone, value: phone, label: 'Telefon' },
+              }[k];
+              return (
+                <a key={k} href={cfg.href} className="footer-contact-item" {...(cfg.ext ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                  <cfg.Icon size={14} />
+                  <EditableText value={cfg.value} onSave={(v) => saveInfo({ [k]: v })} label={cfg.label} />
+                  {isEditableMode && <MoveButtons index={i} total={contactOrder.length} onMove={(d) => saveInfo({ order: move(contactOrder, i, d) })} />}
+                </a>
+              );
+            })}
           </div>
           {isEditableMode && (
             <div className="footer-contact-items" style={{ marginTop: 8 }}>
-              {[['instagram', 'Instagram'], ['telegram', 'Telegram'], ['facebook', 'Facebook'], ['youtube', 'YouTube'], ['mapUrl', 'Xarita havolasi']].map(([k, lab]) => (
+              {[...socialOrder.map((k) => [k, { instagram: 'Instagram', telegram: 'Telegram', facebook: 'Facebook', youtube: 'YouTube' }[k]]), ['mapUrl', 'Xarita havolasi']].map(([k, lab], idx) => (
                 <div key={k} className="footer-contact-item" style={{ gap: 6 }}>
                   <span>{lab}:</span>
                   <EditableText
@@ -107,6 +144,7 @@ export default function Footer() {
                     onSave={(v) => saveInfo({ [k]: v.trim() })}
                     label={`${lab} havolasi`}
                   />
+                  {k !== 'mapUrl' && <MoveButtons index={idx} total={socialOrder.length} onMove={(d) => saveInfo({ socialOrder: move(socialOrder, idx, d) })} />}
                 </div>
               ))}
             </div>

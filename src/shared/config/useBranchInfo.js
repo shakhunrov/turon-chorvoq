@@ -18,6 +18,8 @@ const merge = (base, saved) => {
   if (!saved) return info;
   FIELDS.forEach((k) => { if (typeof saved[k] === 'string') info[k] = saved[k]; });
   SOCIALS.forEach((k) => { if (typeof saved[k] === 'string') info.social[k] = saved[k]; });
+  if (Array.isArray(saved.order)) info.order = saved.order;
+  if (Array.isArray(saved.socialOrder)) info.socialOrder = saved.socialOrder;
   return info;
 };
 
@@ -47,7 +49,7 @@ export function useBranchInfo() {
 
   const save = useCallback(async (patch) => {
     const current = merge(getBranchInfo(), cache?.saved);
-    const flat = { ...FIELDS.reduce((a, k) => ({ ...a, [k]: current[k] || '' }), {}), ...SOCIALS.reduce((a, k) => ({ ...a, [k]: current.social[k] || '' }), {}), ...patch };
+    const flat = { ...FIELDS.reduce((a, k) => ({ ...a, [k]: current[k] || '' }), {}), ...SOCIALS.reduce((a, k) => ({ ...a, [k]: current.social[k] || '' }), {}), order: current.order, socialOrder: current.socialOrder, ...patch };
     const content = JSON.stringify(flat);
     try {
       await savePageSection({ branch: branchId, page: PAGE, section_id: SECTION, content_uz: content, content_ru: content, content_en: content });
