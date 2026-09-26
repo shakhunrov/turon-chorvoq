@@ -1,0 +1,35 @@
+/* Avtomatik scroll-reveal (autoReveal.js) */
+.rv:not(.rv-in) {
+    opacity: 0;
+    transform: translateY(26px);
+}
+
+.rv.rv-in {
+    /* `to` berilmagan — animatsiya elementning o'z (asl) opacity/transform qiymatiga qaytadi */
+    animation: rvIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--rv-d, 0ms);
+}
+
+@keyframes rvIn {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+}
+
+/* Tugma va kartalar uchun yengil hover/bosish animatsiyasi */
+.btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, filter 0.2s ease;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rv:not(.rv-in) { opacity: 1; transform: none; }
+    .rv.rv-in { animation: none; }
+    .btn:hover { transform: none; }
+}
