@@ -97,4 +97,6 @@
 .swap-btn.is-on { background: #0f766e; }
 
 /* render bilan chizilgan blok (h1/h2/p/div) atrofidagi o'ram ham blok bo'lsin */
-.editable-text-wrap:has(> h1, > h2, > h3, > h4, > p, > div) { display: block; }
+.editable-text-wrap:has(h1, h2, h3, h4, p, div) { display: block; }
+/* render bilan chizilgan matn bitta blok bo'lib turadi (aks holda inline-flex ichida so'zlar ustunlarga bo'linib ketadi) */
+.editable-text-body { display: inline; }

@@ -343,3 +343,6 @@
   }
   .hero-stat:last-child { border-bottom: none; }
 }
+
+/* Hero yorlig'i qorong'i fonda o'qiladigan bo'lsin */
+.hero-badge .badge { color: rgba(255, 255, 255, 0.95); background: transparent; }
