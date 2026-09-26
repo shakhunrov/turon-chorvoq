@@ -59,7 +59,7 @@ export const BRANCH_INFO = {
     name: 'Nurafshon',
     mapTitle: 'Nurafshon, Tashkent Region',
     address: "Toshkent viloyati, Nurafshon shahar, Toshkent yo'li ko'chasi 60-uy",
-    phone: '',
+    phone: '+998 78 333 33 36',
     email: DEFAULT_EMAIL,
     mapUrl: 'https://maps.app.goo.gl/TstXjfPLQ3RH4MFV7',
     social: {
