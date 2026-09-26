@@ -558,3 +558,22 @@
   background: #e2e8f0; border-radius: 12px; padding: 24px;
 }
 .pgsec-preview-canvas { background: #fff; box-shadow: 0 4px 24px rgba(15,23,42,0.12); position: relative; overflow: hidden; }
+
+/* ── Bosh sahifa (Overview) ── */
+.ov-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.ov-title { padding: 16px 20px 8px; font-weight: 700; color: #0f172a; }
+.ov-empty { padding: 28px 20px; color: #94a3b8; text-align: center; }
+.ov-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 20px; border: none; border-top: 1px solid #f1f5f9; background: transparent; cursor: pointer; text-align: left; }
+.ov-row:hover { background: #f8fafc; }
+.ov-ico { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; }
+.ov-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ov-main b { font-size: 14px; color: #0f172a; }
+.ov-main small { color: #64748b; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ov-date { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+.ov-status { padding-bottom: 12px; }
+.ov-bar-row { padding: 8px 20px; }
+.ov-bar-top { display: flex; justify-content: space-between; font-size: 13px; color: #475569; margin-bottom: 5px; }
+.ov-bar { height: 8px; border-radius: 6px; background: #e2e8f0; overflow: hidden; }
+.ov-bar > div { height: 100%; border-radius: 6px; }
+.sidebar-badge { margin-left: auto; min-width: 20px; padding: 1px 7px; border-radius: 999px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; text-align: center; }
+@media (max-width: 900px) { .ov-grid { grid-template-columns: 1fr; } }

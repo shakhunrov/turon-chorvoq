@@ -49,10 +49,14 @@ import {
     Newspaper, Briefcase, UserPlus, Plus, Edit2, Trash2,
     LogOut, Search, CheckCircle, Clock,
     X, Save, Shield, TrendingUp, Globe,
-    Upload, Tag, List as ListIcon, FileText, LayoutTemplate,
+    Upload, Tag, List as ListIcon, FileText, LayoutTemplate, LayoutDashboard, MessageSquare, Download,
 } from 'lucide-react';
 import PageSectionsManager from './PageSectionsManager';
 import SitePreview from './SitePreview';
+import DashboardOverview from './DashboardOverview';
+import MessagesList from './MessagesList';
+import { useFormsSummary } from './useFormsSummary';
+import { downloadCsv, fmtDateTime } from '../../shared/admin/exportCsv';
 import logoImg from '../../shared/assets/logo/turonLogo.png';
 import './AdminDashboard.css';
 
@@ -84,7 +88,7 @@ export default function AdminDashboard() {
     const categoriesList = useSelector(selectCategoriesList);
     const categoriesLoading = useSelector(selectCategoriesLoading);
 
-    const [view, setView] = useState('news-list');
+    const [view, setView] = useState('overview');
     const [editItem, setEditItem] = useState(null);
     const [search, setSearch] = useState('');
     const [catFilter, setCatFilter] = useState('All');
@@ -95,6 +99,7 @@ export default function AdminDashboard() {
     const [deleteId, setDeleteId] = useState(null);
     const [deleteType, setDeleteType] = useState('news');
     const branchId = localStorage.getItem('globalBranchId');
+    const summary = useFormsSummary(branchId);
     const [statusModal, setStatusModal] = useState(null);
     const [statusForm, setStatusForm] = useState({ status: '', notes: '' });
 
@@ -103,7 +108,9 @@ export default function AdminDashboard() {
     const [cvFile, setCvFile] = useState(null);
     const cvInputRef = useRef(null);
 
-    const section = view.startsWith('pos') ? 'positions'
+    const section = view === 'overview' ? 'overview'
+        : view.startsWith('msg') ? 'messages'
+        : view.startsWith('pos') ? 'positions'
         : view.startsWith('adm') ? 'admissions'
             : view.startsWith('cat') ? 'categories'
                 : view.startsWith('app') ? 'applications'
@@ -112,6 +119,9 @@ export default function AdminDashboard() {
                             : 'news';
 
     useEffect(() => { dispatch(fetchCategories({ branch: branchId })); }, [dispatch, branchId]);
+
+    // Ro'yxatlardan qaytganda sidebar belgilari va statistika yangilansin
+    useEffect(() => { summary.reload(); }, [view]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (view !== 'news-list') return;
@@ -267,12 +277,40 @@ export default function AdminDashboard() {
     );
     console.log(filteredNews, "newsss")
 
+    const STATUS_UZ = { pending: 'Kutilmoqda', contacted: "Bog'lanildi", enrolled: 'Qabul qilindi', rejected: 'Rad etildi', interview: 'Suhbat', hired: 'Ishga olindi' };
+    const exportAdmissions = () => downloadCsv('qabul-arizalari', [
+        { label: "O'quvchi", get: (r) => r.student_name },
+        { label: 'Telefon', get: (r) => r.phone },
+        { label: 'Sinf', get: (r) => r.grade },
+        { label: 'Holati', get: (r) => STATUS_UZ[r.status] || r.status },
+        { label: 'Izoh', get: (r) => r.notes },
+        { label: 'Sana', get: (r) => fmtDateTime(r.created_at) },
+    ], filteredAdmissions);
+    const exportApplications = () => downloadCsv('ish-arizalari', [
+        { label: 'Ism', get: (r) => r.name },
+        { label: 'Telefon', get: (r) => r.phone },
+        { label: 'Email', get: (r) => r.email },
+        { label: 'Holati', get: (r) => STATUS_UZ[r.status] || r.status },
+        { label: 'CV', get: (r) => r.cv_file },
+        { label: 'Izoh', get: (r) => r.notes },
+        { label: 'Sana', get: (r) => fmtDateTime(r.created_at) },
+    ], filteredApplications);
+    const ExcelBtn = ({ onClick, count }) => (
+        <button className="btn btn-outline" onClick={onClick} disabled={!count} title="Excel'da ochiladigan CSV (joriy filtr bo'yicha)">
+            <Download size={16} /> Excel
+        </button>
+    );
+
     return (
         <div className="admin-layout">
             {/* Sidebar */}
             <aside className="admin-sidebar">
                 <div className="sidebar-logo"><img src={logoImg} alt="" /><div><b>Turon International School</b><small>Admin panel</small></div></div>
                 <nav className="sidebar-nav">
+                    <button className={`sidebar-item ${section === 'overview' ? 'active' : ''}`}
+                            onClick={() => { setView('overview'); setSearch(''); }}>
+                        <LayoutDashboard size={18} /> Bosh sahifa
+                    </button>
                     <button className={`sidebar-item ${section === 'news' ? 'active' : ''}`}
                             onClick={() => { setView('news-list'); setSearch(''); }}>
                         <Newspaper size={18} /> Yangiliklar
@@ -287,11 +325,15 @@ export default function AdminDashboard() {
                     </button>
                     <button className={`sidebar-item ${section === 'applications' ? 'active' : ''}`}
                             onClick={() => { setView('app-list'); setSearch(''); }}>
-                        <FileText size={18} /> Arizalar
+                        <FileText size={18} /> Arizalar{summary.pending.applications > 0 && <span className="sidebar-badge">{summary.pending.applications}</span>}
                     </button>
                     <button className={`sidebar-item ${section === 'admissions' ? 'active' : ''}`}
                             onClick={() => { setView('adm-list'); setSearch(''); }}>
-                        <UserPlus size={18} /> Qabullar
+                        <UserPlus size={18} /> Qabullar{summary.pending.admissions > 0 && <span className="sidebar-badge">{summary.pending.admissions}</span>}
+                    </button>
+                    <button className={`sidebar-item ${section === 'messages' ? 'active' : ''}`}
+                            onClick={() => { setView('msg-list'); setSearch(''); }}>
+                        <MessageSquare size={18} /> Murojaatlar{summary.pending.contacts > 0 && <span className="sidebar-badge">{summary.pending.contacts}</span>}
                     </button>
                     <button className={`sidebar-item ${section === 'sections' ? 'active' : ''}`}
                             onClick={() => { setView('sections-list'); setSearch(''); }}>
@@ -307,6 +349,9 @@ export default function AdminDashboard() {
             </aside>
 
             <main className="admin-main">
+
+                {view === 'overview' && <DashboardOverview summary={summary} onGo={(v) => { setView(v); setSearch(''); }} />}
+                {view === 'msg-list' && <MessagesList contacts={summary.contacts} reload={summary.reload} />}
 
                 {/* ═══════════════════ NEWS LIST ═══════════════════ */}
                 {view === 'news-list' && (
@@ -695,6 +740,7 @@ export default function AdminDashboard() {
                                 ))}
                             </div>
                             {renderDateFilters()}
+                            <ExcelBtn onClick={exportAdmissions} count={filteredAdmissions.length} />
                         </div>
                         {admissionsError && (
                             <div style={{ background: '#fef2f2', color: '#ef4444', padding: '12px 20px', borderRadius: 12, marginBottom: 16, fontSize: 14 }}>
@@ -785,6 +831,7 @@ export default function AdminDashboard() {
                                 ))}
                             </div>
                             {renderDateFilters()}
+                            <ExcelBtn onClick={exportApplications} count={filteredApplications.length} />
                         </div>
                         {applicationsError && (
                             <div style={{ background: '#fef2f2', color: '#ef4444', padding: '12px 20px', borderRadius: 12, marginBottom: 16, fontSize: 14 }}>
