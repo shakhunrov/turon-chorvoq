@@ -20,8 +20,8 @@ export const loginThunk = createAsyncThunk(
     }
 
     // school.gennis.uz'ga so'rov yuborilmaydi — hamma narsa admin.tisedu.uz orqali.
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
     return { access: null, refresh: null };
   },
 );
@@ -46,9 +46,9 @@ export const loginAdminTisThunk = createAsyncThunk(
 // ── Slice ─────────────────────────────────────────────────────────
 
 const initialState = {
-  accessToken: localStorage.getItem('access_token') || null,
-  refreshToken: localStorage.getItem('refresh_token') || null,
-  isAuth: !!localStorage.getItem('access_token') || isAdminTisAuthed(),
+  accessToken: sessionStorage.getItem('access_token') || null,
+  refreshToken: sessionStorage.getItem('refresh_token') || null,
+  isAuth: !!sessionStorage.getItem('access_token') || isAdminTisAuthed(),
   adminTisAuthed: isAdminTisAuthed(),
   loading: false,
   error: null,
@@ -64,8 +64,8 @@ const authSlice = createSlice({
       state.isAuth = false;
       state.adminTisAuthed = false;
       state.error = null;
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('refresh_token');
       clearAdminTisTokens();
     },
     clearAuthError(state) {

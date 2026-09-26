@@ -10,23 +10,29 @@ const BASE_URL = 'https://admin.tisedu.uz/api/v1';
 const ACCESS_KEY = 'tis_admin_access_token';
 const REFRESH_KEY = 'tis_admin_refresh_token';
 
-export const getAdminTisAccess = () => localStorage.getItem(ACCESS_KEY);
+// Login faqat joriy brauzer sessiyasida (sessionStorage) saqlanadi — brauzer/tab yopilsa chiqib ketadi.
+// Avval localStorage'da qolib ketgan eski tokenlarni tozalaymiz (aks holda pen'lar login qilinmasdan ham chiqaverardi).
+try {
+  [ACCESS_KEY, REFRESH_KEY, 'access_token', 'refresh_token'].forEach((k) => window.localStorage.removeItem(k));
+} catch { /* ignore */ }
+
+export const getAdminTisAccess = () => sessionStorage.getItem(ACCESS_KEY);
 export const isAdminTisAuthed = () => !!getAdminTisAccess();
 export const clearAdminTisTokens = () => {
-  localStorage.removeItem(ACCESS_KEY);
-  localStorage.removeItem(REFRESH_KEY);
+  sessionStorage.removeItem(ACCESS_KEY);
+  sessionStorage.removeItem(REFRESH_KEY);
 };
 
 // Admin (login qilgan) foydalanuvchi uchun admin.tisedu.uz 401 qaytarsa — sessiya
 // yaroqsiz: ikkala tizimning tokenlarini o'chirib, login sahifasiga qaytaramiz.
 // Oddiy tashrifchilar (asosiy login yo'q) — jamoat yangiliklari endpointi ochiq,
 // ularga tegmaymiz.
-const isAdminSession = () => !!getAdminTisAccess() || !!localStorage.getItem('access_token');
+const isAdminSession = () => !!getAdminTisAccess() || !!sessionStorage.getItem('access_token');
 const forceRelogin = (wasAdmin) => {
   if (!wasAdmin) return;
   clearAdminTisTokens();
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
+  sessionStorage.removeItem('access_token');
+  sessionStorage.removeItem('refresh_token');
   if (window.location.pathname !== '/admin') window.location.href = '/admin';
 };
 
@@ -36,8 +42,8 @@ export async function loginAdminTis(username, password) {
   const { data } = await axios.post(`${BASE_URL}/auth/login`, body, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
-  localStorage.setItem(ACCESS_KEY, data.access_token);
-  if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
+  sessionStorage.setItem(ACCESS_KEY, data.access_token);
+  if (data.refresh_token) sessionStorage.setItem(REFRESH_KEY, data.refresh_token);
   return data;
 }
 
@@ -68,7 +74,7 @@ adminTisApi.interceptors.response.use(
     }
 
     const wasAdmin = isAdminSession();
-    const refreshToken = localStorage.getItem(REFRESH_KEY);
+    const refreshToken = sessionStorage.getItem(REFRESH_KEY);
     if (!refreshToken) {
       clearAdminTisTokens();
       forceRelogin(wasAdmin);
@@ -88,8 +94,8 @@ adminTisApi.interceptors.response.use(
     isRefreshing = true;
     try {
       const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
-      localStorage.setItem(ACCESS_KEY, data.access_token);
-      if (data.refresh_token) localStorage.setItem(REFRESH_KEY, data.refresh_token);
+      sessionStorage.setItem(ACCESS_KEY, data.access_token);
+      if (data.refresh_token) sessionStorage.setItem(REFRESH_KEY, data.refresh_token);
       processQueue(null, data.access_token);
       originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
       return adminTisApi(originalRequest);
