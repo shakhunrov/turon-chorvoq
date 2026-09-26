@@ -11,6 +11,7 @@ import {
 } from '../../features/contact';
 import { RevealOnScroll, StaggerGrid, staggerItem } from '../../shared/components/kinetic';
 import { getBranchInfo } from '../../shared/config/branchInfo';
+import { useBranchInfo } from '../../shared/config/useBranchInfo';
 import './Contact.css';
 
 /* ── SVG Icon components ── */
@@ -73,7 +74,8 @@ export default function Contact() {
   const submitSuccess = useSelector(selectSubmitSuccess);
   const branchId      = localStorage.getItem('globalBranchId');
   // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar ishlatiladi
-  const bi = getBranchInfo();
+  const { info: liveInfo } = useBranchInfo();
+  const bi = { ...(getBranchInfo() || {}), ...liveInfo };
   const address = bi?.address || c.address;
   const email = bi?.email || c.email;
   const phone = bi?.phone || c.phone;

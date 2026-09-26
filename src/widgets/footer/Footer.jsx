@@ -6,7 +6,9 @@ import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
 import { MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
-import { getBranchInfo } from '../../shared/config/branchInfo';
+import { useBranchInfo } from '../../shared/config/useBranchInfo';
+import { EditableText } from '../../shared/editable';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Footer.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
 
@@ -19,7 +21,10 @@ export default function Footer() {
   const inner = useAnimateOnScroll(0.08);
 
   // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar
-  const bi = getBranchInfo();
+  const { info: bi, save: saveInfo } = useBranchInfo();
+  const { sections, handleSaveSection } = useEditableSections('footer', { brand: { name: 'TURON', sub: `International School · ${bi?.name || 'Chorvoq'}`, tagline: t.footer.tagline } });
+  const brandSave = (patch) => handleSaveSection('brand', { ...sections.brand, ...patch });
+  const tagline = sections.brand?.tagline || t.footer.tagline;
   const branchName = bi?.name || 'Chorvoq';
   const address = bi?.address || t.contact.address;
   const email = bi?.email || t.contact.email;
@@ -59,24 +64,43 @@ export default function Footer() {
           <div className="footer-logo">
             <img width={70} src={logo} alt="" />
             <div>
-              <div className="footer-logo-name">TURON</div>
-              <div className="footer-logo-sub">International School · {branchName}</div>
+              <div className="footer-logo-name"><EditableText value={sections.brand?.name || 'TURON'} onSave={(v) => brandSave({ name: v })} label="Nomi" /></div>
+              <div className="footer-logo-sub"><EditableText value={sections.brand?.sub || `International School · ${branchName}`} onSave={(v) => brandSave({ sub: v })} label="Tagnomi" /></div>
             </div>
           </div>
-          <p className="footer-tagline">{t.footer.tagline}</p>
+          <p className="footer-tagline">
+            <EditableText value={tagline} onSave={(v) => brandSave({ tagline: v })} label="Shior" multiline />
+          </p>
           <div className="footer-contact-items">
             <a href={mapUrl} className="footer-contact-item" target="_blank" rel="noreferrer">
-              <MapPin size={14} /> {address}
+              <MapPin size={14} />
+              <EditableText value={address} onSave={(v) => saveInfo({ address: v })} label="Manzil" />
             </a>
             <a href={`mailto:${email}`} className="footer-contact-item">
-              <Mail size={14} /> {email}
+              <Mail size={14} />
+              <EditableText value={email} onSave={(v) => saveInfo({ email: v })} label="Email" />
             </a>
-            {phone && (
+            {(phone || isEditableMode) && (
               <a href={`tel:${phone}`} className="footer-contact-item">
-                <Phone size={14} /> {phone}
+                <Phone size={14} />
+                <EditableText value={phone} onSave={(v) => saveInfo({ phone: v })} label="Telefon" />
               </a>
             )}
           </div>
+          {isEditableMode && (
+            <div className="footer-contact-items" style={{ marginTop: 8 }}>
+              {[['instagram', 'Instagram'], ['telegram', 'Telegram'], ['facebook', 'Facebook'], ['youtube', 'YouTube'], ['mapUrl', 'Xarita havolasi']].map(([k, lab]) => (
+                <div key={k} className="footer-contact-item" style={{ gap: 6 }}>
+                  <span>{lab}:</span>
+                  <EditableText
+                    value={k === 'mapUrl' ? (bi?.mapUrl || '') : (bi?.social?.[k] || '')}
+                    onSave={(v) => saveInfo({ [k]: v.trim() })}
+                    label={`${lab} havolasi`}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
           {socials.length > 0 && (
             <div className="footer-social">
               {socials.map(({ key, label, Icon, href }) => (
