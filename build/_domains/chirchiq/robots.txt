@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /editable
+
+Sitemap: https://chirchiq.tisedu.uz/sitemap.xml

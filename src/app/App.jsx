@@ -5,6 +5,7 @@ import { LangProvider } from '../shared/i18n';
 import { AdminAuthProvider } from '../shared/admin/adminAuth';
 import { selectIsAuth } from '../features/auth';
 import Navbar from '../widgets/navbar/Navbar';
+import Seo from '../shared/seo/Seo';
 import Footer from '../widgets/footer/Footer';
 import StickyCTA from '../widgets/sticky-cta/StickyCTA';
 import Home from '../pages/home/Home';
@@ -90,6 +91,7 @@ export default function App() {
         <ToastHost />
         <BrowserRouter>
           <ScrollToTop />
+          <Seo />
           <Routes>
             {/* Admin routes (no public navbar/footer) */}
             <Route path="/admin" element={<AdminLogin />} />
