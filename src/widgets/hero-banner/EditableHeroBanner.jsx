@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectIsAuth } from '../../features/auth';
 import { Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { useLang } from '../../shared/i18n';
 import { EditableList, EditableText, EditableImage } from '../../shared/editable';
@@ -11,6 +13,7 @@ import './HeroBanner.css';
 export default function EditableHeroBanner() {
   const { t, lang } = useLang();
   const branchId = localStorage.getItem('globalBranchId');
+  const basePrefix = useSelector(selectIsAuth) ? '/editable' : '';
 
   const [heroData, setHeroData] = useState({
     subtitle: t.hero.subtitle,
@@ -200,12 +203,12 @@ export default function EditableHeroBanner() {
             <p className="hero-sub fade-up-d2"><EditableText value={heroData.text} onSave={(v) => handleSaveHero({ ...heroData, text: v })} label="Matn" multiline /></p>
 
             <div className="hero-actions fade-up-d3">
-              <div className="btn btn-primary">
+              <Link to={`${basePrefix}/about/vision`} className="btn btn-primary">
                 <EditableText value={heroData.cta} onSave={(v) => handleSaveHero({ ...heroData, cta: v })} label="Birinchi tugma" /> <ArrowRight size={18} />
-              </div>
-              <div className="btn btn-outline">
+              </Link>
+              <Link to={`${basePrefix}/admissions`} className="btn btn-outline">
                 <EditableText value={heroData.apply} onSave={(v) => handleSaveHero({ ...heroData, apply: v })} label="Ikkinchi tugma" />
-              </div>
+              </Link>
             </div>
 
             <div className="hero-stats fade-up-d3">
