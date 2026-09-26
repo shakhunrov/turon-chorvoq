@@ -46,7 +46,7 @@ export const BRANCH_INFO = {
     address: "Toshkent viloyati, Bo'stonliq tumani, Besh-tut mahallasi, 16-maktab yonida",
     phone: '+998 94 310 33 33',
     email: DEFAULT_EMAIL,
-    mapUrl: '', // anketada faqat umumiy maps.google.com berilgan — aniq joylashuv havolasi kelgach qo'shiladi
+    mapUrl: 'https://maps.app.goo.gl/zHSkKn2jud4St5B4A',
     social: {
       instagram: 'https://www.instagram.com/tis_chorvoq',
       telegram: 'https://t.me/+HiwBiPHPPl9iZGQy',
