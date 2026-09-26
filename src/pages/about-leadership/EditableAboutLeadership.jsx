@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLang } from '../../shared/i18n';
-import { EditableList, EditableText, EditableImage } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage, makeTx } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
@@ -75,6 +75,8 @@ export default function EditableAboutLeadership() {
       : sections.director.image instanceof File
         ? URL.createObjectURL(sections.director.image)
         : directorImg;
+
+  const tx = makeTx(sections, handleSaveSection);
 
   return (
     <div className="page ls-page">
@@ -155,7 +157,7 @@ export default function EditableAboutLeadership() {
           <div className="container">
             <div className="ls-board-intro">
               <div className="ls-board-intro-left">
-                <span className="ls-section-eyebrow">Bizning Jamoamiz</span>
+                <span className="ls-section-eyebrow">{tx('boardLabel', 'Bizning Jamoamiz')}</span>
                 <h2 className="ls-board-title"><EditableText value={sections.board.title} onSave={(v) => handleSaveSection('board', { ...sections.board, title: v })} label="Sarlavha" /></h2>
               </div>
               <p className="ls-board-desc-text"><EditableText value={sections.board.desc} onSave={(v) => handleSaveSection('board', { ...sections.board, desc: v })} label="Matn" multiline /></p>
@@ -218,10 +220,10 @@ export default function EditableAboutLeadership() {
             <div className="ls-cta-mesh" />
             <div className="ls-cta-orb" />
             <div className="ls-cta-inner">
-              <h2 className="ls-cta-title">Jamoamiz bilan bog'laning</h2>
-              <p className="ls-cta-sub">Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.</p>
+              <h2 className="ls-cta-title">{tx('ctaTitle', "Jamoamiz bilan bog'laning")}</h2>
+              <p className="ls-cta-sub">{tx('ctaSub', 'Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.', { multiline: true })}</p>
               <a href="/contact" className="btn btn-primary ls-cta-btn">
-                Bog'lanish →
+                {tx('ctaBtn', "Bog'lanish →")}
               </a>
             </div>
           </div>

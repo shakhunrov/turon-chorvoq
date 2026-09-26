@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
+import { useSelector } from 'react-redux';
+import { selectIsAuth } from '../../features/auth';
+import { EditableText, EditableList, makeTx, makeLst } from '../../shared/editable';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import AdmissionModal from '../../features/admission-modal/AdmissionModal';
 import { getBranchInfo } from '../../shared/config/branchInfo';
 import {
@@ -101,14 +105,18 @@ export default function Admissions() {
   const a = t.admissions;
   const [showModal, setShowModal] = useState(false);
   const branchName = getBranchInfo()?.name || 'Chorvoq';
+  const isEditableMode = useSelector(selectIsAuth);
+  const { sections, handleSaveSection } = useEditableSections('admissions', {});
+  const tx = makeTx(sections, handleSaveSection);
+  const stepsList = makeLst(sections, handleSaveSection)('steps', a.steps.map((text) => ({ text })));
 
   const heroChips = [
-    { icon: <IconClipboard />, text: '5-step process' },
-    { icon: <IconClock />,     text: 'Apply in 10 min' },
-    { icon: <IconCalendar />,  text: 'Fall 2026 open' },
+    { icon: <IconClipboard />, text: tx('chip0', '5-step process') },
+    { icon: <IconClock />,     text: tx('chip1', 'Apply in 10 min') },
+    { icon: <IconCalendar />,  text: tx('chip2', 'Fall 2026 open') },
   ];
 
-  const timelineSteps = a.steps.map((step) => ({ text: step }));
+  const timelineSteps = stepsList.items.map((step) => ({ text: step.text }));
 
   const benefits = [
     { icon: <IconGraduationCap />, title: 'IB Curriculum',  desc: 'Internationally recognised qualification' },
@@ -130,9 +138,14 @@ export default function Admissions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
           >
-            Ro'yxatdan o'tish
+            {tx('label', "Ro'yxatdan o'tish")}
           </motion.span>
-          <TextSplit text={a.title} as="h1" className="section-title" style={{ marginTop: 12 }} />
+          <EditableText
+            value={sections.texts?.title || a.title}
+            onSave={(v) => handleSaveSection('texts', { ...(sections.texts || {}), title: v })}
+            label="Sarlavha"
+            render={(v) => <TextSplit text={v} as="h1" className="section-title" style={{ marginTop: 12 }} />}
+          />
           <motion.div
             className="divider"
             initial={{ scaleX: 0 }}
@@ -146,7 +159,7 @@ export default function Admissions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.5 }}
           >
-            {a.subtitle}
+            {tx('subtitle', a.subtitle, { multiline: true })}
           </motion.p>
           {/* Hero chips */}
           <motion.div
@@ -175,19 +188,19 @@ export default function Admissions() {
                 <IconSchool />
               </div>
               <div className="school-card-body">
-                <h2 className="school-card-name">{a.schoolCard.name}</h2>
+                <h2 className="school-card-name">{tx('cardName', a.schoolCard.name)}</h2>
                 <div className="school-card-infos">
                   <div className="school-card-info">
                     <span className="info-icon"><IconMapPin /></span>
-                    <span>{a.schoolCard.location}</span>
+                    <span>{tx('cardLocation', a.schoolCard.location)}</span>
                   </div>
                   <div className="school-card-info">
                     <span className="info-icon"><IconUsers /></span>
-                    <span>{a.schoolCard.ageRange}</span>
+                    <span>{tx('cardAge', a.schoolCard.ageRange)}</span>
                   </div>
                   <div className="school-card-info">
                     <span className="info-icon"><IconBookOpen /></span>
-                    <span>{a.schoolCard.curriculum}</span>
+                    <span>{tx('cardCurriculum', a.schoolCard.curriculum)}</span>
                   </div>
                 </div>
                 <button
@@ -195,7 +208,7 @@ export default function Admissions() {
                   style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}
                   onClick={() => setShowModal(true)}
                 >
-                  {a.applyBtn} →
+                  {tx('applyBtn', a.applyBtn)} →
                 </button>
               </div>
             </div>
@@ -204,10 +217,21 @@ export default function Admissions() {
           {/* ── How to apply → Timeline ── */}
           <div className="admission-steps">
             <RevealOnScroll>
-              <h2 className="section-title">{a.howToApply}</h2>
+              <h2 className="section-title">{tx('howToApply', a.howToApply)}</h2>
               <div className="divider" style={{ marginBottom: 32 }} />
             </RevealOnScroll>
             <TimelineRail steps={timelineSteps} />
+            {isEditableMode && (
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 24 }}>
+                <EditableList
+                  items={stepsList.items}
+                  onSave={stepsList.onSave}
+                  defaultItem={{ text: '' }}
+                  itemName="Qadam"
+                  renderItem={(step, i) => <div className="glass-card" style={{ padding: '8px 14px' }}><b>{i + 1}.</b> {step.text}</div>}
+                />
+              </div>
+            )}
           </div>
 
           {/* ── Benefits grid ── */}

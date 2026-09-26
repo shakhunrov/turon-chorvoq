@@ -9,7 +9,8 @@ import {
   selectNewsLoading,
 } from '../../features/news';
 import { X } from 'lucide-react';
-import { EditableImage } from '../../shared/editable';
+import { EditableImage, makeTx } from '../../shared/editable';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import { RevealOnScroll } from '../../shared/components/kinetic';
 import './News.css';
 
@@ -35,6 +36,8 @@ export default function News() {
   const allText = typeof t.news === 'object' ? (t.news?.categories?.[0] || 'All') : 'All';
   const branchId = localStorage.getItem('globalBranchId');
   const dispatch = useDispatch();
+  const { sections, handleSaveSection } = useEditableSections('news', {});
+  const tx = makeTx(sections, handleSaveSection);
 
   const newsList    = useSelector(selectNewsList);
   const loading     = useSelector(selectNewsLoading);
@@ -55,7 +58,7 @@ export default function News() {
     if (p.category?.id) catsMap.set(p.category.id, p.category);
   });
   const categories = [
-    { id: 'All', name: allText },
+    { id: 'All', name: tx('all', allText) },
     ...Array.from(catsMap.values()),
   ];
 
@@ -79,7 +82,7 @@ export default function News() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
           >
-            Latest
+            {tx('label', 'Latest')}
           </motion.span>
           <motion.h1
             className="section-title"
@@ -87,7 +90,7 @@ export default function News() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.12, ease: [0.23, 1, 0.32, 1] }}
           >
-            {title}
+            {tx('title', title)}
           </motion.h1>
           <motion.div
             className="divider"
@@ -137,7 +140,7 @@ export default function News() {
             ) : filtered.length === 0 ? (
               <div className="news-empty">
                 <div className="news-empty-icon"><IconInbox /></div>
-                <p>Bu bo'limda hozircha yangilik yo'q.</p>
+                <p>{tx('empty', "Bu bo'limda hozircha yangilik yo'q.")}</p>
               </div>
 
             ) : (

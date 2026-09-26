@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
-import { EditableList, EditableText } from '../../shared/editable';
+import { EditableList, EditableText, makeTx } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import {
   fetchPositions,
@@ -81,6 +81,7 @@ export default function EditableCareers() {
   };
 
   const { sections, handleSaveSection } = useEditableSections('careers', defaultSections);
+  const tx = makeTx(sections, handleSaveSection);
 
   useEffect(() => {
     dispatch(fetchPositions({ branch: branchId }));
@@ -175,7 +176,7 @@ export default function EditableCareers() {
                         <div className="car-istat-num">
                           <AnimatedCounter to={s.to} suffix={s.suffix} duration={1400} />
                         </div>
-                        <div className="car-istat-label">{s.label}</div>
+                        <div className="car-istat-label">{tx(`stat${i}`, s.label)}</div>
                       </div>
                     ))}
                   </div>
@@ -239,7 +240,7 @@ export default function EditableCareers() {
                   <div className="car-path-orb" />
 
                   <div className="car-path-header">
-                    <span className="car-path-eyebrow">Your Journey</span>
+                    <span className="car-path-eyebrow">{tx('journey', 'Your Journey')}</span>
                     <h3 className="car-path-title">
                       <EditableText value={sections.pathway.title} onSave={(v) => handleSaveSection('pathway', { ...sections.pathway, title: v })} label="Sarlavha" />
                       <EditableText
@@ -274,7 +275,7 @@ export default function EditableCareers() {
               <RevealOnScroll>
                 <div className="car-pos-heading-row">
                   <div>
-                    <h2 className="section-title">{c.rolesTitle || 'Open Positions'}</h2>
+                    <h2 className="section-title">{tx('rolesTitle', c.rolesTitle || 'Open Positions')}</h2>
                     <div className="divider" />
                   </div>
                   {!positionsLoading && activePositions.length > 0 && (
@@ -296,8 +297,8 @@ export default function EditableCareers() {
                 <RevealOnScroll>
                   <div className="car-pos-empty">
                     <div className="car-pos-empty-icon"><IconBriefcaseEmpty /></div>
-                    <h4>No open positions right now</h4>
-                    <p>We're always looking for talent. Check back soon!</p>
+                    <h4>{tx('emptyTitle', 'No open positions right now')}</h4>
+                    <p>{tx('emptyText', "We're always looking for talent. Check back soon!")}</p>
                   </div>
                 </RevealOnScroll>
 
@@ -383,7 +384,7 @@ export default function EditableCareers() {
                         document.querySelector('.positions-section')?.scrollIntoView({ behavior: 'smooth' })
                       }
                     >
-                      View Open Positions
+                      {tx('viewPositions', 'View Open Positions')}
                       <span className="car-cta-arrow">→</span>
                     </button>
                   </div>

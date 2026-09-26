@@ -5,7 +5,7 @@ import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
-import { EditableList, EditableText, EditableImage } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage, makeTx } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -128,6 +128,8 @@ export default function EditableHome() {
         }
     };
 
+    const tx = makeTx(sections, handleSaveSection);
+
     // Statistika kartalari avval nomlangan maydonlarda saqlangan (students/teachers/...).
     // Endi umumiy ro'yxat (items) sifatida saqlaymiz — shu bilan har bir kartani alohida
     // tahrirlash/o'chirish/qo'shish/sudrash (EditableList) mumkin bo'ladi. Eski (hali `items`ga
@@ -156,7 +158,7 @@ export default function EditableHome() {
                             <EditableText value={sections.whoWeAre.text} onSave={(v) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, text: v })} label="Matn" multiline />
                         </p>
                         <Link to={`${basePrefix}/about/vision`} className="btn btn-primary" style={{ marginTop: 16 }}>
-                            Batafsil →
+                            {tx('learnMore', 'Batafsil →')}
                         </Link>
                     </div>
                     <div className="wwa-image-side">
@@ -232,7 +234,7 @@ export default function EditableHome() {
                             />
                         </p>
                         <Link to={`${basePrefix}/education`} className="btn btn-outline" style={{ marginTop: 24 }}>
-                            Bizning yondashuvimiz →
+                            {tx('ourApproach', 'Bizning yondashuvimiz →')}
                         </Link>
                     </div>
                     <div className="philosophy-cards">

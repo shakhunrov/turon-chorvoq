@@ -9,6 +9,8 @@ import {
   StaggerGrid,
   staggerItem,
 } from '../../shared/components/kinetic';
+import { EditableText, EditableList, makeTx, makeLst } from '../../shared/editable';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Policies.css';
 
 function PolicyAccordion({ policy }) {
@@ -74,6 +76,10 @@ export default function Policies() {
     },
   ];
 
+  const { sections, handleSaveSection } = useEditableSections('policies', {});
+  const tx = makeTx(sections, handleSaveSection);
+  const list = makeLst(sections, handleSaveSection)('policies', policies);
+
   return (
     <div className="page">
       {/* ── Hero ── */}
@@ -86,9 +92,14 @@ export default function Policies() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
           >
-            Huquqiy
+            {tx('label', 'Huquqiy')}
           </motion.span>
-          <TextSplit text="Siyosat va muvofiqlik" as="h1" className="section-title" style={{ marginTop: 12 }} />
+          <EditableText
+            value={sections.texts?.title || 'Siyosat va muvofiqlik'}
+            onSave={(v) => handleSaveSection('texts', { ...(sections.texts || {}), title: v })}
+            label="Sarlavha"
+            render={(v) => <TextSplit text={v} as="h1" className="section-title" style={{ marginTop: 12 }} />}
+          />
           <motion.div
             className="divider"
             initial={{ scaleX: 0 }}
@@ -102,7 +113,7 @@ export default function Policies() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.55 }}
           >
-            Last updated: January 2026
+            {tx('updated', 'Last updated: January 2026')}
           </motion.p>
         </div>
       </div>
@@ -110,9 +121,13 @@ export default function Policies() {
       <section className="section">
         <div className="container policies-content">
           <StaggerGrid stagger={0.1}>
-            {policies.map((policy) => (
-              <PolicyAccordion key={policy.id} policy={policy} />
-            ))}
+            <EditableList
+              items={list.items}
+              onSave={list.onSave}
+              defaultItem={{ id: '', icon: '📄', title: '', content: '' }}
+              itemName="Siyosat"
+              renderItem={(policy) => <PolicyAccordion policy={policy} />}
+            />
           </StaggerGrid>
         </div>
       </section>

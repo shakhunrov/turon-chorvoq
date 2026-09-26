@@ -12,6 +12,8 @@ import {
 import { RevealOnScroll, StaggerGrid, staggerItem } from '../../shared/components/kinetic';
 import { getBranchInfo } from '../../shared/config/branchInfo';
 import { useBranchInfo } from '../../shared/config/useBranchInfo';
+import { EditableText, makeTx } from '../../shared/editable';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Contact.css';
 
 /* ── SVG Icon components ── */
@@ -74,7 +76,9 @@ export default function Contact() {
   const submitSuccess = useSelector(selectSubmitSuccess);
   const branchId      = localStorage.getItem('globalBranchId');
   // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar ishlatiladi
-  const { info: liveInfo } = useBranchInfo();
+  const { info: liveInfo, save: saveInfo } = useBranchInfo();
+  const { sections, handleSaveSection } = useEditableSections('contact', {});
+  const tx = makeTx(sections, handleSaveSection);
   const bi = { ...(getBranchInfo() || {}), ...liveInfo };
   const address = bi?.address || c.address;
   const email = bi?.email || c.email;
@@ -94,9 +98,9 @@ export default function Contact() {
   };
 
   const infoItems = [
-    { Icon: IconLocation, label: address, color: '#F59E0B' },
-    { Icon: IconMail,     label: email,   color: '#2563EB' },
-    { Icon: IconPhone,    label: phone,   color: '#10B981' },
+    { Icon: IconLocation, label: <EditableText value={address} onSave={(v) => saveInfo({ address: v })} label="Manzil" />, color: '#F59E0B' },
+    { Icon: IconMail,     label: <EditableText value={email} onSave={(v) => saveInfo({ email: v })} label="Email" />,   color: '#2563EB' },
+    { Icon: IconPhone,    label: <EditableText value={phone} onSave={(v) => saveInfo({ phone: v })} label="Telefon" />,    color: '#10B981' },
   ];
 
   return (
@@ -114,7 +118,7 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Bog'lanish
+            {tx('eyebrow', "Bog'lanish")}
           </motion.span>
           <motion.h1
             className="con-hero-title"
@@ -122,7 +126,7 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.23,1,0.32,1] }}
           >
-            {c.title}
+            {tx('title', c.title)}
           </motion.h1>
           <motion.div
             className="con-hero-line"
@@ -137,7 +141,7 @@ export default function Contact() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.55 }}
           >
-            Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.
+            {tx('sub', 'Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.', { multiline: true })}
           </motion.p>
         </div>
       </div>
@@ -153,15 +157,15 @@ export default function Contact() {
             <RevealOnScroll variant="fadeRight">
               <div className="con-school-badge">
                 <span className="con-school-dot" />
-                {c.schoolName || 'Turon International School'}
+                {tx('schoolName', c.schoolName || 'Turon International School')}
               </div>
-              <h2 className="con-section-heading">Manzil va aloqa</h2>
+              <h2 className="con-section-heading">{tx('addrHeading', 'Manzil va aloqa')}</h2>
             </RevealOnScroll>
 
             {/* Info cards */}
             <StaggerGrid stagger={0.10} margin="-10px">
-              {infoItems.map(({ Icon, label, color }) => (
-                <motion.div key={label} className="con-info-card" variants={staggerItem}
+              {infoItems.map(({ Icon, label, color }, i) => (
+                <motion.div key={i} className="con-info-card" variants={staggerItem}
                   style={{ '--info-color': color }}>
                   <div className="con-info-icon">
                     <Icon />
@@ -188,8 +192,8 @@ export default function Contact() {
                 </div>
                 <div className="con-map-footer">
                   <div>
-                    <div className="con-map-title">{bi?.mapTitle || c.mapTitle || 'Chorvoq, Tashkent Region'}</div>
-                    <div className="con-map-sub">Uzbekistan</div>
+                    <div className="con-map-title">{tx('mapTitle', bi?.mapTitle || c.mapTitle || 'Chorvoq, Tashkent Region')}</div>
+                    <div className="con-map-sub">{tx('mapSub', 'Uzbekistan')}</div>
                   </div>
                   <a
                     href={mapUrl}
@@ -197,7 +201,7 @@ export default function Contact() {
                     rel="noreferrer"
                     className="con-map-btn"
                   >
-                    {c.openMap || 'Xaritada ko\'rish'}
+                    {tx('openMap', c.openMap || "Xaritada ko'rish")}
                     <IconExternalLink />
                   </a>
                 </div>
@@ -209,8 +213,8 @@ export default function Contact() {
           <div className="con-right">
             <RevealOnScroll variant="fadeLeft">
               <div className="con-form-header">
-                <h2 className="con-section-heading">{c.partnershipTitle}</h2>
-                <p className="con-form-sub">{c.partnershipDesc}</p>
+                <h2 className="con-section-heading">{tx('formHeading', c.partnershipTitle)}</h2>
+                <p className="con-form-sub">{tx('formSub', c.partnershipDesc, { multiline: true })}</p>
               </div>
             </RevealOnScroll>
 
@@ -232,7 +236,7 @@ export default function Contact() {
 
                   {/* Name */}
                   <div className={`con-field ${focused.name || form.name ? 'active' : ''}`}>
-                    <label className="con-field-label" htmlFor="cf-name">{c.form.name}</label>
+                    <label className="con-field-label" htmlFor="cf-name">{tx('fName', c.form.name)}</label>
                     <input
                       id="cf-name"
                       className="con-field-input"
@@ -248,7 +252,7 @@ export default function Contact() {
 
                   {/* Email */}
                   <div className={`con-field ${focused.email || form.email ? 'active' : ''}`}>
-                    <label className="con-field-label" htmlFor="cf-email">{c.form.email}</label>
+                    <label className="con-field-label" htmlFor="cf-email">{tx('fEmail', c.form.email)}</label>
                     <input
                       id="cf-email"
                       type="email"
@@ -265,7 +269,7 @@ export default function Contact() {
 
                   {/* Message */}
                   <div className={`con-field con-field-textarea ${focused.message || form.message ? 'active' : ''}`}>
-                    <label className="con-field-label" htmlFor="cf-message">{c.form.message}</label>
+                    <label className="con-field-label" htmlFor="cf-message">{tx('fMessage', c.form.message)}</label>
                     <textarea
                       id="cf-message"
                       className="con-field-input"
@@ -295,7 +299,7 @@ export default function Contact() {
                     ) : (
                       <>
                         <IconSend />
-                        {c.form.submit}
+                        {tx('fSubmit', c.form.submit)}
                       </>
                     )}
                   </button>

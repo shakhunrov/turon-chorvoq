@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useLang } from '../../shared/i18n';
-import { EditableText, EditableImage } from '../../shared/editable';
+import { EditableText, EditableImage, makeTx } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { fetchPublicNews, uploadNewsImage, selectNewsList, selectNewsLoading } from '../../features/news';
 import { selectIsAuth } from '../../features/auth';
@@ -24,7 +24,7 @@ export default function EditableNewsSection() {
       title: t.news.title,
     },
   });
-
+  const tx = makeTx(sections, handleSaveSection);
 
   // Backend'dan yangiliklar ma'lumotlarini yuklash (faqat nashr etilganlar — public endpoint)
   useEffect(() => {
@@ -87,7 +87,7 @@ export default function EditableNewsSection() {
               </div>
 
               <div style={{ textAlign: 'center', marginTop: 40 }}>
-                <Link to={`${basePrefix}/news`} className="btn btn-outline">Barcha yangiliklar</Link>
+                <Link to={`${basePrefix}/news`} className="btn btn-outline">{tx('allNews', 'Barcha yangiliklar')}</Link>
               </div>
             </>
           )}
