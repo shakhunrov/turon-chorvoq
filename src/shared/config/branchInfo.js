@@ -30,7 +30,7 @@ export const BRANCH_INFO = {
   9: {
     name: 'Sergeli',
     address: 'Toshkent shahar, Yangi Sergeli, 9/13',
-    phone: '', // hali berilmagan — fallback ishlatiladi
+    phone: '+998 94 310 33 33',
     email: DEFAULT_EMAIL,
     mapUrl: 'https://yandex.ru/navi?text=41.229213,69.218142',
     social: {
