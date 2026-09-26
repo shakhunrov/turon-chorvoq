@@ -5,7 +5,7 @@ const AdminAuthContext = createContext(null);
 const ADMIN_CREDS = { username: 'admin', password: 'tis2026' };
 const AUTH_KEY = 'tis_admin_auth';
 
-const host = window.location.hostname;
+const host = window.__PRERENDER_HOST__ || window.location.hostname; // prerender paytida domen shu orqali beriladi
 
 let branchId = 6; // Default for Chorvoq
 

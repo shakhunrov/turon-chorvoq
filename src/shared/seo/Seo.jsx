@@ -26,7 +26,7 @@ export default function Seo() {
   const { lang } = useLang();
 
   useEffect(() => {
-    const host = window.location.hostname;
+    const host = window.__PRERENDER_HOST__ || window.location.hostname;
     const branchId = Number(localStorage.getItem('globalBranchId')) || 6;
     const name = branchOf(branchId)?.name || 'Chorvoq';
     const l = ['uz', 'ru', 'en'].includes(lang) ? lang : 'uz';
