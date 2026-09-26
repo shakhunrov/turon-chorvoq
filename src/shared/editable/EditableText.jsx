@@ -12,13 +12,16 @@ import './EditableText.css';
  * Ro'yxat (EditableList) allaqachon o'z pen/o'chirish/sudrash tugmalariga ega bo'lgan
  * section'larda, qolgan yagona matn maydoni (masalan title) uchun ishlatiladi.
  */
-export default function EditableText({ value, onSave, as: Tag = 'span', className, multiline = false, label = 'Matn' }) {
+export default function EditableText({ value, onSave, as: Tag = 'span', className, multiline = false, label = 'Matn', render }) {
     const isEditableMode = useSelector(selectIsAuth);
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(value || '');
 
+    // `render` bo'lsa matn shu funksiya orqali chiziladi (masalan TextSplit/gradient); `render={() => null}` — faqat pen
+    const display = render ? render(value) : null;
+
     if (!isEditableMode) {
-        return <Tag className={className}>{value}</Tag>;
+        return render ? display : <Tag className={className}>{value}</Tag>;
     }
 
     const handleOpen = () => {
@@ -35,7 +38,7 @@ export default function EditableText({ value, onSave, as: Tag = 'span', classNam
 
     return (
         <span className="editable-text-wrap">
-            <Tag className={className}>{value || '…'}</Tag>
+            {render ? display : <Tag className={className}>{value || '…'}</Tag>}
             <button type="button" className="editable-text-pen" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleOpen(); }} title="Tahrirlash">
                 <Edit2 size={14} />
             </button>
