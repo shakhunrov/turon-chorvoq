@@ -5,7 +5,7 @@ import EditableHeroBanner from '../../widgets/hero-banner/EditableHeroBanner';
 import EditableWhyChoose from '../../widgets/why-choose/EditableWhyChoose';
 import EditableTestimonials from '../../widgets/testimonials/EditableTestimonials';
 import EditableNewsSection from '../../widgets/news-section/EditableNewsSection';
-import { EditableList, EditableText, EditableImage, makeTx } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage, makeTx, SwapButton, swapClass } from '../../shared/editable';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
@@ -145,7 +145,8 @@ export default function EditableHome() {
 
             {/* Biz haqimizda — matnlar alohida pen, rasm alohida tugma */}
             <section className="section">
-                <div className="container who-we-are">
+                <div className={`container who-we-are ${swapClass(sections.whoWeAre.flip)}`} style={{ position: 'relative' }}>
+                    <SwapButton flipped={!!sections.whoWeAre.flip} onToggle={() => handleSaveSection('whoWeAre', { ...sections.whoWeAre, flip: !sections.whoWeAre.flip })} />
                     <div className="wwa-content">
                         <span className="section-label">
                             <EditableText value={sections.whoWeAre.label} onSave={(v) => handleSaveSection('whoWeAre', { ...sections.whoWeAre, label: v })} label="Yorliq" />

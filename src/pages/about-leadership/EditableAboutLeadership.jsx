@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLang } from '../../shared/i18n';
-import { EditableList, EditableText, EditableImage, makeTx } from '../../shared/editable';
+import { EditableList, EditableText, EditableImage, makeTx, SwapButton, swapClass } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import { savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
@@ -90,7 +90,8 @@ export default function EditableAboutLeadership() {
           <div className="ls-orb ls-orb-1" />
           <div className="ls-orb ls-orb-2" />
 
-          <div className="container ls-hero-inner">
+          <div className={`container ls-hero-inner ${swapClass(sections.director.flip)}`} style={{ position: 'relative' }}>
+            <SwapButton flipped={!!sections.director.flip} onToggle={() => handleSaveSection('director', { ...sections.director, flip: !sections.director.flip })} />
             {/* Left: director photo with gold rings */}
             <div className="ls-hero-photo-col">
               <EditableImage onSave={(file) => handleSaveSection('director', { ...sections.director, image: file })}>
