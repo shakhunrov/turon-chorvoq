@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher';
-import { ChevronUp, ChevronDown, MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
+import { GripVertical, MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
 import { useBranchInfo } from '../../shared/config/useBranchInfo';
 import { EditableText, EditableList, EditableImage } from '../../shared/editable';
@@ -19,22 +19,26 @@ const SOCIAL_KEYS = ['instagram', 'telegram', 'facebook', 'youtube'];
 // Tartibni saqlangan massiv bo'yicha chiqaradi (yangi/yo'qolgan kalitlar oxiriga qo'shiladi)
 const ordered = (saved, all) => [...(saved || []).filter((k) => all.includes(k)), ...all.filter((k) => !(saved || []).includes(k))];
 
-// Edit rejimida element yonidagi yuqoriga/pastga tugmalari
-function MoveButtons({ index, total, onMove }) {
-  const btn = { display: 'inline-flex', width: 22, height: 22, alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: 6, background: 'rgba(255,255,255,0.16)', color: '#fff', cursor: 'pointer', padding: 0 };
+// Edit rejimida element yonidagi sudrash tutqichi (grip)
+function DragHandle({ onDragStart }) {
   return (
-    <span style={{ display: 'inline-flex', gap: 4, marginLeft: 6 }}>
-      <button type="button" style={{ ...btn, opacity: index === 0 ? 0.3 : 1 }} disabled={index === 0} title="Yuqoriga" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMove(-1); }}><ChevronUp size={14} /></button>
-      <button type="button" style={{ ...btn, opacity: index === total - 1 ? 0.3 : 1 }} disabled={index === total - 1} title="Pastga" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMove(1); }}><ChevronDown size={14} /></button>
+    <span
+      draggable
+      onDragStart={(e) => { e.stopPropagation(); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', 'x'); } catch { /* ignore */ } onDragStart(); }}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+      title="Sudrab tartibini o'zgartiring"
+      style={{ display: 'inline-flex', width: 24, height: 24, alignItems: 'center', justifyContent: 'center', marginLeft: 6, borderRadius: 6, background: 'rgba(255,255,255,0.16)', color: '#fff', cursor: 'grab' }}
+    >
+      <GripVertical size={14} />
     </span>
   );
 }
 
-const move = (list, i, d) => {
+const move = (list, from, to) => {
+  if (from === null || from === to) return list;
   const next = [...list];
-  const j = i + d;
-  if (j < 0 || j >= next.length) return list;
-  [next[i], next[j]] = [next[j], next[i]];
+  const [m] = next.splice(from, 1);
+  next.splice(to, 0, m);
   return next;
 };
 
@@ -75,6 +79,7 @@ export default function Footer() {
     if (logoFile instanceof File) return URL.createObjectURL(logoFile);
     return typeof logoFile === 'string' && logoFile ? logoFile : logo;
   }, [logoFile]);
+  const [drag, setDrag] = useState(null); // { group, index }
   const contactOrder = ordered(bi?.order, CONTACT_KEYS);
   const socialOrder = ordered(bi?.socialOrder, SOCIAL_KEYS);
   const tagline = sections.brand?.tagline || t.footer.tagline;
@@ -126,10 +131,13 @@ export default function Footer() {
                 phone: { href: `tel:${phone}`, Icon: Phone, value: phone, label: 'Telefon' },
               }[k];
               return (
-                <a key={k} href={cfg.href} className="footer-contact-item" {...(cfg.ext ? { target: '_blank', rel: 'noreferrer' } : {})}>
+                <a key={k} href={cfg.href} className="footer-contact-item"
+                  onDragOver={(e) => { if (drag?.group === 'contact') e.preventDefault(); }}
+                  onDrop={(e) => { if (drag?.group !== 'contact') return; e.preventDefault(); saveInfo({ order: move(contactOrder, drag.index, i) }); setDrag(null); }}
+                  {...(cfg.ext ? { target: '_blank', rel: 'noreferrer' } : {})}>
                   <cfg.Icon size={14} />
                   <EditableText value={cfg.value} onSave={(v) => saveInfo({ [k]: v })} label={cfg.label} />
-                  {isEditableMode && <MoveButtons index={i} total={contactOrder.length} onMove={(d) => saveInfo({ order: move(contactOrder, i, d) })} />}
+                  {isEditableMode && <DragHandle onDragStart={() => setDrag({ group: 'contact', index: i })} />}
                 </a>
               );
             })}
@@ -137,14 +145,16 @@ export default function Footer() {
           {isEditableMode && (
             <div className="footer-contact-items" style={{ marginTop: 8 }}>
               {[...socialOrder.map((k) => [k, { instagram: 'Instagram', telegram: 'Telegram', facebook: 'Facebook', youtube: 'YouTube' }[k]]), ['mapUrl', 'Xarita havolasi']].map(([k, lab], idx) => (
-                <div key={k} className="footer-contact-item" style={{ gap: 6 }}>
+                <div key={k} className="footer-contact-item" style={{ gap: 6 }}
+                  onDragOver={(e) => { if (drag?.group === 'social' && k !== 'mapUrl') e.preventDefault(); }}
+                  onDrop={(e) => { if (drag?.group !== 'social' || k === 'mapUrl') return; e.preventDefault(); saveInfo({ socialOrder: move(socialOrder, drag.index, idx) }); setDrag(null); }}>
                   <span>{lab}:</span>
                   <EditableText
                     value={k === 'mapUrl' ? (bi?.mapUrl || '') : (bi?.social?.[k] || '')}
                     onSave={(v) => saveInfo({ [k]: v.trim() })}
                     label={`${lab} havolasi`}
                   />
-                  {k !== 'mapUrl' && <MoveButtons index={idx} total={socialOrder.length} onMove={(d) => saveInfo({ socialOrder: move(socialOrder, idx, d) })} />}
+                  {k !== 'mapUrl' && <DragHandle onDragStart={() => setDrag({ group: 'social', index: idx })} />}
                 </div>
               ))}
             </div>
