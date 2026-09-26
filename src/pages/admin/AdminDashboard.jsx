@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import PageSectionsManager from './PageSectionsManager';
 import SitePreview from './SitePreview';
+import logoImg from '../../shared/assets/logo/turonLogo.png';
 import './AdminDashboard.css';
 
 const TYPE_CHOICES = ['Academic', 'Non-Academic'];
@@ -270,7 +271,7 @@ export default function AdminDashboard() {
         <div className="admin-layout">
             {/* Sidebar */}
             <aside className="admin-sidebar">
-                <div className="sidebar-logo"><Shield size={22} /><span>TIS Boshqaruv</span></div>
+                <div className="sidebar-logo"><img src={logoImg} alt="" /><div><b>Turon International School</b><small>Admin panel</small></div></div>
                 <nav className="sidebar-nav">
                     <button className={`sidebar-item ${section === 'news' ? 'active' : ''}`}
                             onClick={() => { setView('news-list'); setSearch(''); }}>
@@ -301,6 +302,7 @@ export default function AdminDashboard() {
                         <Globe size={18} /> Saytni ko'rish
                     </button>
                 </nav>
+                <div className="sidebar-tagline"><img src={logoImg} alt="" /><span>Ta'lim –<br />kelajak poydevori</span></div>
                 <button className="sidebar-logout" onClick={handleLogout}><LogOut size={16} /> Chiqish</button>
             </aside>
 
