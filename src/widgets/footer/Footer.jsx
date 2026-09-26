@@ -7,7 +7,7 @@ import LanguageSwitcher from '../../features/language-switcher/LanguageSwitcher'
 import { MessageCircle, ExternalLink, Play, ThumbsUp, MapPin, Mail, Phone } from 'lucide-react';
 import { useAnimateOnScroll, staggerContainer, fadeUp } from '../../shared/hooks/useScrollAnimation';
 import { useBranchInfo } from '../../shared/config/useBranchInfo';
-import { EditableText } from '../../shared/editable';
+import { EditableText, EditableList } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
 import './Footer.css';
 import logo from "../../shared/assets/logo/turonLogo.png"
@@ -20,10 +20,30 @@ export default function Footer() {
 
   const inner = useAnimateOnScroll(0.08);
 
+  const defaultLinks = [
+    { label: t.nav.home, href: '/' },
+    { label: t.nav.about, href: '/about/vision' },
+    { label: t.nav.education, href: '/education' },
+    { label: t.nav.partnerships, href: '/partnerships' },
+    { label: t.nav.careers, href: '/careers' },
+    { label: t.nav.news, href: '/news' },
+    { label: t.nav.admissions, href: '/admissions' },
+    { label: t.nav.contact, href: '/contact' },
+  ];
+  const defaultAccred = [
+    { icon: '🎓', text: 'Cambridge Assessment International Education' },
+    { icon: '🌐', text: 'STEAM Certified' },
+    { icon: '🤖', text: 'AI-Integrated Learning' },
+  ];
+
   // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar
   const { info: bi, save: saveInfo } = useBranchInfo();
-  const { sections, handleSaveSection } = useEditableSections('footer', { brand: { name: 'TURON', sub: `International School · ${bi?.name || 'Chorvoq'}`, tagline: t.footer.tagline } });
+  const { sections, handleSaveSection } = useEditableSections('footer', { cols: { linksTitle: t.footer.links, accTitle: t.footer.accreditation, rights: t.footer.rights }, links: { items: defaultLinks }, accred: { items: defaultAccred }, brand: { name: 'TURON', sub: `International School · ${bi?.name || 'Chorvoq'}`, tagline: t.footer.tagline } });
   const brandSave = (patch) => handleSaveSection('brand', { ...sections.brand, ...patch });
+  const cols = sections.cols || {};
+  const linkItems = sections.links?.items || defaultLinks;
+  const accredItems = sections.accred?.items || defaultAccred;
+  const withPrefix = (h) => (h.startsWith('/') && !h.startsWith('/editable') ? basePrefix + h : h);
   const tagline = sections.brand?.tagline || t.footer.tagline;
   const branchName = bi?.name || 'Chorvoq';
   const address = bi?.address || t.contact.address;
@@ -38,16 +58,6 @@ export default function Footer() {
     { key: 'youtube', label: 'YouTube', Icon: Play, href: bi?.social?.youtube },
   ].filter((s) => s.href);
 
-  const quickLinks = [
-    { label: t.nav.home, href: basePrefix + '/' },
-    { label: t.nav.about, href: basePrefix + '/about/vision' },
-    { label: t.nav.education, href: basePrefix + '/education' },
-    { label: t.nav.partnerships, href: basePrefix + '/partnerships' },
-    { label: t.nav.careers, href: basePrefix + '/careers' },
-    { label: t.nav.news, href: basePrefix + '/news' },
-    { label: t.nav.admissions, href: basePrefix + '/admissions' },
-    { label: t.nav.contact, href: basePrefix + '/contact' },
-  ];
 
   return (
     <footer className="footer">
@@ -114,32 +124,38 @@ export default function Footer() {
 
         {/* Quick Links */}
         <motion.div className="footer-col" variants={fadeUp}>
-          <h4 className="footer-col-title">{t.footer.links}</h4>
-          <ul className="footer-links-list">
-            {quickLinks.map((l) => (
-              <li key={l.href}>
-                <Link to={l.href} className="footer-link">{l.label}</Link>
-              </li>
-            ))}
-          </ul>
+          <h4 className="footer-col-title">
+            <EditableText value={cols.linksTitle} onSave={(v) => handleSaveSection('cols', { ...cols, linksTitle: v })} label="Sarlavha" />
+          </h4>
+          <div className="footer-links-list">
+            <EditableList
+              items={linkItems}
+              onSave={(items) => handleSaveSection('links', { items })}
+              defaultItem={{ label: '', href: '/' }}
+              itemName="Havola"
+              renderItem={(l) => <Link to={withPrefix(l.href || '/')} className="footer-link">{l.label}</Link>}
+            />
+          </div>
         </motion.div>
 
         {/* Accreditations & Lang */}
         <motion.div className="footer-col" variants={fadeUp}>
-          <h4 className="footer-col-title">{t.footer.accreditation}</h4>
+          <h4 className="footer-col-title">
+            <EditableText value={cols.accTitle} onSave={(v) => handleSaveSection('cols', { ...cols, accTitle: v })} label="Sarlavha" />
+          </h4>
           <div className="accreditation-badges">
-            <div className="accred-badge">
-              <span className="accred-icon">🎓</span>
-              <span>Cambridge Assessment International Education</span>
-            </div>
-            <div className="accred-badge">
-              <span className="accred-icon">🌐</span>
-              <span>STEAM Certified</span>
-            </div>
-            <div className="accred-badge">
-              <span className="accred-icon">🤖</span>
-              <span>AI-Integrated Learning</span>
-            </div>
+            <EditableList
+              items={accredItems}
+              onSave={(items) => handleSaveSection('accred', { items })}
+              defaultItem={{ icon: '🎓', text: '' }}
+              itemName="Akkreditatsiya"
+              renderItem={(a) => (
+                <div className="accred-badge">
+                  <span className="accred-icon">{a.icon}</span>
+                  <span>{a.text}</span>
+                </div>
+              )}
+            />
           </div>
           <div style={{ marginTop: 24 }}>
             <LanguageSwitcher />
@@ -150,7 +166,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
-          <span>{t.footer.rights}</span>
+          <EditableText value={cols.rights} onSave={(v) => handleSaveSection('cols', { ...cols, rights: v })} label="Matn" />
           <div className="footer-policy-links">
             <Link to="/policies#privacy">{t.footer.policies}</Link>
             <Link to="/policies#safeguarding">{t.footer.safeguarding}</Link>
