@@ -47,6 +47,18 @@ export async function loginAdminTis(username, password) {
   return data;
 }
 
+// office.gennis.uz'dagi "<Filial> web site change" tugmasi (SMM/direktor
+// uchun) shu sahifaga `/admin?sso=<token>` bilan yuboradi — parol so'ramasdan
+// kirish uchun. Token management-v2 da mintalgan, ~2 daqiqa amal qiladi;
+// admin.tisedu.uz uni /auth/site-sso-exchange'da tekshirib, haqiqiy sessiya
+// (access/refresh token) qaytaradi — xuddi parol bilan kirilgandek.
+export async function exchangeSiteSso(token) {
+  const { data } = await axios.post(`${BASE_URL}/auth/site-sso-exchange`, { token });
+  sessionStorage.setItem(ACCESS_KEY, data.access_token);
+  if (data.refresh_token) sessionStorage.setItem(REFRESH_KEY, data.refresh_token);
+  return data;
+}
+
 const adminTisApi = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
