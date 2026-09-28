@@ -49,7 +49,7 @@ import {
     Newspaper, Briefcase, UserPlus, Plus, Edit2, Trash2,
     LogOut, Search, CheckCircle, Clock,
     X, Save, Shield, TrendingUp, Globe,
-    Upload, Tag, List as ListIcon, FileText, LayoutTemplate, LayoutDashboard, MessageSquare, Download,
+    Upload, Tag, List as ListIcon, FileText, LayoutDashboard, MessageSquare, Download,
 } from 'lucide-react';
 import PageSectionsManager from './PageSectionsManager';
 import SitePreview from './SitePreview';
@@ -334,10 +334,6 @@ export default function AdminDashboard() {
                     <button className={`sidebar-item ${section === 'messages' ? 'active' : ''}`}
                             onClick={() => { setView('msg-list'); setSearch(''); }}>
                         <MessageSquare size={18} /> Murojaatlar{summary.pending.contacts > 0 && <span className="sidebar-badge">{summary.pending.contacts}</span>}
-                    </button>
-                    <button className={`sidebar-item ${section === 'sections' ? 'active' : ''}`}
-                            onClick={() => { setView('sections-list'); setSearch(''); }}>
-                        <LayoutTemplate size={18} /> Sahifa bo'limlari
                     </button>
                     <button className={`sidebar-item ${section === 'preview' ? 'active' : ''}`}
                             onClick={() => { setView('site-preview'); setSearch(''); }}>
