@@ -2,7 +2,14 @@
 // Excel o'zbek/rus sozlamalarida ";" ni ustun ajratgich sifatida taniydi, BOM esa
 // kirill/lotin harflarni to'g'ri ko'rsatadi.
 const esc = (v) => {
-  const s = v === null || v === undefined ? '' : String(v).replace(/\r?\n/g, ' ');
+  let s = v === null || v === undefined ? '' : String(v).replace(/\r?\n/g, ' ');
+  // CSV/formula in'ektsiyasidan himoya: bu qatorlar ochiq (login shart emas) forma orqali
+  // saytga kelgan matnlarni (ism, izoh, xabar) o'z ichiga oladi — kimdir "=1+1" yoki
+  // "=HYPERLINK(...)" kabi Excel formulasi bilan boshlanadigan qiymat yuborishi mumkin.
+  // Boshida =, +, -, @ bo'lsa, Excel/LibreOffice uni matn sifatida o'qishi uchun oldiga
+  // bitta apostrof qo'yiladi (fayl ochilganda ko'rinmaydi, faqat formula sifatida
+  // bajarilishini oldini oladi).
+  if (/^[=+\-@]/.test(s)) s = `'${s}`;
   return /[";]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 
