@@ -30,14 +30,22 @@ if (!executablePath) {
 const PORT = 4189;
 const server = await preview({ preview: { port: PORT, strictPort: true } });
 // --disable-web-security: localhost'dan admin.tisedu.uz API'siga CORS'siz so'rov (faqat build vaqtida)
-const browser = await puppeteer.launch({ executablePath, headless: true, args: ['--no-sandbox', '--disable-web-security'] });
+const launch = () => puppeteer.launch({ executablePath, headless: true, args: ['--no-sandbox', '--disable-web-security'] });
+let browser = await launch();
 const out = path.resolve('build/_domains');
 let failed = 0;
 let done = 0;
 
+const LANGS = ['uz', 'ru', 'en'];
+const prefixOf = (l) => (l === 'uz' ? '' : `/${l}`);
+
 for (const [key, { host, branch }] of Object.entries(DOMAINS)) {
-  for (const { path: route } of PAGES) {
-    const page = await browser.newPage();
+  for (const lang of LANGS) for (const { path: base } of PAGES) {
+    const route = base === '/' ? (lang === 'uz' ? '/' : `${prefixOf(lang)}/`) : `${prefixOf(lang)}${base}`;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+    if (!browser.connected) browser = await launch(); // Chrome kutilmaganda yopilsa qayta ishga tushiramiz
+    const page = await browser.newPage().catch(() => null);
+    if (!page) continue;
     try {
       await page.evaluateOnNewDocument((h, b) => {
         window.__NO_REVEAL__ = true;          // animatsiya sinflari HTML'ga kirmasin
@@ -56,17 +64,21 @@ for (const [key, { host, branch }] of Object.entries(DOMAINS)) {
       await page.waitForFunction(() => document.getElementById('root')?.children.length > 0, { timeout: 10000 });
       // Meta Pixel prerender paytida o'ziga <script src=fbevents.js> qo'shadi — HTML'ga kiritmaymiz (ikki marta yuklanib xato bermasin)
       await page.evaluate(() => document.querySelectorAll('script[src*="connect.facebook.net"]').forEach((s) => s.remove()));
+      // Lenis (silliq scroll) <html> ga klass qo'shadi — tayyor HTML'ga o'tmasin
+      await page.evaluate(() => document.documentElement.classList.remove('lenis', 'lenis-smooth', 'lenis-scrolling', 'lenis-stopped'));
       const html = '<!doctype html>\n' + (await page.evaluate(() => document.documentElement.outerHTML));
       const dir = route === '/' ? path.join(out, key) : path.join(out, key, route);
       await mkdir(dir, { recursive: true });
       await writeFile(path.join(dir, 'index.html'), html);
       done += 1;
       console.log(`[prerender] ${host}${route} (${(html.length / 1024).toFixed(0)} KB)`);
+      await page.close().catch(() => {});
+      break;
     } catch (e) {
-      failed += 1;
-      console.warn(`[prerender] XATO ${host}${route}: ${e.message}`);
-    } finally {
-      await page.close();
+      console.warn(`[prerender] urinish ${attempt} XATO ${host}${route}: ${e.message.split('\n')[0]}`);
+      if (attempt === 3) failed += 1;
+      await page.close().catch(() => {});
+    }
     }
   }
 }

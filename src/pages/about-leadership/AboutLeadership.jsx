@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLang } from '../../shared/i18n';
@@ -309,9 +310,9 @@ export default function AboutLeadership() {
               <div className="ls-cta-inner">
                 <h2 className="ls-cta-title">Jamoamiz bilan bog'laning</h2>
                 <p className="ls-cta-sub">Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.</p>
-                <a href="/contact" className="btn btn-primary ls-cta-btn">
+                <Link to="/contact" className="btn btn-primary ls-cta-btn">
                   Bog'lanish →
-                </a>
+                </Link>
               </div>
             </div>
           </RevealOnScroll>

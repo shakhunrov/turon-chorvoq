@@ -59,10 +59,15 @@ for (const [key, { host, branch }] of Object.entries(DOMAINS)) {
     `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /editable\n\nSitemap: https://${host}/sitemap.xml\n`,
   );
   const today = new Date().toISOString().slice(0, 10);
-  const urls = PAGES.map((p) => `  <url>\n    <loc>https://${host}${p.path === '/' ? '/' : p.path}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${p.priority}</priority>\n  </url>`).join('\n');
+  const LANGS = ['uz', 'ru', 'en'];
+  const urlOf = (lg, p) => `https://${host}${lg === 'uz' ? '' : `/${lg}`}${p}`;
+  const urls = PAGES.flatMap((p) => LANGS.map((lg) => {
+    const alts = [...LANGS.map((x) => `    <xhtml:link rel="alternate" hreflang="${x}" href="${urlOf(x, p.path)}"/>`), `    <xhtml:link rel="alternate" hreflang="x-default" href="${urlOf('uz', p.path)}"/>`].join('\n');
+    return `  <url>\n    <loc>${urlOf(lg, p.path)}</loc>\n${alts}\n    <lastmod>${today}</lastmod>\n    <priority>${p.priority}</priority>\n  </url>`;
+  })).join('\n');
   fs.writeFileSync(
     path.join(dir, 'sitemap.xml'),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`,
   );
   console.log(`[seo] ${host}: ${title}`);
 }

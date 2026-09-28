@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useLang } from '../../shared/i18n';
 import { EditableList, EditableText, EditableImage, makeTx, SwapButton, swapClass } from '../../shared/editable';
@@ -223,9 +224,9 @@ export default function EditableAboutLeadership() {
             <div className="ls-cta-inner">
               <h2 className="ls-cta-title">{tx('ctaTitle', "Jamoamiz bilan bog'laning")}</h2>
               <p className="ls-cta-sub">{tx('ctaSub', 'Savollaringiz bormi? Biz har doim yordam berishga tayyormiz.', { multiline: true })}</p>
-              <a href="/contact" className="btn btn-primary ls-cta-btn">
+              <Link to={`${window.location.pathname.includes('/editable') ? '/editable' : ''}/contact`} className="btn btn-primary ls-cta-btn">
                 {tx('ctaBtn', "Bog'lanish →")}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

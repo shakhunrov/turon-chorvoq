@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { LangProvider } from '../shared/i18n';
+import { LangProvider, langFromPath, prefixOf } from '../shared/i18n';
 import { AdminAuthProvider } from '../shared/admin/adminAuth';
 import { selectIsAuth } from '../features/auth';
 import Navbar from '../widgets/navbar/Navbar';
@@ -89,7 +89,7 @@ export default function App() {
     <LangProvider>
       <AdminAuthProvider>
         <ToastHost />
-        <BrowserRouter>
+        <BrowserRouter basename={prefixOf(langFromPath()) || undefined}>
           <ScrollToTop />
           <Seo />
           <Routes>

@@ -36,13 +36,29 @@ export default function Seo() {
     const title = fill((page || home).title[l], name);
     const desc = fill((page || home).desc[l], name);
     const path = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
-    const canonical = `https://${host}${isPrivate || !page ? '/' : path}`;
+    const prefix = l === 'uz' ? '' : `/${l}`;
+    const pagePath = isPrivate || !page ? '/' : path;
+    const urlFor = (lg) => `https://${host}${lg === 'uz' ? '' : `/${lg}`}${pagePath === '/' && lg !== 'uz' ? '/' : pagePath}`;
+    const canonical = urlFor(l);
+    void prefix;
 
     document.documentElement.lang = l;
     document.title = isPrivate ? `Admin | TIS ${name}` : title;
     meta('description', desc);
     meta('robots', isPrivate ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
     upsert('link[rel="canonical"]', 'link', { rel: 'canonical', href: canonical });
+
+    // hreflang (uz — asosiy, x-default ham shu)
+    document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((n) => n.remove());
+    if (!isPrivate) {
+      [['uz', urlFor('uz')], ['ru', urlFor('ru')], ['en', urlFor('en')], ['x-default', urlFor('uz')]].forEach(([hl, href]) => {
+        const n = document.createElement('link');
+        n.setAttribute('rel', 'alternate');
+        n.setAttribute('hreflang', hl);
+        n.setAttribute('href', href);
+        document.head.appendChild(n);
+      });
+    }
 
     meta('og:type', 'website', true);
     meta('og:site_name', `Turon International School — ${name}`, true);
