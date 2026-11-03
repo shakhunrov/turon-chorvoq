@@ -308,6 +308,7 @@ const en = {
     safeguarding: "Safeguarding",
     terms: "Terms & Conditions",
   },
+  counselor: { label: "School Counselor", title: "International admission guidance", name: "Alisher Khamidov", role: "School Counselor | Turon International School", text: "Alisher supports students in exploring international higher education opportunities and planning their academic pathways, from choosing universities to preparing a strong application.", point1: "University admissions guidance", point2: "Scholarship opportunities", point3: "Application materials and requirements", email: "tis_counsellor@tisedu.uz", cta: "Contact the counselor", more: "Learn more" },
   sticky: {
     consult: "Ariza topshirish",
     admission: "Qabul bo'yicha yordam",

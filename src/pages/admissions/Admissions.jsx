@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { selectIsAuth } from '../../features/auth';
 import { EditableText, EditableList, makeTx, makeLst } from '../../shared/editable';
 import { useEditableSections } from '../../shared/api/useEditableSections';
+import Counselor from '../../shared/components/Counselor';
 import AdmissionModal from '../../features/admission-modal/AdmissionModal';
 import { getBranchInfo } from '../../shared/config/branchInfo';
 import {
@@ -253,6 +254,8 @@ export default function Admissions() {
 
         </div>
       </section>
+
+      <Counselor data={sections.counselor} onSave={(d) => handleSaveSection('counselor', d)} />
 
       {showModal && <AdmissionModal onClose={() => setShowModal(false)} />}
     </div>

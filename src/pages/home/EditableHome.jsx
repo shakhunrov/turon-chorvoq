@@ -10,6 +10,8 @@ import { useLang } from '../../shared/i18n';
 import { selectIsAuth } from '../../features/auth';
 import { getPageSections, savePageSection } from '../../shared/api/pageSections';
 import { showToast } from '../../shared/toast/toast';
+import Counselor from '../../shared/components/Counselor';
+import { useEditableSections } from '../../shared/api/useEditableSections';
 import schoolImg from '../../shared/assets/img/school.png';
 import '../home/Home.css';
 
@@ -18,6 +20,7 @@ export default function EditableHome() {
     const branchId = localStorage.getItem('globalBranchId');
     const isEditableMode = useSelector(selectIsAuth);
     const basePrefix = isEditableMode ? '/editable' : '';
+    const adm = useEditableSections('admissions', {});
 
     // Section ma'lumotlari
     const [sections, setSections] = useState({
@@ -257,6 +260,7 @@ export default function EditableHome() {
 
             <EditableWhyChoose />
             <EditableTestimonials />
+            <Counselor compact moreTo={`${basePrefix}/admissions`} data={adm.sections.counselor} onSave={(d) => adm.handleSaveSection('counselor', d)} />
             <EditableNewsSection />
 
             {/* CTA Banner — har bir matn alohida pen */}
