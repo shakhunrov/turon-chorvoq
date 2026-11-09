@@ -504,7 +504,7 @@ function EditModal({ sectionId, data, onSave, onClose }) {
                             setFormData({ ...formData, ...parsed });
                         }}
                         rows={6}
-                        placeholder="O'quvchilar - 200+ - 👨‍🎓&#10;O'qituvchilar - 30+ - 👩‍🏫 - Cambridge tajribasi&#10;Dasturlar - 15+ - 📚&#10;Universitetlar - 50+ - 🏛️"
+                        placeholder="O'quvchilar - 200+ - 👨‍🎓&#10;O'qituvchilar - 30+ - 👩‍🏫 - xalqaro tajriba&#10;Dasturlar - 15+ - 📚&#10;Universitetlar - 50+ - 🏛️"
                     />
                     <small style={{ color: '#888', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                         Format: nomi - qiymati - emoji - izoh (ixtiyoriy). Har bir qatorda bitta karochka.

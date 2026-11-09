@@ -19,14 +19,14 @@ export const PAGES = [
   {
     path: '/', priority: '1.0',
     title: {
-      uz: "Turon Xalqaro Maktabi — {N} filiali | Cambridge STEAM ta'limi",
-      ru: 'Международная школа Turon — филиал {N} | Cambridge и STEAM',
-      en: 'Turon International School — {N} campus | Cambridge STEAM education',
+      uz: "Turon Xalqaro Maktabi — {N} filiali | Britaniya tizimidagi STEAM ta'limi",
+      ru: 'Международная школа Turon — филиал {N} | британская система образования и STEAM',
+      en: 'Turon International School — {N} campus | British education system STEAM education',
     },
     desc: {
-      uz: "Turon Xalqaro Maktabi {N} filiali: inglizcha STEAM ta'limi, Cambridge dasturi, sun'iy intellekt va amaliy texnologiyalar. Qabul ochiq — hoziroq ariza qoldiring.",
-      ru: 'Международная школа Turon, филиал {N}: обучение на английском по программе Cambridge и STEAM, ИИ и практические технологии. Приём открыт — оставьте заявку.',
-      en: 'Turon International School, {N} campus: English-medium STEAM education, Cambridge curriculum, AI and applied technology. Admissions are open — apply today.',
+      uz: "Turon Xalqaro Maktabi {N} filiali: inglizcha STEAM ta'limi, Britaniya ta'lim tizimi, sun'iy intellekt va amaliy texnologiyalar. Qabul ochiq — hoziroq ariza qoldiring.",
+      ru: 'Международная школа Turon, филиал {N}: обучение на английском по программе британская система образования и STEAM, ИИ и практические технологии. Приём открыт — оставьте заявку.',
+      en: 'Turon International School, {N} campus: English-medium STEAM education, British education system, AI and applied technology. Admissions are open — apply today.',
     },
   },
   {
@@ -69,9 +69,9 @@ export const PAGES = [
     path: '/education', priority: '0.8',
     title: { uz: "Ta'lim dasturi va ko'nikmalar | TIS {N}", ru: 'Образовательная программа и навыки | TIS {N}', en: 'Curriculum and skills | TIS {N}' },
     desc: {
-      uz: "TIS {N} ta'lim dasturi: Cambridge, STEAM, sun'iy intellekt va kelajak ko'nikmalari — tanqidiy fikrlash, hamkorlik, ijodkorlik.",
-      ru: 'Образовательная программа TIS {N}: Cambridge, STEAM, ИИ и навыки будущего — критическое мышление, сотрудничество, креативность.',
-      en: 'The TIS {N} curriculum: Cambridge, STEAM, AI and future skills — critical thinking, collaboration and creativity.',
+      uz: "TIS {N} ta'lim dasturi: Britaniya ta'lim tizimi, STEAM, sun'iy intellekt va kelajak ko'nikmalari — tanqidiy fikrlash, hamkorlik, ijodkorlik.",
+      ru: 'Образовательная программа TIS {N}: британская система образования, STEAM, ИИ и навыки будущего — критическое мышление, сотрудничество, креативность.',
+      en: 'The TIS {N} curriculum: British education system, STEAM, AI and future skills — critical thinking, collaboration and creativity.',
     },
   },
   {

@@ -60,19 +60,12 @@ export default function Footer() {
     { label: t.nav.admissions, href: '/admissions' },
     { label: t.nav.contact, href: '/contact' },
   ];
-  const defaultAccred = [
-    { icon: '🎓', text: 'Cambridge Assessment International Education' },
-    { icon: '🌐', text: 'STEAM Certified' },
-    { icon: '🤖', text: 'AI-Integrated Learning' },
-  ];
-
   // Haqiqiy filial ma'lumotlari (branchInfo.js) — topilmasa i18n'dagi zaxira matnlar
   const { info: bi, save: saveInfo } = useBranchInfo();
-  const { sections, handleSaveSection } = useEditableSections('footer', { cols: { linksTitle: t.footer.links, accTitle: t.footer.accreditation, rights: t.footer.rights }, links: { items: defaultLinks }, accred: { items: defaultAccred }, brand: { name: 'TURON', sub: `International School · ${bi?.name || 'Chorvoq'}`, tagline: t.footer.tagline } });
+  const { sections, handleSaveSection } = useEditableSections('footer', { cols: { linksTitle: t.footer.links, accTitle: t.footer.accreditation, rights: t.footer.rights }, links: { items: defaultLinks }, brand: { name: 'TURON', sub: `International School · ${bi?.name || 'Chorvoq'}`, tagline: t.footer.tagline } });
   const brandSave = (patch) => handleSaveSection('brand', { ...sections.brand, ...patch });
   const cols = sections.cols || {};
   const linkItems = sections.links?.items || defaultLinks;
-  const accredItems = sections.accred?.items || defaultAccred;
   const withPrefix = (h) => (h.startsWith('/') && !h.startsWith('/editable') ? basePrefix + h : h);
   const logoFile = sections.brand?.image;
   const logoSrc = useMemo(() => {
@@ -188,24 +181,7 @@ export default function Footer() {
 
         {/* Accreditations & Lang */}
         <motion.div className="footer-col" variants={fadeUp}>
-          <h4 className="footer-col-title">
-            <EditableText value={cols.accTitle} onSave={(v) => handleSaveSection('cols', { ...cols, accTitle: v })} label="Sarlavha" />
-          </h4>
-          <div className="accreditation-badges">
-            <EditableList
-              items={accredItems}
-              onSave={(items) => handleSaveSection('accred', { items })}
-              defaultItem={{ icon: '🎓', text: '' }}
-              itemName="Akkreditatsiya"
-              renderItem={(a) => (
-                <div className="accred-badge">
-                  <span className="accred-icon">{a.icon}</span>
-                  <span>{a.text}</span>
-                </div>
-              )}
-            />
-          </div>
-          <div style={{ marginTop: 24 }}>
+          <div>
             <LanguageSwitcher />
           </div>
         </motion.div>

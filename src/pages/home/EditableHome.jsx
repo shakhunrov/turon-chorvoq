@@ -34,8 +34,6 @@ export default function EditableHome() {
             title: t.stats.title,
             students: { val: t.stats.studentsVal, label: t.stats.students, icon: '👨‍🎓' },
             teachers: { val: t.stats.teachersVal, label: t.stats.teachers, icon: '👩‍🏫', note: t.stats.teachersNote },
-            programs: { val: t.stats.programsVal, label: t.stats.programs, icon: '📚' },
-            universities: { val: t.stats.universitiesVal, label: t.stats.universities, icon: '🏛️' },
         },
         philosophy: {
             label: 'Falsafa',
@@ -44,7 +42,7 @@ export default function EditableHome() {
             tags: [
                 { name: 'STEAM', icon: '🔬' },
                 { name: 'AI', icon: '🤖' },
-                { name: 'Cambridge', icon: '🎓' },
+                { name: 'Britaniya tizimi', icon: '🎓' },
                 { name: 'Kelajak ko\'nikmalari', icon: '🚀' }
             ],
         },
@@ -137,7 +135,7 @@ export default function EditableHome() {
     // Endi umumiy ro'yxat (items) sifatida saqlaymiz — shu bilan har bir kartani alohida
     // tahrirlash/o'chirish/qo'shish/sudrash (EditableList) mumkin bo'ladi. Eski (hali `items`ga
     // o'tmagan) ma'lumot uchun quyidagi fallback bilan o'qiymiz — hech narsa yo'qolmaydi.
-    const STAT_KEYS_DEFAULT = ['students', 'teachers', 'programs', 'universities'];
+    const STAT_KEYS_DEFAULT = ['students', 'teachers'];
     const statsItems = Array.isArray(sections.stats.items)
         ? sections.stats.items
         : STAT_KEYS_DEFAULT.map((k) => sections.stats[k]).filter(Boolean);

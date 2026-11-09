@@ -74,14 +74,12 @@ export default function Home() {
       title: t.stats.title,
       students: { val: t.stats.studentsVal, label: t.stats.students, icon: '👨‍🎓' },
       teachers: { val: t.stats.teachersVal, label: t.stats.teachers, icon: '👩‍🏫', note: t.stats.teachersNote },
-      programs: { val: t.stats.programsVal, label: t.stats.programs, icon: '📚' },
-      universities: { val: t.stats.universitiesVal, label: t.stats.universities, icon: '🏛️' },
     },
     philosophy: {
       label: 'Falsafa',
       title: t.philosophy.title,
       text: t.philosophy.text,
-      tags: ['STEAM', 'AI', 'Cambridge', "Kelajak ko'nikmalari"],
+      tags: ['STEAM', 'AI', 'Britaniya tizimi', "Kelajak ko'nikmalari"],
     },
     cta: {
       title: t.cta.title,
