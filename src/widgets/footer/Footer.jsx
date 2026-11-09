@@ -215,11 +215,6 @@ export default function Footer() {
       <div className="footer-bottom">
         <div className="container footer-bottom-inner">
           <EditableText value={cols.rights} onSave={(v) => handleSaveSection('cols', { ...cols, rights: v })} label="Matn" />
-          <div className="footer-policy-links">
-            <Link to="/policies#privacy">{t.footer.policies}</Link>
-            <Link to="/policies#safeguarding">{t.footer.safeguarding}</Link>
-            <Link to="/policies#terms">{t.footer.terms}</Link>
-          </div>
         </div>
       </div>
     </footer>
